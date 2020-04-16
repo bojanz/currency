@@ -4,6 +4,7 @@
 package currency
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/cockroachdb/apd"
@@ -200,4 +201,38 @@ func (a Amount) IsNegative() bool {
 func (a Amount) IsZero() bool {
 	zero := apd.New(0, 0)
 	return a.number.Cmp(zero) == 0
+}
+
+// MarshalJSON implements the json.Marshaler interface.
+func (a Amount) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&struct {
+		Number       string `json:"number"`
+		CurrencyCode string `json:"currency"`
+	}{
+		Number:       a.Number(),
+		CurrencyCode: a.CurrencyCode(),
+	})
+}
+
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (a *Amount) UnmarshalJSON(data []byte) error {
+	aux := struct {
+		Number       string `json:"number"`
+		CurrencyCode string `json:"currency"`
+	}{}
+	err := json.Unmarshal(data, &aux)
+	if err != nil {
+		return err
+	}
+	number, _, err := apd.NewFromString(aux.Number)
+	if err != nil {
+		return InvalidNumberError{"Amount.UnmarshalJSON", aux.Number}
+	}
+	if !IsValid(aux.CurrencyCode) {
+		return InvalidCurrencyCodeError{"Amount.UnmarshalJSON", aux.CurrencyCode}
+	}
+	a.number = number
+	a.currencyCode = aux.CurrencyCode
+
+	return nil
 }

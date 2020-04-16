@@ -4,6 +4,7 @@
 package currency_test
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/bojanz/currency"
@@ -396,5 +397,59 @@ func TestAmount_Checks(t *testing.T) {
 				t.Errorf("zero: got %v, want %v", gotZero, tt.wantZero)
 			}
 		})
+	}
+}
+
+func TestAmount_MarshalJSON(t *testing.T) {
+	a, _ := currency.NewAmount("3.45", "USD")
+	d, err := json.Marshal(a)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+	got := string(d)
+	want := `{"number":"3.45","currency":"USD"}`
+	if got != want {
+		t.Errorf("got %v, want %v", got, want)
+	}
+}
+
+func TestAmount_UnmarshalJSON(t *testing.T) {
+	d := []byte(`{"number":"INVALID","currency":"USD"}`)
+	unmarshalled := &currency.Amount{}
+	err := json.Unmarshal(d, unmarshalled)
+	if e, ok := err.(currency.InvalidNumberError); ok {
+		if e.Op != "Amount.UnmarshalJSON" {
+			t.Errorf("got %v, want Amount.UnmarshalJSON", e.Op)
+		}
+		if e.Number != "INVALID" {
+			t.Errorf("got %v, want INVALID", e.Number)
+		}
+	} else {
+		t.Errorf("got %T, want currency.InvalidNumberError", err)
+	}
+
+	d = []byte(`{"number":"3.45","currency":"usd"}`)
+	err = json.Unmarshal(d, unmarshalled)
+	if e, ok := err.(currency.InvalidCurrencyCodeError); ok {
+		if e.Op != "Amount.UnmarshalJSON" {
+			t.Errorf("got %v, want Amount.UnmarshalJSON", e.Op)
+		}
+		if e.CurrencyCode != "usd" {
+			t.Errorf("got %v, want usd", e.CurrencyCode)
+		}
+	} else {
+		t.Errorf("got %T, want currency.InvalidCurrencyCodeError", err)
+	}
+
+	d = []byte(`{"number":"3.45","currency":"USD"}`)
+	err = json.Unmarshal(d, unmarshalled)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+	if unmarshalled.Number() != "3.45" {
+		t.Errorf("got %v, want 3.45", unmarshalled.Number())
+	}
+	if unmarshalled.CurrencyCode() != "USD" {
+		t.Errorf("got %v, want USD", unmarshalled.CurrencyCode())
 	}
 }
