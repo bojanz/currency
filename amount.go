@@ -17,7 +17,7 @@ type InvalidNumberError struct {
 }
 
 func (e InvalidNumberError) Error() string {
-	return fmt.Sprintf("currency/%v: invalid number %v", e.Op, e.Number)
+	return fmt.Sprintf("currency/%v: invalid number %q", e.Op, e.Number)
 }
 
 // InvalidCurrencyCodeError is returned when a currency code is invalid or unrecognized.
@@ -27,7 +27,7 @@ type InvalidCurrencyCodeError struct {
 }
 
 func (e InvalidCurrencyCodeError) Error() string {
-	return fmt.Sprintf("currency/%v: invalid currency code %v", e.Op, e.CurrencyCode)
+	return fmt.Sprintf("currency/%v: invalid currency code %q", e.Op, e.CurrencyCode)
 }
 
 // MismatchError is returned when two amounts have mismatched currency codes.
@@ -38,7 +38,7 @@ type MismatchError struct {
 }
 
 func (e MismatchError) Error() string {
-	return fmt.Sprintf("currency/%v: %v and %v have mismatched currency codes", e.Op, e.A, e.B)
+	return fmt.Sprintf("currency/%v: %q and %q have mismatched currency codes", e.Op, e.A, e.B)
 }
 
 // Amount stores a decimal number with its currency code.
@@ -73,7 +73,7 @@ func (a Amount) CurrencyCode() string {
 	return a.currencyCode
 }
 
-// String returns a string representation of a.
+// String returns the string representation of a.
 func (a Amount) String() string {
 	return a.Number() + " " + a.CurrencyCode()
 }
