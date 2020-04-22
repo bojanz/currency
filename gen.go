@@ -49,6 +49,10 @@ var currencyCodes = []string{
 var currencies = map[string]currencyInfo{
 	{{ export .CurrencyInfo 3 "\t" }}
 }
+
+var parentLocales = map[string]string{
+	{{ export .ParentLocales 3 "\t" }}
+}
 `
 
 type currencyInfo struct {
@@ -87,6 +91,11 @@ func main() {
 		os.RemoveAll(assetDir)
 		log.Fatal(err)
 	}
+	parentLocales, err := generateParentLocales(assetDir)
+	if err != nil {
+		os.RemoveAll(assetDir)
+		log.Fatal(err)
+	}
 
 	var currencyCodes []string
 	for currencyCode := range currencies {
@@ -99,14 +108,7 @@ func main() {
 	}
 	var otherCurrencies []string
 	for _, currencyCode := range currencyCodes {
-		isG10 := false
-		for _, g10CurrencyCode := range g10Currencies {
-			if currencyCode == g10CurrencyCode {
-				isG10 = true
-				break
-			}
-		}
-		if !isG10 {
+		if !contains(g10Currencies, currencyCode) {
 			otherCurrencies = append(otherCurrencies, currencyCode)
 		}
 	}
@@ -132,11 +134,13 @@ func main() {
 		G10Currencies   []string
 		OtherCurrencies []string
 		CurrencyInfo    map[string]*currencyInfo
+		ParentLocales   map[string]string
 	}{
 		CLDRVersion:     CLDRVersion,
 		G10Currencies:   g10Currencies,
 		OtherCurrencies: otherCurrencies,
 		CurrencyInfo:    currencies,
+		ParentLocales:   parentLocales,
 	})
 
 	log.Println("Done.")
@@ -242,7 +246,7 @@ func fetchURL(url string) ([]byte, error) {
 
 // replaceDigits replaces each currency's digits with data from CLDR.
 //
-// CLDR's data reflects real life usage more closely, specifying 0 digits
+// CLDR data reflects real life usage more closely, specifying 0 digits
 // (instead of 2 in ISO data) for ~14 currencies, such as ALL and RSD.
 func replaceDigits(currencies map[string]*currencyInfo, dir string) error {
 	data, err := ioutil.ReadFile(dir + "/cldr-core/supplemental/currencyData.json")
@@ -268,6 +272,93 @@ func replaceDigits(currencies map[string]*currencyInfo, dir string) error {
 	}
 
 	return nil
+}
+
+// generateParentLocales generates parent locales from CLDR data.
+//
+// Ensures ignored locales are skipped.
+// Replaces "root" with "en", since this package treats them as equivalent.
+func generateParentLocales(dir string) (map[string]string, error) {
+	data, err := ioutil.ReadFile(dir + "/cldr-core/supplemental/parentLocales.json")
+	if err != nil {
+		return nil, fmt.Errorf("generateParentLocales: %w", err)
+	}
+	aux := struct {
+		Supplemental struct {
+			ParentLocales struct {
+				ParentLocale map[string]string
+			}
+		}
+	}{}
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return nil, fmt.Errorf("generateParentLocales: %w", err)
+	}
+
+	parentLocales := make(map[string]string)
+	for locale, parent := range aux.Supplemental.ParentLocales.ParentLocale {
+		// Avoid exposing the concept of "root" to users.
+		if parent == "root" {
+			parent = "en"
+		}
+		if !shouldIgnoreLocale(locale) {
+			parentLocales[locale] = parent
+		}
+	}
+	// Dsrt and Shaw are made up scripts.
+	delete(parentLocales, "en-Dsrt")
+	delete(parentLocales, "en-Shaw")
+
+	return parentLocales, nil
+}
+
+func shouldIgnoreLocale(locale string) bool {
+	ignoredLocales := []string{
+		// Esperanto, Interlingua, Volapuk are made up languages.
+		"eo", "ia", "vo",
+		// Church Slavic, Manx, Prussian are historical languages.
+		"cu", "gv", "prg",
+		// Valencian differs from its parent only by a single character (è/é).
+		"ca-ES-VALENCIA",
+		// Africa secondary languages.
+		"agq", "ak", "am", "asa", "bas", "bem", "bez", "bm", "cgg", "dav",
+		"dje", "dua", "dyo", "ebu", "ee", "ewo", "ff", "ff-Latn", "guz",
+		"ha", "ig", "jgo", "jmc", "kab", "kam", "kea", "kde", "ki", "kkj",
+		"kln", "khq", "ksb", "ksf", "lag", "luo", "luy", "lu", "lg", "ln",
+		"mas", "mer", "mua", "mgo", "mgh", "mfe", "naq", "nd", "nmg", "nnh",
+		"nus", "nyn", "om", "pcm", "rof", "rwk", "saq", "seh", "ses", "sbp",
+		"sg", "shi", "sn", "teo", "ti", "tzm", "twq", "vai", "vai-Latn", "vun",
+		"wo", "xog", "xh", "zgh", "yav", "yo", "zu",
+		// Europe secondary languages.
+		"br", "dsb", "fo", "fur", "fy", "hsb", "ksh", "kw", "nds", "or",
+		"rm", "se", "smn", "wae",
+		// India secondary languages.
+		"as", "brx", "gu", "kok", "ks", "mai", "ml", "mni", "mr", "sat",
+		"sd", "te",
+		// Other infrequently used locales.
+		"ceb", "ccp", "chr", "ckb", "haw", "ii", "jv", "kl", "kn", "lkt",
+		"lrc", "mi", "mzn", "os", "qu", "row", "sah", "su", "tt", "ug", "yi",
+		// Special "grouping" locales.
+		"root", "en-US-POSIX",
+	}
+	localeParts := strings.Split(locale, "-")
+	ignore := false
+	for _, ignoredLocale := range ignoredLocales {
+		if ignoredLocale == locale || ignoredLocale == localeParts[0] {
+			ignore = true
+			break
+		}
+	}
+
+	return ignore
+}
+
+func contains(a []string, x string) bool {
+	for _, v := range a {
+		if v == x {
+			return true
+		}
+	}
+	return false
 }
 
 func parseDigits(n string) byte {

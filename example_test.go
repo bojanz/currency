@@ -90,6 +90,36 @@ func ExampleAmount_RoundTo() {
 	// 12 USD
 }
 
+func ExampleNewLocale() {
+	firstLocale := currency.NewLocale("en-US")
+	fmt.Println(firstLocale)
+	fmt.Println(firstLocale.Language, firstLocale.Region)
+
+	// Locale IDs are normalized.
+	secondLocale := currency.NewLocale("sr_rs_latn")
+	fmt.Println(secondLocale)
+	fmt.Println(secondLocale.Language, secondLocale.Script, secondLocale.Region)
+	// Output: en-US
+	// en US
+	// sr-Latn-RS
+	// sr Latn RS
+}
+
+func ExampleLocale_GetParent() {
+	locale := currency.NewLocale("sr-Cyrl-RS")
+	for {
+		fmt.Println(locale)
+		locale = locale.GetParent()
+		if locale.IsEmpty() {
+			break
+		}
+	}
+	// Output: sr-Cyrl-RS
+	// sr-Cyrl
+	// sr
+	// en
+}
+
 func ExampleGetNumericCode() {
 	numericCode, ok := currency.GetNumericCode("USD")
 	fmt.Println(numericCode, ok)
