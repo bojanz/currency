@@ -165,17 +165,18 @@ func fetchCLDR(dir string) (string, error) {
 		}
 	}
 
-	cmd := exec.Command("git", "tag", "--sort=-committerdate")
-	cmd.Dir = dir + "/cldr-core"
-	cmd.Stderr = os.Stderr
-	out, err := cmd.Output()
+	data, err := ioutil.ReadFile(dir + "/cldr-core/package.json")
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("fetchCLDR: %w", err)
 	}
-	lines := strings.Split(string(out), "\n")
-	version := lines[0]
+	aux := struct {
+		Version string
+	}{}
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return "", fmt.Errorf("fetchCLDR: %w", err)
+	}
 
-	return version, nil
+	return aux.Version, nil
 }
 
 // fetchISO fetches currency info from ISO.

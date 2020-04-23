@@ -4,7 +4,7 @@
 package currency
 
 // CLDRVersion is the CLDR version from which the data is derived.
-const CLDRVersion = "36.0.0"
+const CLDRVersion = "37.0.0"
 
 type currencyInfo struct {
 	numericCode string
