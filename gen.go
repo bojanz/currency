@@ -20,6 +20,8 @@ import (
 	"strings"
 	"text/template"
 	"time"
+
+	"github.com/bojanz/currency"
 )
 
 const assetDir = "raw"
@@ -37,6 +39,11 @@ type currencyInfo struct {
 	digits      byte
 }
 
+type symbolInfo struct {
+	symbol  string
+	locales []string
+}
+
 // Defined separately to ensure consistent ordering (G10, then others).
 var currencyCodes = []string{
 	// G10 currencies https://en.wikipedia.org/wiki/G10_currencies.
@@ -48,6 +55,10 @@ var currencyCodes = []string{
 
 var currencies = map[string]currencyInfo{
 	{{ export .CurrencyInfo 3 "\t" }}
+}
+
+var currencySymbols = map[string][]symbolInfo{
+	{{ export .SymbolInfo 1 "\t" }}
 }
 
 var parentLocales = map[string]string{
@@ -62,6 +73,29 @@ type currencyInfo struct {
 
 func (c currencyInfo) GoString() string {
 	return fmt.Sprintf("{%q, %d}", c.numericCode, int(c.digits))
+}
+
+type symbolInfo struct {
+	symbol  string
+	locales []string
+}
+
+func (s symbolInfo) GoString() string {
+	return fmt.Sprintf("{%q, %#v}", s.symbol, s.locales)
+}
+
+type symbolInfoSlice []*symbolInfo
+
+func (ss symbolInfoSlice) GoString() string {
+	b := strings.Builder{}
+	b.WriteString("{\n")
+	for _, s := range ss {
+		b.WriteString("\t\t")
+		fmt.Fprintf(&b, "%#v,\n", s)
+	}
+	b.WriteString("\t}")
+
+	return b.String()
 }
 
 func main() {
@@ -87,6 +121,11 @@ func main() {
 
 	log.Println("Processing...")
 	err = replaceDigits(currencies, assetDir)
+	if err != nil {
+		os.RemoveAll(assetDir)
+		log.Fatal(err)
+	}
+	symbols, err := generateSymbols(currencies, assetDir)
 	if err != nil {
 		os.RemoveAll(assetDir)
 		log.Fatal(err)
@@ -134,12 +173,14 @@ func main() {
 		G10Currencies   []string
 		OtherCurrencies []string
 		CurrencyInfo    map[string]*currencyInfo
+		SymbolInfo      map[string]symbolInfoSlice
 		ParentLocales   map[string]string
 	}{
 		CLDRVersion:     CLDRVersion,
 		G10Currencies:   g10Currencies,
 		OtherCurrencies: otherCurrencies,
 		CurrencyInfo:    currencies,
+		SymbolInfo:      symbols,
 		ParentLocales:   parentLocales,
 	})
 
@@ -273,6 +314,151 @@ func replaceDigits(currencies map[string]*currencyInfo, dir string) error {
 	}
 
 	return nil
+}
+
+// generateSymbols generates currency symbols for all locales.
+//
+// Symbols are grouped by locale, and deduplicated by parent.
+func generateSymbols(currencies map[string]*currencyInfo, dir string) (map[string]symbolInfoSlice, error) {
+	symbols := make(map[string]map[string][]string)
+	files, err := ioutil.ReadDir(dir + "/cldr-numbers-full/main")
+	if err != nil {
+		return nil, fmt.Errorf("generateSymbols: %w", err)
+	}
+	for _, file := range files {
+		locale := file.Name()
+		if shouldIgnoreLocale(locale) {
+			continue
+		}
+		localSymbols, err := readSymbols(currencies, dir, locale)
+		if err != nil {
+			return nil, fmt.Errorf("generateSymbols: %w", err)
+		}
+
+		for currencyCode, symbol := range localSymbols {
+			if _, ok := symbols[currencyCode]; !ok {
+				symbols[currencyCode] = make(map[string][]string)
+			}
+			symbols[currencyCode][symbol] = append(symbols[currencyCode][symbol], locale)
+		}
+	}
+
+	for currencyCode, localSymbols := range symbols {
+		if _, ok := localSymbols[currencyCode]; !ok {
+			continue
+		}
+		// currency.GetSymbol always returns the currency code when no
+		// symbol is available, so there is no need to store a currency
+		// whose only symbol is the currency code.
+		if len(localSymbols) == 1 {
+			delete(symbols, currencyCode)
+			continue
+		}
+		// Diverge from CLDR by preventing child locales from using the
+		// currency code as a symbol when the "en" locale has a real one.
+		// E.g. the "hr", "hu", "ro" locales should use $, £, € instead
+		// of USD, GBP, EUR, just like the "en" locale does.
+		// This noticeably decreases the size of generated data.
+		for symbol, locales := range localSymbols {
+			if contains(locales, "en") && currencyCode != symbol {
+				symbols[currencyCode][symbol] = append(symbols[currencyCode][symbol], localSymbols[currencyCode]...)
+				delete(symbols[currencyCode], currencyCode)
+				break
+			}
+		}
+		// The logic above results in "en-AU" using the same $ symbol for AUD and USD.
+		// Related: https://unicode-org.atlassian.net/projects/CLDR/issues/CLDR-10710
+		if currencyCode == "USD" {
+			// Move en-AU from symbols["USD"]["$"] to symbols["USD"]["US$"].
+			li := 0
+			for i, locale := range symbols["USD"]["$"] {
+				if locale == "en-AU" {
+					li = i
+					break
+				}
+			}
+			symbols["USD"]["$"] = append(symbols["USD"]["$"][:li], symbols["USD"]["$"][li+1:]...)
+			symbols["USD"]["US$"] = append(symbols["USD"]["US$"], "en-AU")
+		}
+	}
+
+	// Child locales don't need to be listed if the parent is present.
+	for currencyCode, localSymbols := range symbols {
+		for symbol, locales := range localSymbols {
+			var deleteLocales []string
+			for _, localeID := range locales {
+				locale := currency.NewLocale(localeID)
+				parent := locale.GetParent()
+				if contains(locales, parent.String()) {
+					deleteLocales = append(deleteLocales, localeID)
+				}
+			}
+			symbols[currencyCode][symbol] = []string{}
+			for _, localeID := range locales {
+				if !contains(deleteLocales, localeID) {
+					symbols[currencyCode][symbol] = append(symbols[currencyCode][symbol], localeID)
+				}
+			}
+			sort.Strings(symbols[currencyCode][symbol])
+		}
+	}
+
+	// Convert to the final data structure.
+	currencySymbols := make(map[string]symbolInfoSlice)
+	for currencyCode, localSymbols := range symbols {
+		// Always put the "en" symbol first, then the other sorted symbols.
+		for symbol, locales := range localSymbols {
+			if contains(locales, "en") {
+				currencySymbols[currencyCode] = append(currencySymbols[currencyCode], &symbolInfo{symbol, locales})
+				break
+			}
+		}
+		var symbolKeys []string
+		for symbol := range localSymbols {
+			symbolKeys = append(symbolKeys, symbol)
+		}
+		sort.Strings(symbolKeys)
+		for _, symbol := range symbolKeys {
+			locales := symbols[currencyCode][symbol]
+			if !contains(locales, "en") {
+				currencySymbols[currencyCode] = append(currencySymbols[currencyCode], &symbolInfo{symbol, locales})
+			}
+		}
+	}
+
+	return currencySymbols, nil
+}
+
+// readSymbols reads the given locale's currency symbols from CLDR data.
+//
+// Discards symbols belonging to inactive currencies.
+func readSymbols(currencies map[string]*currencyInfo, dir string, locale string) (map[string]string, error) {
+	filename := fmt.Sprintf("%v/cldr-numbers-full/main/%v/currencies.json", dir, locale)
+	data, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return nil, fmt.Errorf("readSymbols: %w", err)
+	}
+
+	type cldrData struct {
+		Numbers struct {
+			Currencies map[string]map[string]string
+		}
+	}
+	aux := struct {
+		Main map[string]cldrData
+	}{}
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return nil, fmt.Errorf("readSymbols: %w", err)
+	}
+
+	symbols := make(map[string]string)
+	for currencyCode, data := range aux.Main[locale].Numbers.Currencies {
+		if _, ok := currencies[currencyCode]; ok {
+			symbols[currencyCode] = data["symbol"]
+		}
+	}
+
+	return symbols, nil
 }
 
 // generateParentLocales generates parent locales from CLDR data.

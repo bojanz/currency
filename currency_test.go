@@ -79,3 +79,33 @@ func TestGetDigits(t *testing.T) {
 		t.Errorf("got %v, want 0", digits)
 	}
 }
+
+func TestGetSymbol(t *testing.T) {
+	tests := []struct {
+		currencyCode string
+		locale       currency.Locale
+		wantSymbol   string
+		wantOk       bool
+	}{
+		{"XXX", currency.NewLocale("en"), "XXX", false},
+		{"usd", currency.NewLocale("en"), "usd", false},
+		{"CHF", currency.NewLocale("en"), "CHF", true},
+		{"USD", currency.NewLocale("en"), "$", true},
+		{"USD", currency.NewLocale("en-US"), "$", true},
+		{"USD", currency.NewLocale("en-AU"), "US$", true},
+		{"USD", currency.NewLocale("es"), "US$", true},
+		{"USD", currency.NewLocale("es-ES"), "US$", true},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			gotSymbol, gotOk := currency.GetSymbol(tt.currencyCode, tt.locale)
+			if gotSymbol != tt.wantSymbol {
+				t.Errorf("got %v, want %v", gotSymbol, tt.wantSymbol)
+			}
+			if gotOk != tt.wantOk {
+				t.Errorf("got %v, want %v", gotOk, tt.wantOk)
+			}
+		})
+	}
+}

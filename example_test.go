@@ -141,3 +141,15 @@ func ExampleGetDigits() {
 	// Output: 2 true
 	// 0 false
 }
+
+func ExampleGetSymbol() {
+	locale := currency.NewLocale("en")
+	symbol, ok := currency.GetSymbol("USD", locale)
+	fmt.Println(symbol, ok)
+
+	// Non-existent currency code.
+	symbol, ok = currency.GetSymbol("XXX", locale)
+	fmt.Println(symbol, ok)
+	// Output: $ true
+	// XXX false
+}

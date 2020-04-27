@@ -11,6 +11,11 @@ type currencyInfo struct {
 	digits      byte
 }
 
+type symbolInfo struct {
+	symbol  string
+	locales []string
+}
+
 // Defined separately to ensure consistent ordering (G10, then others).
 var currencyCodes = []string{
 	// G10 currencies https://en.wikipedia.org/wiki/G10_currencies.
@@ -88,6 +93,679 @@ var currencies = map[string]currencyInfo{
 	"XAF": {"950", 0}, "XCD": {"951", 2}, "XOF": {"952", 0},
 	"XPF": {"953", 0}, "YER": {"886", 0}, "ZAR": {"710", 2},
 	"ZMW": {"967", 2}, "ZWL": {"932", 2},
+}
+
+var currencySymbols = map[string][]symbolInfo{
+	"AED": {
+		{"AED", []string{"en"}},
+		{"د.إ.\u200f", []string{"ar"}},
+	},
+	"AFN": {
+		{"AFN", []string{"en"}},
+		{"؋", []string{"fa", "ps", "uz-Arab"}},
+	},
+	"ALL": {
+		{"ALL", []string{"en"}},
+		{"Lekë", []string{"sq"}},
+	},
+	"AMD": {
+		{"AMD", []string{"en"}},
+		{"֏", []string{"hy"}},
+	},
+	"ANG": {
+		{"ANG", []string{"en"}},
+		{"NAf", []string{"my"}},
+		{"NAf.", []string{"en-SX", "nl-CW", "nl-SX"}},
+	},
+	"AOA": {
+		{"AOA", []string{"en"}},
+		{"Kz", []string{"pt-AO"}},
+	},
+	"ARS": {
+		{"ARS", []string{"en", "fr-CA"}},
+		{"$", []string{"es-AR"}},
+		{"$AR", []string{"fr"}},
+	},
+	"AUD": {
+		{"A$", []string{"en"}},
+		{"$", []string{"en-AU", "en-CC", "en-CX", "en-KI", "en-NF", "en-NR", "en-TV"}},
+		{"$AU", []string{"fr"}},
+		{"$\u00a0AU", []string{"fr-CA"}},
+		{"AU$", []string{"ar", "ca", "cs", "da", "de", "dz", "et", "id", "ko", "lb", "lv", "nl", "pt", "th", "tr", "vi", "yue", "yue-Hans", "zh", "zh-Hant"}},
+		{"AUD$", []string{"to"}},
+	},
+	"AWG": {
+		{"AWG", []string{"en"}},
+		{"Afl", []string{"my"}},
+		{"Afl.", []string{"nl-AW"}},
+	},
+	"AZN": {
+		{"AZN", []string{"en"}},
+		{"₼", []string{"az", "az-Cyrl"}},
+	},
+	"BAM": {
+		{"BAM", []string{"en"}},
+		{"KM", []string{"bs", "hr-BA", "sr-Latn"}},
+		{"КМ", []string{"bs-Cyrl", "sr"}},
+	},
+	"BBD": {
+		{"BBD", []string{"en"}},
+		{"$", []string{"en-BB"}},
+		{"Bds$", []string{"sv"}},
+		{"DBB", []string{"so"}},
+	},
+	"BDT": {
+		{"BDT", []string{"en"}},
+		{"৳", []string{"bn"}},
+	},
+	"BGN": {
+		{"BGN", []string{"en"}},
+		{"лв.", []string{"bg"}},
+	},
+	"BHD": {
+		{"BHD", []string{"en"}},
+		{"د.ب.\u200f", []string{"ar"}},
+	},
+	"BIF": {
+		{"BIF", []string{"en"}},
+		{"FBu", []string{"en-BI", "fr-BI", "rn"}},
+	},
+	"BMD": {
+		{"BMD", []string{"en", "fr-CA"}},
+		{"$", []string{"en-BM"}},
+		{"$BM", []string{"fr"}},
+		{"BM$", []string{"sv"}},
+	},
+	"BND": {
+		{"BND", []string{"en", "fr-CA"}},
+		{"$", []string{"ms-BN"}},
+		{"$BN", []string{"fr"}},
+	},
+	"BOB": {
+		{"BOB", []string{"en"}},
+		{"Bs", []string{"es-BO"}},
+	},
+	"BRL": {
+		{"R$", []string{"en"}},
+		{"BR$", []string{"sv"}},
+	},
+	"BSD": {
+		{"BSD", []string{"en"}},
+		{"$", []string{"en-BS"}},
+		{"BS$", []string{"sv"}},
+	},
+	"BTN": {
+		{"BTN", []string{"en"}},
+		{"Nu.", []string{"dz"}},
+	},
+	"BWP": {
+		{"BWP", []string{"en"}},
+		{"P", []string{"en-BW"}},
+	},
+	"BYN": {
+		{"BYN", []string{"en"}},
+		{"Br", []string{"be", "ru-BY"}},
+	},
+	"BZD": {
+		{"BZD", []string{"en", "fr-CA"}},
+		{"$", []string{"en-BZ", "es-BZ"}},
+		{"$BZ", []string{"fr"}},
+		{"BZ$", []string{"sv"}},
+	},
+	"CAD": {
+		{"CA$", []string{"en"}},
+		{"$", []string{"en-CA", "fr-CA"}},
+		{"$CA", []string{"fa", "fr"}},
+		{"C$", []string{"nl"}},
+	},
+	"CDF": {
+		{"CDF", []string{"en"}},
+		{"FC", []string{"fr-CD", "sw-CD"}},
+	},
+	"CLP": {
+		{"CLP", []string{"en", "fr-CA"}},
+		{"$", []string{"es-CL"}},
+		{"$CL", []string{"fr"}},
+	},
+	"CNY": {
+		{"CN¥", []string{"bo-IN", "en", "zh-Hans-HK", "zh-Hans-MO", "zh-Hans-SG"}},
+		{"¥", []string{"bo", "zh"}},
+		{"¥CN", []string{"fa"}},
+		{"\u200eCN¥\u200e", []string{"he"}},
+		{"元", []string{"ja"}},
+		{"￥", []string{"yue-Hans"}},
+	},
+	"COP": {
+		{"COP", []string{"en", "fr-CA"}},
+		{"$", []string{"es-CO"}},
+		{"$CO", []string{"fr"}},
+	},
+	"CRC": {
+		{"CRC", []string{"en"}},
+		{"₡", []string{"es-CR"}},
+	},
+	"CUP": {
+		{"CUP", []string{"en"}},
+		{"$", []string{"es-CU"}},
+	},
+	"CVE": {
+		{"CVE", []string{"en"}},
+		{"\u200b", []string{"pt-CV"}},
+	},
+	"CZK": {
+		{"CZK", []string{"en"}},
+		{"Kč", []string{"cs"}},
+		{"Кч", []string{"bs-Cyrl"}},
+	},
+	"DJF": {
+		{"DJF", []string{"en"}},
+		{"Fdj", []string{"ar-DJ", "fr-DJ", "so-DJ"}},
+	},
+	"DKK": {
+		{"DKK", []string{"en"}},
+		{"Dkr", []string{"sv"}},
+		{"kr.", []string{"da", "en-DK"}},
+	},
+	"DOP": {
+		{"DOP", []string{"en"}},
+		{"RD$", []string{"es-DO", "sv"}},
+	},
+	"DZD": {
+		{"DZD", []string{"en"}},
+		{"DA", []string{"fr-DZ"}},
+		{"د.ج.\u200f", []string{"ar"}},
+	},
+	"EGP": {
+		{"EGP", []string{"en"}},
+		{"EG£", []string{"sv"}},
+		{"ج.م.\u200f", []string{"ar"}},
+	},
+	"ERN": {
+		{"ERN", []string{"en"}},
+		{"Nfk", []string{"ar-ER", "en-ER"}},
+	},
+	"ETB": {
+		{"ETB", []string{"en"}},
+		{"Br", []string{"so-ET"}},
+	},
+	"EUR": {
+		{"€", []string{"en"}},
+	},
+	"FJD": {
+		{"FJD", []string{"en", "fr-CA"}},
+		{"$", []string{"en-FJ"}},
+		{"$FJ", []string{"fr"}},
+		{"FJ$", []string{"nl"}},
+	},
+	"FKP": {
+		{"FKP", []string{"en", "fr-CA"}},
+		{"£", []string{"en-FK"}},
+		{"£FK", []string{"fr"}},
+	},
+	"GBP": {
+		{"£", []string{"en", "fr-CA"}},
+		{"GB£", []string{"ar-SS", "en-FK", "en-GI", "en-MT", "en-SH", "en-SS"}},
+		{"UK£", []string{"ar"}},
+		{"£GB", []string{"fr"}},
+	},
+	"GEL": {
+		{"GEL", []string{"en"}},
+		{"₾", []string{"ka"}},
+	},
+	"GHS": {
+		{"GHS", []string{"en"}},
+		{"GH₵", []string{"en-GH"}},
+	},
+	"GIP": {
+		{"GIP", []string{"en", "fr-CA"}},
+		{"£", []string{"en-GI"}},
+		{"£GI", []string{"fr"}},
+	},
+	"GMD": {
+		{"GMD", []string{"en"}},
+		{"D", []string{"en-GM"}},
+	},
+	"GNF": {
+		{"GNF", []string{"en"}},
+		{"FG", []string{"fr-GN"}},
+	},
+	"GTQ": {
+		{"GTQ", []string{"en"}},
+		{"Q", []string{"es-GT"}},
+	},
+	"GYD": {
+		{"GYD", []string{"en"}},
+		{"$", []string{"en-GY"}},
+	},
+	"HKD": {
+		{"HK$", []string{"en"}},
+		{"$HK", []string{"fa"}},
+		{"$\u00a0HK", []string{"fr-CA"}},
+	},
+	"HNL": {
+		{"HNL", []string{"en"}},
+		{"L", []string{"es-HN"}},
+	},
+	"HRK": {
+		{"HRK", []string{"en"}},
+		{"kn", []string{"bs"}},
+	},
+	"HTG": {
+		{"HTG", []string{"en"}},
+		{"G", []string{"fr-HT", "my"}},
+	},
+	"HUF": {
+		{"HUF", []string{"en"}},
+		{"Ft", []string{"hu"}},
+	},
+	"IDR": {
+		{"IDR", []string{"en"}},
+		{"Rp", []string{"id"}},
+	},
+	"ILS": {
+		{"₪", []string{"en"}},
+		{"NIS", []string{"sk"}},
+	},
+	"INR": {
+		{"₹", []string{"en"}},
+		{"Rs", []string{"id"}},
+	},
+	"IQD": {
+		{"IQD", []string{"en"}},
+		{"د.ع.\u200f", []string{"ar"}},
+	},
+	"IRR": {
+		{"IRR", []string{"en"}},
+		{"ر.إ.", []string{"ar"}},
+		{"ریال", []string{"fa"}},
+	},
+	"ISK": {
+		{"ISK", []string{"en"}},
+		{"Ikr", []string{"sv"}},
+	},
+	"JMD": {
+		{"JMD", []string{"en"}},
+		{"$", []string{"en-JM"}},
+		{"JM$", []string{"sv"}},
+	},
+	"JOD": {
+		{"JOD", []string{"en"}},
+		{"د.أ.\u200f", []string{"ar"}},
+	},
+	"JPY": {
+		{"¥", []string{"en", "en-AU"}},
+		{"JP¥", []string{"af", "ar", "az", "az-Cyrl", "bn", "bo", "ce", "cs", "cy", "da", "dz", "el", "en-001", "eu", "gd", "gl", "hi", "hy", "id", "is", "kk", "km", "ko", "ku", "ky", "lo", "mg", "mn", "ms", "mt", "my", "ne", "nl", "pa", "pa-Arab", "ps", "pt", "rn", "rw", "si", "so", "sq", "sw", "tg", "tk", "to", "ur", "uz", "uz-Arab", "uz-Cyrl", "vi", "yue-Hans", "zh"}},
+		{"￥", []string{"ja"}},
+	},
+	"KES": {
+		{"KES", []string{"en"}},
+		{"Ksh", []string{"en-KE", "so-KE", "sw"}},
+	},
+	"KGS": {
+		{"KGS", []string{"en"}},
+		{"сом", []string{"ky", "ru-KG"}},
+	},
+	"KHR": {
+		{"KHR", []string{"en"}},
+		{"៛", []string{"km"}},
+	},
+	"KMF": {
+		{"KMF", []string{"en"}},
+		{"CF", []string{"ar-KM", "fr-KM"}},
+	},
+	"KRW": {
+		{"₩", []string{"en", "zh-Hant-HK"}},
+		{"KR₩", []string{"dz"}},
+		{"￦", []string{"yue", "yue-Hans", "zh", "zh-Hant"}},
+	},
+	"KWD": {
+		{"KWD", []string{"en"}},
+		{"د.ك.\u200f", []string{"ar"}},
+	},
+	"KYD": {
+		{"KYD", []string{"en"}},
+		{"$", []string{"en-KY"}},
+	},
+	"KZT": {
+		{"KZT", []string{"en"}},
+		{"₸", []string{"kk", "ru-KZ"}},
+	},
+	"LAK": {
+		{"LAK", []string{"en"}},
+		{"₭", []string{"lo"}},
+	},
+	"LBP": {
+		{"LBP", []string{"en", "fr-CA"}},
+		{"£LB", []string{"fr"}},
+		{"ل.ل.\u200f", []string{"ar"}},
+	},
+	"LKR": {
+		{"LKR", []string{"en"}},
+		{"Rs.", []string{"ta-LK"}},
+		{"රු.", []string{"si"}},
+	},
+	"LRD": {
+		{"LRD", []string{"en"}},
+		{"$", []string{"en-LR"}},
+	},
+	"LYD": {
+		{"LYD", []string{"en"}},
+		{"د.ل.\u200f", []string{"ar"}},
+	},
+	"MAD": {
+		{"MAD", []string{"en"}},
+		{"د.م.\u200f", []string{"ar"}},
+	},
+	"MDL": {
+		{"MDL", []string{"en"}},
+		{"L", []string{"ro-MD", "ru-MD"}},
+	},
+	"MGA": {
+		{"MGA", []string{"en"}},
+		{"Ar", []string{"en-MG", "fr-MG", "mg"}},
+	},
+	"MKD": {
+		{"MKD", []string{"en"}},
+		{"den", []string{"sq-MK"}},
+		{"ден.", []string{"mk"}},
+	},
+	"MMK": {
+		{"MMK", []string{"en"}},
+		{"K", []string{"my"}},
+	},
+	"MNT": {
+		{"MNT", []string{"en"}},
+		{"₮", []string{"mn"}},
+	},
+	"MOP": {
+		{"MOP", []string{"en"}},
+		{"MOP$", []string{"en-MO", "pt-MO", "zh-Hans-MO", "zh-Hant-MO"}},
+	},
+	"MRU": {
+		{"MRU", []string{"en"}},
+		{"UM", []string{"es-MX", "fr-MR"}},
+		{"أ.م.", []string{"ar"}},
+	},
+	"MUR": {
+		{"MUR", []string{"en"}},
+		{"Rs", []string{"en-MU", "fr-MU"}},
+	},
+	"MWK": {
+		{"MWK", []string{"en"}},
+		{"MK", []string{"en-MW"}},
+	},
+	"MXN": {
+		{"MX$", []string{"en", "fr-CA"}},
+		{"$", []string{"es-MX"}},
+		{"$MX", []string{"fa", "fr", "gl"}},
+	},
+	"MYR": {
+		{"MYR", []string{"en"}},
+		{"RM", []string{"en-MY", "ms", "ta-MY", "ta-SG"}},
+	},
+	"MZN": {
+		{"MZN", []string{"en"}},
+		{"MTn", []string{"pt-MZ"}},
+	},
+	"NAD": {
+		{"NAD", []string{"en", "fr-CA"}},
+		{"$", []string{"af-NA", "en-NA"}},
+		{"$NA", []string{"fr"}},
+	},
+	"NGN": {
+		{"NGN", []string{"en"}},
+		{"₦", []string{"en-NG"}},
+	},
+	"NIO": {
+		{"NIO", []string{"en"}},
+		{"C$", []string{"es-NI"}},
+	},
+	"NOK": {
+		{"NOK", []string{"en"}},
+		{"Nkr", []string{"sv"}},
+		{"kr", []string{"nb", "nn"}},
+	},
+	"NPR": {
+		{"NPR", []string{"en"}},
+		{"नेरू", []string{"ne"}},
+	},
+	"NZD": {
+		{"NZ$", []string{"en"}},
+		{"$", []string{"en-CK", "en-NU", "en-NZ", "en-PN", "en-TK"}},
+		{"$NZ", []string{"fa", "fr"}},
+		{"$\u00a0NZ", []string{"fr-CA"}},
+		{"NZD$", []string{"to"}},
+	},
+	"OMR": {
+		{"OMR", []string{"en"}},
+		{"ر.ع.\u200f", []string{"ar"}},
+	},
+	"PAB": {
+		{"PAB", []string{"en"}},
+		{"B/.", []string{"es-PA", "my"}},
+	},
+	"PEN": {
+		{"PEN", []string{"en"}},
+		{"S/", []string{"es-PE"}},
+	},
+	"PGK": {
+		{"PGK", []string{"en"}},
+		{"K", []string{"en-PG"}},
+	},
+	"PHP": {
+		{"PHP", []string{"en"}},
+		{"₱", []string{"en-PH", "es-PH", "fil"}},
+	},
+	"PKR": {
+		{"PKR", []string{"en", "ur-IN"}},
+		{"Rs", []string{"en-PK", "ps-PK", "ur"}},
+		{"ر", []string{"pa-Arab"}},
+	},
+	"PLN": {
+		{"PLN", []string{"en"}},
+		{"zł", []string{"pl"}},
+		{"зл", []string{"bs-Cyrl"}},
+	},
+	"PYG": {
+		{"PYG", []string{"en"}},
+		{"Gs.", []string{"es-PY"}},
+	},
+	"QAR": {
+		{"QAR", []string{"en"}},
+		{"ر.ق.\u200f", []string{"ar"}},
+	},
+	"RSD": {
+		{"RSD", []string{"en"}},
+		{"din.", []string{"bs"}},
+		{"дин.", []string{"bs-Cyrl"}},
+	},
+	"RUB": {
+		{"RUB", []string{"en"}},
+		{"₽", []string{"be", "ce", "kk", "ru"}},
+	},
+	"RWF": {
+		{"RWF", []string{"en"}},
+		{"RF", []string{"en-RW", "fr-RW", "rw"}},
+	},
+	"SAR": {
+		{"SAR", []string{"en"}},
+		{"ر.س.\u200f", []string{"ar"}},
+	},
+	"SBD": {
+		{"SBD", []string{"en", "fr-CA"}},
+		{"$", []string{"en-SB"}},
+		{"$SB", []string{"fr"}},
+		{"SI$", []string{"nl"}},
+	},
+	"SCR": {
+		{"SCR", []string{"en"}},
+		{"Rs", []string{"en-AU"}},
+		{"SR", []string{"en-SC", "fr-SC"}},
+	},
+	"SDG": {
+		{"SDG", []string{"ar-LB", "en"}},
+		{"ج.س.", []string{"ar"}},
+	},
+	"SEK": {
+		{"SEK", []string{"en"}},
+		{"kr", []string{"en-SE", "sv"}},
+	},
+	"SGD": {
+		{"SGD", []string{"en"}},
+		{"$", []string{"en-SG", "ms-SG", "ta-SG", "zh-Hans-SG"}},
+		{"$SG", []string{"fr"}},
+		{"$\u00a0SG", []string{"fr-CA"}},
+		{"S$", []string{"ta-MY"}},
+	},
+	"SHP": {
+		{"SHP", []string{"en"}},
+		{"£", []string{"en-SH"}},
+	},
+	"SLL": {
+		{"SLL", []string{"en"}},
+		{"Le", []string{"en-SL"}},
+	},
+	"SOS": {
+		{"SOS", []string{"en"}},
+		{"S", []string{"ar-SO", "so"}},
+	},
+	"SRD": {
+		{"SRD", []string{"en", "fr-CA"}},
+		{"$", []string{"nl-SR"}},
+		{"$SR", []string{"fr"}},
+	},
+	"SSP": {
+		{"SSP", []string{"en"}},
+		{"£", []string{"ar-SS", "en-SS"}},
+	},
+	"STN": {
+		{"STN", []string{"en"}},
+		{"Db", []string{"pt-ST"}},
+	},
+	"SYP": {
+		{"SYP", []string{"en"}},
+		{"LS", []string{"fr-SY"}},
+		{"ل.س.\u200f", []string{"ar"}},
+	},
+	"SZL": {
+		{"SZL", []string{"en"}},
+		{"E", []string{"en-SZ"}},
+	},
+	"THB": {
+		{"THB", []string{"en", "es-419"}},
+		{"TH฿", []string{"dz"}},
+		{"฿", []string{"af", "ar", "ast", "az", "bn", "bs", "ca", "cy", "da", "de", "el", "es", "et", "eu", "fa", "fil", "ga", "gd", "gl", "he", "hi", "hy", "id", "it", "kk", "km", "ky", "lb", "lo", "lv", "mn", "my", "ne", "nl", "pa", "pt", "ru", "si", "sq", "sw", "ta", "th", "tr", "ur", "uz-Cyrl", "vi"}},
+	},
+	"TJS": {
+		{"TJS", []string{"en"}},
+		{"сом.", []string{"tg"}},
+	},
+	"TMT": {
+		{"TMT", []string{"en"}},
+		{"ТМТ", []string{"ru"}},
+	},
+	"TND": {
+		{"TND", []string{"en"}},
+		{"DT", []string{"fr-TN"}},
+		{"د.ت.\u200f", []string{"ar"}},
+	},
+	"TOP": {
+		{"TOP", []string{"en"}},
+		{"T$", []string{"en-TO", "to"}},
+	},
+	"TRY": {
+		{"TRY", []string{"en"}},
+		{"Тл", []string{"bs-Cyrl"}},
+		{"₺", []string{"ku", "tr"}},
+	},
+	"TTD": {
+		{"TTD", []string{"en", "fr-CA"}},
+		{"$", []string{"en-TT"}},
+		{"$TT", []string{"fr"}},
+		{"TT$", []string{"my"}},
+	},
+	"TWD": {
+		{"NT$", []string{"en", "zh-Hant-HK"}},
+		{"$", []string{"zh-Hant"}},
+	},
+	"TZS": {
+		{"TZS", []string{"en"}},
+		{"TSh", []string{"en-TZ", "sw"}},
+	},
+	"UAH": {
+		{"UAH", []string{"en"}},
+		{"₴", []string{"ru", "uk"}},
+	},
+	"UGX": {
+		{"UGX", []string{"en"}},
+		{"USh", []string{"en-UG", "sw-UG"}},
+	},
+	"USD": {
+		{"$", []string{"en", "es-419", "nl-BQ", "sw-KE"}},
+		{"$US", []string{"fr"}},
+		{"$\u00a0US", []string{"fr-CA"}},
+		{"US$", []string{"ar", "az", "az-Cyrl", "bn", "bo", "bs-Cyrl", "ce", "cs", "cy", "da", "dz", "en-001", "es", "es-AR", "es-CL", "es-CO", "es-CU", "es-DO", "es-UY", "eu", "id", "ka", "ko", "ku", "lo", "mg", "mk", "mt", "my", "ne", "nl", "pa", "pa-Arab", "pt", "rn", "rw", "si", "so", "sq", "sr", "sr-Latn", "sv", "sw", "ta-SG", "th", "tk", "to", "uz", "uz-Arab", "uz-Cyrl", "vi", "yue", "yue-Hans", "zh", "zh-Hant"}},
+		{"щ.д.", []string{"bg"}},
+	},
+	"UYU": {
+		{"UYU", []string{"en", "fr-CA"}},
+		{"$", []string{"es-UY"}},
+		{"$UY", []string{"fr"}},
+	},
+	"UYW": {
+		{"UYW", []string{"en"}},
+		{"UP", []string{"es-UY"}},
+	},
+	"UZS": {
+		{"UZS", []string{"en"}},
+		{"soʻm", []string{"uz"}},
+		{"сўм", []string{"uz-Cyrl"}},
+	},
+	"VES": {
+		{"VES", []string{"en"}},
+		{"Bs.S", []string{"es-VE"}},
+	},
+	"VND": {
+		{"₫", []string{"en"}},
+	},
+	"VUV": {
+		{"VUV", []string{"en"}},
+		{"VT", []string{"en-VU", "fr-VU"}},
+	},
+	"WST": {
+		{"WST", []string{"en", "fr-CA"}},
+		{"$WS", []string{"fr"}},
+		{"WS$", []string{"en-WS"}},
+	},
+	"XAF": {
+		{"FCFA", []string{"en"}},
+	},
+	"XCD": {
+		{"EC$", []string{"en"}},
+		{"$", []string{"en-AG", "en-AI", "en-DM", "en-GD", "en-KN", "en-LC", "en-MS", "en-VC"}},
+		{"$EC", []string{"fa"}},
+	},
+	"XOF": {
+		{"CFA", []string{"en"}},
+		{"සිෆ්එ", []string{"si"}},
+	},
+	"XPF": {
+		{"CFPF", []string{"en", "fr-CA"}},
+		{"CFP", []string{"en-AU"}},
+		{"FCFP", []string{"fr"}},
+	},
+	"YER": {
+		{"YER", []string{"en"}},
+		{"ر.ي.\u200f", []string{"ar"}},
+	},
+	"ZAR": {
+		{"ZAR", []string{"en"}},
+		{"R", []string{"af", "en-LS", "en-ZA"}},
+	},
+	"ZMW": {
+		{"ZMW", []string{"en"}},
+		{"K", []string{"en-ZM"}},
+	},
 }
 
 var parentLocales = map[string]string{
