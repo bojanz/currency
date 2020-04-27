@@ -36,7 +36,7 @@ const CLDRVersion = "{{ .CLDRVersion }}"
 
 type currencyInfo struct {
 	numericCode string
-	digits      byte
+	digits      uint8
 }
 
 type symbolInfo struct {
@@ -68,7 +68,7 @@ var parentLocales = map[string]string{
 
 type currencyInfo struct {
 	numericCode string
-	digits      byte
+	digits      uint8
 }
 
 func (c currencyInfo) GoString() string {
@@ -548,13 +548,13 @@ func contains(a []string, x string) bool {
 	return false
 }
 
-func parseDigits(n string) byte {
+func parseDigits(n string) uint8 {
 	digits, err := strconv.Atoi(n)
 	if err != nil {
 		digits = 2
 	}
 
-	return byte(digits)
+	return uint8(digits)
 }
 
 func export(i interface{}, width int, indent string) string {

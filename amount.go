@@ -156,7 +156,7 @@ func (a Amount) Round() Amount {
 }
 
 // RoundTo rounds a to the given number of fraction digits.
-func (a Amount) RoundTo(digits byte) Amount {
+func (a Amount) RoundTo(digits uint8) Amount {
 	result := apd.New(0, 0)
 	ctx := apd.BaseContext.WithPrecision(16)
 	ctx.Quantize(result, a.number, -int32(digits))

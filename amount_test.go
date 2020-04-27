@@ -275,7 +275,7 @@ func TestAmount_Round(t *testing.T) {
 func TestAmount_RoundTo(t *testing.T) {
 	tests := []struct {
 		number string
-		digits byte
+		digits uint8
 		want   string
 	}{
 		{"12.345", 4, "12.3450"},

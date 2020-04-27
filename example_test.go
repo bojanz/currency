@@ -80,7 +80,7 @@ func ExampleAmount_Round() {
 
 func ExampleAmount_RoundTo() {
 	amount, _ := currency.NewAmount("12.345", "USD")
-	for _, digits := range []byte{4, 3, 2, 1, 0} {
+	for _, digits := range []uint8{4, 3, 2, 1, 0} {
 		fmt.Println(amount.RoundTo(digits))
 	}
 	// Output: 12.3450 USD

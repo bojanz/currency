@@ -8,7 +8,7 @@ const CLDRVersion = "37.0.0"
 
 type currencyInfo struct {
 	numericCode string
-	digits      byte
+	digits      uint8
 }
 
 type symbolInfo struct {

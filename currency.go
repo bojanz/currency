@@ -29,7 +29,7 @@ func GetNumericCode(currencyCode string) (numericCode string, ok bool) {
 }
 
 // GetDigits returns the number of fraction digits for a currencyCode.
-func GetDigits(currencyCode string) (digits byte, ok bool) {
+func GetDigits(currencyCode string) (digits uint8, ok bool) {
 	if !IsValid(currencyCode) {
 		return 0, false
 	}
