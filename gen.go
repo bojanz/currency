@@ -15,6 +15,7 @@ import (
 	"os"
 	"os/exec"
 	"reflect"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -34,6 +35,18 @@ package currency
 // CLDRVersion is the CLDR version from which the data is derived.
 const CLDRVersion = "{{ .CLDRVersion }}"
 
+type numberingSystem uint8
+
+const (
+	numLatn numberingSystem = iota
+	numArab
+	numArabExt
+	numBeng
+	numDeva
+	numMymr
+	numTibt
+)
+
 type currencyInfo struct {
 	numericCode string
 	digits      uint8
@@ -42,6 +55,18 @@ type currencyInfo struct {
 type symbolInfo struct {
 	symbol  string
 	locales []string
+}
+
+type currencyFormat struct {
+	pattern               string
+	numberingSystem       numberingSystem
+	minGroupingDigits     uint8
+	primaryGroupingSize   uint8
+	secondaryGroupingSize uint8
+	decimalSeparator      string
+	groupingSeparator     string
+	plusSign              string
+	minusSign             string
 }
 
 // Defined separately to ensure consistent ordering (G10, then others).
@@ -59,6 +84,10 @@ var currencies = map[string]currencyInfo{
 
 var currencySymbols = map[string][]symbolInfo{
 	{{ export .SymbolInfo 1 "\t" }}
+}
+
+var currencyFormats = map[string]currencyFormat{
+	{{ export .Formats 1 "\t" }}
 }
 
 var parentLocales = map[string]string{
@@ -98,6 +127,34 @@ func (ss symbolInfoSlice) GoString() string {
 	return b.String()
 }
 
+type numberingSystem uint8
+
+const (
+	numLatn numberingSystem = iota
+	numArab
+	numArabExt
+	numBeng
+	numDeva
+	numMymr
+	numTibt
+)
+
+type currencyFormat struct {
+	pattern               string
+	numberingSystem       numberingSystem
+	minGroupingDigits     uint8
+	primaryGroupingSize   uint8
+	secondaryGroupingSize uint8
+	decimalSeparator      string
+	groupingSeparator     string
+	plusSign              string
+	minusSign             string
+}
+
+func (f currencyFormat) GoString() string {
+	return fmt.Sprintf("{%q, %d, %d, %d, %d, %q, %q, %q, %q}", f.pattern, f.numberingSystem, f.minGroupingDigits, f.primaryGroupingSize, f.secondaryGroupingSize, f.decimalSeparator, f.groupingSeparator, f.plusSign, f.minusSign)
+}
+
 func main() {
 	err := os.Mkdir(assetDir, 0755)
 	if err != nil {
@@ -126,6 +183,11 @@ func main() {
 		log.Fatal(err)
 	}
 	symbols, err := generateSymbols(currencies, assetDir)
+	if err != nil {
+		os.RemoveAll(assetDir)
+		log.Fatal(err)
+	}
+	formats, err := generateFormats(assetDir)
 	if err != nil {
 		os.RemoveAll(assetDir)
 		log.Fatal(err)
@@ -174,6 +236,7 @@ func main() {
 		OtherCurrencies []string
 		CurrencyInfo    map[string]*currencyInfo
 		SymbolInfo      map[string]symbolInfoSlice
+		Formats         map[string]currencyFormat
 		ParentLocales   map[string]string
 	}{
 		CLDRVersion:     CLDRVersion,
@@ -181,6 +244,7 @@ func main() {
 		OtherCurrencies: otherCurrencies,
 		CurrencyInfo:    currencies,
 		SymbolInfo:      symbols,
+		Formats:         formats,
 		ParentLocales:   parentLocales,
 	})
 
@@ -261,7 +325,7 @@ func fetchISO() (map[string]*currencyInfo, error) {
 			// Special currency (Gold, Platinum, etc).
 			continue
 		}
-		digits := parseDigits(entry.Digits)
+		digits := parseDigits(entry.Digits, 2)
 		currencies[entry.Code] = &currencyInfo{entry.Number, digits}
 	}
 
@@ -309,7 +373,7 @@ func replaceDigits(currencies map[string]*currencyInfo, dir string) error {
 	for currencyCode := range currencies {
 		fractions, ok := aux.Supplemental.CurrencyData.Fractions[currencyCode]
 		if ok {
-			currencies[currencyCode].digits = parseDigits(fractions["_digits"])
+			currencies[currencyCode].digits = parseDigits(fractions["_digits"], 2)
 		}
 	}
 
@@ -461,6 +525,156 @@ func readSymbols(currencies map[string]*currencyInfo, dir string, locale string)
 	return symbols, nil
 }
 
+// generateFormats generates currency formats from CLDR data.
+//
+// Formats are deduplicated by parent.
+func generateFormats(dir string) (map[string]currencyFormat, error) {
+	formats := make(map[string]currencyFormat)
+	files, err := ioutil.ReadDir(dir + "/cldr-numbers-full/main")
+	if err != nil {
+		return nil, fmt.Errorf("generateFormats: %w", err)
+	}
+	for _, file := range files {
+		locale := file.Name()
+		if shouldIgnoreLocale(locale) {
+			continue
+		}
+		format, err := readFormat(dir, locale)
+		if err != nil {
+			return nil, fmt.Errorf("generateFormats: %w", err)
+		}
+		formats[locale] = format
+	}
+
+	// Remove formats which are identical to their parents.
+	var deleteLocales []string
+	for localeID, format := range formats {
+		locale := currency.NewLocale(localeID)
+		parentID := locale.GetParent().String()
+		if parentID != "" && format == formats[parentID] {
+			deleteLocales = append(deleteLocales, localeID)
+		}
+	}
+	for _, localeID := range deleteLocales {
+		delete(formats, localeID)
+	}
+
+	return formats, nil
+}
+
+// readFormat reads the given locale's currency format from CLDR data.
+func readFormat(dir string, locale string) (currencyFormat, error) {
+	filename := fmt.Sprintf("%v/cldr-numbers-full/main/%v/numbers.json", dir, locale)
+	data, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return currencyFormat{}, fmt.Errorf("readFormat: %w", err)
+	}
+
+	type cldrPattern struct {
+		Standard string
+	}
+	type cldrData struct {
+		Numbers struct {
+			MinimumGroupingDigits  string
+			DefaultNumberingSystem string
+			PatternLatn            cldrPattern       `json:"currencyFormats-numberSystem-latn"`
+			PatternArab            cldrPattern       `json:"currencyFormats-numberSystem-arab"`
+			PatternArabExt         cldrPattern       `json:"currencyFormats-numberSystem-arabext"`
+			PatternBeng            cldrPattern       `json:"currencyFormats-numberSystem-beng"`
+			PatternDeva            cldrPattern       `json:"currencyFormats-numberSystem-deva"`
+			PatternMymr            cldrPattern       `json:"currencyFormats-numberSystem-mymr"`
+			PatternTibt            cldrPattern       `json:"currencyFormats-numberSystem-tibt"`
+			SymbolsLatn            map[string]string `json:"symbols-numberSystem-latn"`
+			SymbolsArab            map[string]string `json:"symbols-numberSystem-arab"`
+			SymbolsArabExt         map[string]string `json:"symbols-numberSystem-arabext"`
+			SymbolsBeng            map[string]string `json:"symbols-numberSystem-beng"`
+			SymbolsDeva            map[string]string `json:"symbols-numberSystem-deva"`
+			SymbolsMymr            map[string]string `json:"symbols-numberSystem-mymr"`
+			SymbolsTibt            map[string]string `json:"symbols-numberSystem-tibt"`
+		}
+	}
+	aux := struct {
+		Main map[string]cldrData
+	}{}
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return currencyFormat{}, fmt.Errorf("readFormat: %w", err)
+	}
+
+	var numSystem numberingSystem
+	var pattern string
+	var symbols map[string]string
+	extFormat := aux.Main[locale].Numbers
+	switch extFormat.DefaultNumberingSystem {
+	case "latn":
+		numSystem = numLatn
+		pattern = extFormat.PatternLatn.Standard
+		symbols = extFormat.SymbolsLatn
+	case "arab":
+		numSystem = numArab
+		pattern = extFormat.PatternArab.Standard
+		symbols = extFormat.SymbolsArab
+	case "arabext":
+		numSystem = numArabExt
+		pattern = extFormat.PatternArabExt.Standard
+		symbols = extFormat.SymbolsArabExt
+	case "beng":
+		numSystem = numBeng
+		pattern = extFormat.PatternBeng.Standard
+		symbols = extFormat.SymbolsBeng
+	case "deva":
+		numSystem = numDeva
+		pattern = extFormat.PatternDeva.Standard
+		symbols = extFormat.SymbolsDeva
+	case "mymr":
+		numSystem = numMymr
+		pattern = extFormat.PatternMymr.Standard
+		symbols = extFormat.SymbolsMymr
+	case "tibt":
+		numSystem = numTibt
+		pattern = extFormat.PatternTibt.Standard
+		symbols = extFormat.SymbolsTibt
+	default:
+		return currencyFormat{}, fmt.Errorf("readFormat: unknown numbering system %q in locale %q", extFormat.DefaultNumberingSystem, locale)
+	}
+	primaryGroupingSize := 0
+	secondaryGroupingSize := 0
+	patternParts := strings.Split(pattern, ";")
+	if strings.Contains(patternParts[0], ",") {
+		r, _ := regexp.Compile("#+0")
+		primaryGroup := r.FindString(patternParts[0])
+		primaryGroupingSize = len(primaryGroup)
+		secondaryGroupingSize = primaryGroupingSize
+		numberGroups := strings.Split(patternParts[0], ",")
+		if len(numberGroups) > 2 {
+			// This pattern has a distinct secondary group size.
+			secondaryGroupingSize = len(numberGroups[1])
+		}
+	}
+	decimalSeparator := symbols["decimal"]
+	groupingSeparator := symbols["group"]
+	// Most locales use the same separators for decimal and currency
+	// formatting, with the exception of de-AT and fr-CH (as of CLDR v37).
+	if _, ok := symbols["currencyDecimal"]; ok {
+		decimalSeparator = symbols["currencyDecimal"]
+	}
+	if _, ok := symbols["currencyGroup"]; ok {
+		groupingSeparator = symbols["currencyGroup"]
+	}
+
+	format := currencyFormat{}
+	format.pattern = pattern
+	format.numberingSystem = numSystem
+	format.minGroupingDigits = parseDigits(extFormat.MinimumGroupingDigits, 1)
+	format.primaryGroupingSize = uint8(primaryGroupingSize)
+	format.secondaryGroupingSize = uint8(secondaryGroupingSize)
+	format.decimalSeparator = decimalSeparator
+	format.groupingSeparator = groupingSeparator
+	format.plusSign = symbols["plusSign"]
+	format.minusSign = symbols["minusSign"]
+
+	return format, nil
+}
+
 // generateParentLocales generates parent locales from CLDR data.
 //
 // Ensures ignored locales are skipped.
@@ -548,12 +762,11 @@ func contains(a []string, x string) bool {
 	return false
 }
 
-func parseDigits(n string) uint8 {
+func parseDigits(n string, fallback uint8) uint8 {
 	digits, err := strconv.Atoi(n)
 	if err != nil {
-		digits = 2
+		return fallback
 	}
-
 	return uint8(digits)
 }
 
@@ -570,17 +783,27 @@ func export(i interface{}, width int, indent string) string {
 }
 
 func exportMap(v reflect.Value, width int, indent string) string {
+	var maxKeyLen int
 	var keys []string
-	for _, key := range v.MapKeys() {
-		keys = append(keys, key.Interface().(string))
+	for _, k := range v.MapKeys() {
+		key := k.Interface().(string)
+		keys = append(keys, key)
+		if len(key) > maxKeyLen {
+			maxKeyLen = len(key)
+		}
 	}
 	sort.Strings(keys)
 
 	b := strings.Builder{}
 	i := 0
 	for _, key := range keys {
+		spaceWidth := 1
+		if width == 1 {
+			spaceWidth += maxKeyLen - len(key)
+		}
+		space := strings.Repeat(" ", spaceWidth)
 		value := v.MapIndex(reflect.ValueOf(key))
-		fmt.Fprintf(&b, `%q: %#v,`, key, value)
+		fmt.Fprintf(&b, `%q:%v%#v,`, key, space, value)
 		if i+1 != v.Len() {
 			if (i+1)%width == 0 {
 				b.WriteString("\n")
