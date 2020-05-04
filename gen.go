@@ -649,6 +649,10 @@ func readFormat(dir string, locale string) (currencyFormat, error) {
 			// This pattern has a distinct secondary group size.
 			secondaryGroupingSize = len(numberGroups[1])
 		}
+		// Strip the grouping info from the pattern, now that it is
+		// available separately.
+		pattern = strings.ReplaceAll(pattern, "#,##,##", "")
+		pattern = strings.ReplaceAll(pattern, "#,##", "")
 	}
 	decimalSeparator := symbols["decimal"]
 	groupingSeparator := symbols["group"]
