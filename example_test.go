@@ -120,6 +120,27 @@ func ExampleLocale_GetParent() {
 	// en
 }
 
+func ExampleFormatter_Format() {
+	locale := currency.NewLocale("en-US")
+	formatter := currency.NewFormatter(locale)
+	amount, _ := currency.NewAmount("1245.988", "USD")
+	fmt.Println(formatter.Format(amount))
+
+	formatter.MaxDigits = 2
+	fmt.Println(formatter.Format(amount))
+
+	formatter.NoGrouping = true
+	amount, _ = currency.NewAmount("1245", "USD")
+	fmt.Println(formatter.Format(amount))
+
+	formatter.MinDigits = 0
+	fmt.Println(formatter.Format(amount))
+	// Output: $1,245.988
+	// $1,245.99
+	// $1245.00
+	// $1245
+}
+
 func ExampleGetNumericCode() {
 	numericCode, ok := currency.GetNumericCode("USD")
 	fmt.Println(numericCode, ok)
