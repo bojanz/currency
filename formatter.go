@@ -142,11 +142,11 @@ func (f Formatter) formatNumber(amount Amount) string {
 	}
 	amount = amount.RoundTo(maxDigits)
 	numberParts := strings.Split(amount.Number(), ".")
-	if len(numberParts) == 1 {
-		numberParts = append(numberParts, "")
-	}
 	majorDigits := f.groupMajorDigits(numberParts[0])
-	minorDigits := numberParts[1]
+	minorDigits := ""
+	if len(numberParts) == 2 {
+		minorDigits = numberParts[1]
+	}
 	if minDigits < maxDigits {
 		// Strip any trailing zeroes.
 		minorDigits = strings.TrimRight(minorDigits, "0")
