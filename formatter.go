@@ -6,6 +6,8 @@ package currency
 import (
 	"strconv"
 	"strings"
+	"unicode"
+	"unicode/utf8"
 )
 
 // Display represents the currency display type.
@@ -100,6 +102,21 @@ func (f Formatter) Format(amount Amount) string {
 	}
 	formattedNumber := f.formatNumber(amount)
 	formattedCurrency := f.formatCurrency(amount.CurrencyCode())
+	if formattedCurrency != "" {
+		// CLDR requires having a space between the letters
+		// in a currency symbol and adjacent numbers.
+		if strings.Contains(pattern, "0¤") {
+			r, _ := utf8.DecodeRuneInString(formattedCurrency)
+			if unicode.IsLetter(r) {
+				formattedCurrency = "\u00a0" + formattedCurrency
+			}
+		} else if strings.Contains(pattern, "¤0") {
+			r, _ := utf8.DecodeLastRuneInString(formattedCurrency)
+			if unicode.IsLetter(r) {
+				formattedCurrency = formattedCurrency + "\u00a0"
+			}
+		}
+	}
 
 	replacements := []string{
 		"0.00", formattedNumber,

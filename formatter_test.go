@@ -28,7 +28,7 @@ func TestFormatter_Basic(t *testing.T) {
 		{"1234.00", "EUR", "de-AT", "€\u00a01.234,00"},
 		{"1234.00", "EUR", "de-CH", "€\u00a01’234.00"},
 
-		{"1234.00", "CHF", "en", "CHF1,234.00"},
+		{"1234.00", "CHF", "en", "CHF\u00a01,234.00"},
 		{"1234.00", "CHF", "de-AT", "CHF\u00a01.234,00"},
 		{"1234.00", "CHF", "de-CH", "CHF\u00a01’234.00"},
 	}
@@ -58,7 +58,7 @@ func TestFormatter_NumberingSystems(t *testing.T) {
 		// Arabic extended (Persian) digits.
 		{"12345678.90", "USD", "fa", "\u200eUS$۱۲٬۳۴۵٬۶۷۸٫۹۰"},
 		// Bengali digits.
-		{"12345678.90", "USD", "bn", "১,২৩,৪৫,৬৭৮.৯০US$"},
+		{"12345678.90", "USD", "bn", "১,২৩,৪৫,৬৭৮.৯০\u00a0US$"},
 		// Devanagari digits.
 		{"12345678.90", "USD", "ne", "US$\u00a0१,२३,४५,६७८.९०"},
 		// Myanmar (Burmese) digits.
@@ -139,11 +139,11 @@ func TestFormatter_Digits(t *testing.T) {
 	}{
 		{"59", "KRW", "en", currency.DefaultDigits, 6, "₩59"},
 		{"59", "USD", "en", currency.DefaultDigits, 6, "$59.00"},
-		{"59", "OMR", "en", currency.DefaultDigits, 6, "OMR59.000"},
+		{"59", "OMR", "en", currency.DefaultDigits, 6, "OMR\u00a059.000"},
 
 		{"59.6789", "KRW", "en", 0, currency.DefaultDigits, "₩60"},
 		{"59.6789", "USD", "en", 0, currency.DefaultDigits, "$59.68"},
-		{"59.6789", "OMR", "en", 0, currency.DefaultDigits, "OMR59.679"},
+		{"59.6789", "OMR", "en", 0, currency.DefaultDigits, "OMR\u00a059.679"},
 
 		// minDigits:0 strips all trailing zeroes.
 		{"59", "USD", "en", 0, 6, "$59"},
@@ -184,7 +184,7 @@ func TestFormatter_CurrencyDisplay(t *testing.T) {
 		want            string
 	}{
 		{"1234.59", "USD", "en", currency.DisplaySymbol, "$1,234.59"},
-		{"1234.59", "USD", "en", currency.DisplayCode, "USD1,234.59"},
+		{"1234.59", "USD", "en", currency.DisplayCode, "USD\u00a01,234.59"},
 		{"1234.59", "USD", "en", currency.DisplayNone, "1,234.59"},
 
 		{"1234.59", "USD", "de-AT", currency.DisplaySymbol, "US$\u00a01.234,59"},
@@ -224,7 +224,7 @@ func TestFormatter_SymbolMap(t *testing.T) {
 
 	amount, _ = currency.NewAmount("6.99", "EUR")
 	got = formatter.Format(amount)
-	if got != "EU6.99" {
-		t.Errorf("got %v, want EU6.99", got)
+	if got != "EU\u00a06.99" {
+		t.Errorf("got %v, want EU\u00a06.99", got)
 	}
 }
