@@ -34,7 +34,7 @@ var localDigits = map[numberingSystem]string{
 	numTibt:    "༠༡༢༣༤༥༦༧༨༩",
 }
 
-// Formatter formats currency amounts.
+// Formatter formats and parses currency amounts.
 type Formatter struct {
 	locale Locale
 	format currencyFormat
@@ -133,6 +133,33 @@ func (f Formatter) Format(amount Amount) string {
 	}
 
 	return formattedAmount
+}
+
+// Parse parses a formatted amount.
+func (f Formatter) Parse(s, currencyCode string) (Amount, error) {
+	symbol, _ := GetSymbol(currencyCode, f.locale)
+	replacements := []string{
+		f.format.decimalSeparator, ".",
+		f.format.groupingSeparator, "",
+		f.format.plusSign, "+",
+		f.format.minusSign, "-",
+		symbol, "",
+		currencyCode, "",
+		"\u200e", "",
+		"\u200f", "",
+		"\u00a0", "",
+		" ", "",
+	}
+	if f.format.numberingSystem != numLatn {
+		digits := localDigits[f.format.numberingSystem]
+		for i, v := range strings.Split(digits, "") {
+			replacements = append(replacements, v, strconv.Itoa(i))
+		}
+	}
+	r := strings.NewReplacer(replacements...)
+	n := r.Replace(s)
+
+	return NewAmount(n, currencyCode)
 }
 
 // getPattern returns a positive or negative pattern for a currency amount.

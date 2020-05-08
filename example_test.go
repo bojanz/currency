@@ -121,24 +121,45 @@ func ExampleLocale_GetParent() {
 }
 
 func ExampleFormatter_Format() {
-	locale := currency.NewLocale("en-US")
+	locale := currency.NewLocale("tr")
 	formatter := currency.NewFormatter(locale)
-	amount, _ := currency.NewAmount("1245.988", "USD")
+	amount, _ := currency.NewAmount("1245.988", "EUR")
 	fmt.Println(formatter.Format(amount))
 
 	formatter.MaxDigits = 2
 	fmt.Println(formatter.Format(amount))
 
 	formatter.NoGrouping = true
-	amount, _ = currency.NewAmount("1245", "USD")
+	amount, _ = currency.NewAmount("1245", "EUR")
 	fmt.Println(formatter.Format(amount))
 
 	formatter.MinDigits = 0
 	fmt.Println(formatter.Format(amount))
-	// Output: $1,245.988
-	// $1,245.99
-	// $1245.00
-	// $1245
+
+	formatter.CurrencyDisplay = currency.DisplayNone
+	fmt.Println(formatter.Format(amount))
+	// Output: €1.245,988
+	// €1.245,99
+	// €1245,00
+	// €1245
+	// 1245
+}
+
+func ExampleFormatter_Parse() {
+	locale := currency.NewLocale("tr")
+	formatter := currency.NewFormatter(locale)
+
+	amount, _ := formatter.Parse("€1.234,59", "EUR")
+	fmt.Println(amount)
+
+	amount, _ = formatter.Parse("EUR 1.234,59", "EUR")
+	fmt.Println(amount)
+
+	amount, _ = formatter.Parse("1.234,59", "EUR")
+	fmt.Println(amount)
+	// Output: 1234.59 EUR
+	// 1234.59 EUR
+	// 1234.59 EUR
 }
 
 func ExampleGetNumericCode() {

@@ -9,7 +9,7 @@ import (
 	"github.com/bojanz/currency"
 )
 
-func TestFormatter_Basic(t *testing.T) {
+func TestFormatter_Format(t *testing.T) {
 	tests := []struct {
 		number       string
 		currencyCode string
@@ -31,28 +31,7 @@ func TestFormatter_Basic(t *testing.T) {
 		{"1234.00", "CHF", "en", "CHF\u00a01,234.00"},
 		{"1234.00", "CHF", "de-AT", "CHF\u00a01.234,00"},
 		{"1234.00", "CHF", "de-CH", "CHF\u00a01’234.00"},
-	}
 
-	for _, tt := range tests {
-		t.Run("", func(t *testing.T) {
-			amount, _ := currency.NewAmount(tt.number, tt.currencyCode)
-			locale := currency.NewLocale(tt.localeID)
-			formatter := currency.NewFormatter(locale)
-			got := formatter.Format(amount)
-			if got != tt.want {
-				t.Errorf("got %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestFormatter_NumberingSystems(t *testing.T) {
-	tests := []struct {
-		number       string
-		currencyCode string
-		localeID     string
-		want         string
-	}{
 		// Arabic digits.
 		{"12345678.90", "USD", "ar", "١٢٬٣٤٥٬٦٧٨٫٩٠\u00a0US$"},
 		// Arabic extended (Persian) digits.
@@ -226,5 +205,61 @@ func TestFormatter_SymbolMap(t *testing.T) {
 	got = formatter.Format(amount)
 	if got != "EU\u00a06.99" {
 		t.Errorf("got %v, want EU\u00a06.99", got)
+	}
+}
+
+func TestFormatter_Parse(t *testing.T) {
+	tests := []struct {
+		s            string
+		currencyCode string
+		localeID     string
+		want         string
+	}{
+		{"$1,234.59", "USD", "en", "1234.59"},
+		{"USD\u00a01,234.59", "USD", "en", "1234.59"},
+		{"1,234.59", "USD", "en", "1234.59"},
+		{"1234.59", "USD", "en", "1234.59"},
+		{"+1234.59", "USD", "en", "1234.59"},
+		{"1234", "USD", "en", "1234"},
+
+		{"-$1,234.59", "USD", "en", "-1234.59"},
+		{"-USD\u00a01,234.59", "USD", "en", "-1234.59"},
+		{"-1,234.59", "USD", "en", "-1234.59"},
+		{"-1234.59", "USD", "en", "-1234.59"},
+
+		{"€\u00a01.234,00", "EUR", "de-AT", "1234.00"},
+		{"EUR\u00a01.234,00", "EUR", "de-AT", "1234.00"},
+		{"1.234,00", "EUR", "de-AT", "1234.00"},
+		{"1234,00", "EUR", "de-AT", "1234.00"},
+
+		// Arabic digits.
+		{"١٢٬٣٤٥٬٦٧٨٫٩٠\u00a0US$", "USD", "ar", "12345678.90"},
+		// Arabic extended (Persian) digits.
+		{"\u200eUS$۱۲٬۳۴۵٬۶۷۸٫۹۰", "USD", "fa", "12345678.90"},
+		// Bengali digits.
+		{"১,২৩,৪৫,৬৭৮.৯০\u00a0US$", "USD", "bn", "12345678.90"},
+		// Devanagari digits.
+		{"US$\u00a0१,२३,४५,६७८.९०", "USD", "ne", "12345678.90"},
+		// Myanmar (Burmese) digits.
+		{"၁၂,၃၄၅,၆၇၈.၉၀\u00a0US$", "USD", "my", "12345678.90"},
+		// Tibetan digits.
+		{"US$༡,༢༣,༤༥,༦༧༨.༩༠", "USD", "dz", "12345678.90"},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			locale := currency.NewLocale(tt.localeID)
+			formatter := currency.NewFormatter(locale)
+			got, err := formatter.Parse(tt.s, tt.currencyCode)
+			if err != nil {
+				t.Errorf("unexpected error: %v", err)
+			}
+			if got.Number() != tt.want {
+				t.Errorf("got %v, want %v", got, tt.want)
+			}
+			if got.CurrencyCode() != tt.currencyCode {
+				t.Errorf("got %v, want %v", got.CurrencyCode(), tt.currencyCode)
+			}
+		})
 	}
 }
