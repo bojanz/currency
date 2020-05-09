@@ -4,6 +4,7 @@
 package currency
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 
@@ -201,6 +202,35 @@ func (a Amount) IsNegative() bool {
 func (a Amount) IsZero() bool {
 	zero := apd.New(0, 0)
 	return a.number.Cmp(zero) == 0
+}
+
+// MarshalBinary implements the encoding.BinaryMarshaler interface.
+func (a Amount) MarshalBinary() ([]byte, error) {
+	buf := bytes.Buffer{}
+	buf.WriteString(a.CurrencyCode())
+	buf.WriteString(a.Number())
+
+	return buf.Bytes(), nil
+}
+
+// UnmarshalBinary implements the encoding.BinaryUnmarshaler interface.
+func (a *Amount) UnmarshalBinary(data []byte) error {
+	if len(data) < 3 {
+		return InvalidCurrencyCodeError{"Amount.UnmarshalBinary", string(data)}
+	}
+	n := string(data[3:])
+	currencyCode := string(data[0:3])
+	number, _, err := apd.NewFromString(n)
+	if err != nil {
+		return InvalidNumberError{"Amount.UnmarshalBinary", n}
+	}
+	if !IsValid(currencyCode) {
+		return InvalidCurrencyCodeError{"Amount.UnmarshalBinary", currencyCode}
+	}
+	a.number = number
+	a.currencyCode = currencyCode
+
+	return nil
 }
 
 // MarshalJSON implements the json.Marshaler interface.

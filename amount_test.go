@@ -400,6 +400,73 @@ func TestAmount_Checks(t *testing.T) {
 	}
 }
 
+func TestAmount_MarshalBinary(t *testing.T) {
+	a, _ := currency.NewAmount("3.45", "USD")
+	d, err := a.MarshalBinary()
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+	got := string(d)
+	want := "USD3.45"
+	if got != want {
+		t.Errorf("got %v, want %v", got, want)
+	}
+}
+
+func TestAmount_UnmarshalBinary(t *testing.T) {
+	d := []byte("US")
+	a := &currency.Amount{}
+	err := a.UnmarshalBinary(d)
+	if e, ok := err.(currency.InvalidCurrencyCodeError); ok {
+		if e.Op != "Amount.UnmarshalBinary" {
+			t.Errorf("got %v, want Amount.UnmarshalBinary", e.Op)
+		}
+		if e.CurrencyCode != "US" {
+			t.Errorf("got %v, want US", e.CurrencyCode)
+		}
+	} else {
+		t.Errorf("got %T, want currency.InvalidCurrencyCodeError", err)
+	}
+
+	d = []byte("USD3,60")
+	err = a.UnmarshalBinary(d)
+	if e, ok := err.(currency.InvalidNumberError); ok {
+		if e.Op != "Amount.UnmarshalBinary" {
+			t.Errorf("got %v, want Amount.UnmarshalBinary", e.Op)
+		}
+		if e.Number != "3,60" {
+			t.Errorf("got %v, want 3,60", e.Number)
+		}
+	} else {
+		t.Errorf("got %T, want currency.InvalidNumberError", err)
+	}
+
+	d = []byte("XXX2.60")
+	err = a.UnmarshalBinary(d)
+	if e, ok := err.(currency.InvalidCurrencyCodeError); ok {
+		if e.Op != "Amount.UnmarshalBinary" {
+			t.Errorf("got %v, want Amount.UnmarshalBinary", e.Op)
+		}
+		if e.CurrencyCode != "XXX" {
+			t.Errorf("got %v, want XXX", e.CurrencyCode)
+		}
+	} else {
+		t.Errorf("got %T, want currency.InvalidCurrencyCodeError", err)
+	}
+
+	d = []byte("USD3.45")
+	err = a.UnmarshalBinary(d)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+	if a.Number() != "3.45" {
+		t.Errorf("got %v, want 3.45", a.Number())
+	}
+	if a.CurrencyCode() != "USD" {
+		t.Errorf("got %v, want USD", a.CurrencyCode())
+	}
+}
+
 func TestAmount_MarshalJSON(t *testing.T) {
 	a, _ := currency.NewAmount("3.45", "USD")
 	d, err := json.Marshal(a)
