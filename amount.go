@@ -11,6 +11,20 @@ import (
 	"github.com/cockroachdb/apd"
 )
 
+// RoundingMode determines how the amount will be rounded.
+type RoundingMode uint8
+
+const (
+	// RoundHalfUp rounds up if the next digit is >= 5.
+	RoundHalfUp RoundingMode = iota
+	// RoundHalfDown rounds up if the next digit is > 5.
+	RoundHalfDown
+	// RoundUp rounds away from 0.
+	RoundUp
+	// RoundDown rounds towards 0, truncating extra digits.
+	RoundDown
+)
+
 // InvalidNumberError is returned when a numeric string can't be converted to a decimal.
 type InvalidNumberError struct {
 	Op     string
@@ -153,13 +167,20 @@ func (a Amount) Div(n string) (Amount, error) {
 // Round rounds a to its currency's default number of fraction digits.
 func (a Amount) Round() Amount {
 	digits, _ := GetDigits(a.currencyCode)
-	return a.RoundTo(digits)
+	return a.RoundTo(digits, RoundHalfUp)
 }
 
 // RoundTo rounds a to the given number of fraction digits.
-func (a Amount) RoundTo(digits uint8) Amount {
+func (a Amount) RoundTo(digits uint8, mode RoundingMode) Amount {
+	extModes := map[RoundingMode]string{
+		RoundHalfUp:   apd.RoundHalfUp,
+		RoundHalfDown: apd.RoundHalfDown,
+		RoundUp:       apd.RoundUp,
+		RoundDown:     apd.RoundDown,
+	}
 	result := apd.New(0, 0)
 	ctx := apd.BaseContext.WithPrecision(16)
+	ctx.Rounding = extModes[mode]
 	ctx.Quantize(result, a.number, -int32(digits))
 
 	return Amount{result, a.currencyCode}

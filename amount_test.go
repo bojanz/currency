@@ -276,19 +276,52 @@ func TestAmount_RoundTo(t *testing.T) {
 	tests := []struct {
 		number string
 		digits uint8
+		mode   currency.RoundingMode
 		want   string
 	}{
-		{"12.345", 4, "12.3450"},
-		{"12.345", 3, "12.345"},
-		{"12.345", 2, "12.35"},
-		{"12.345", 1, "12.3"},
-		{"12.345", 0, "12"},
+		{"12.343", 2, currency.RoundHalfUp, "12.34"},
+		{"12.345", 2, currency.RoundHalfUp, "12.35"},
+		{"12.347", 2, currency.RoundHalfUp, "12.35"},
+
+		{"12.343", 2, currency.RoundHalfDown, "12.34"},
+		{"12.345", 2, currency.RoundHalfDown, "12.34"},
+		{"12.347", 2, currency.RoundHalfDown, "12.35"},
+
+		{"12.343", 2, currency.RoundUp, "12.35"},
+		{"12.345", 2, currency.RoundUp, "12.35"},
+		{"12.347", 2, currency.RoundUp, "12.35"},
+
+		{"12.343", 2, currency.RoundDown, "12.34"},
+		{"12.345", 2, currency.RoundDown, "12.34"},
+		{"12.347", 2, currency.RoundDown, "12.34"},
+
+		// Negative amounts.
+		{"-12.345", 2, currency.RoundHalfUp, "-12.35"},
+		{"-12.345", 2, currency.RoundHalfDown, "-12.34"},
+		{"-12.345", 2, currency.RoundUp, "-12.35"},
+		{"-12.345", 2, currency.RoundDown, "-12.34"},
+
+		// More digits that the amount has.
+		{"12.345", 4, currency.RoundHalfUp, "12.3450"},
+		{"12.345", 4, currency.RoundHalfDown, "12.3450"},
+
+		// Same number of digits that the amount has.
+		{"12.345", 3, currency.RoundHalfUp, "12.345"},
+		{"12.345", 3, currency.RoundHalfDown, "12.345"},
+		{"12.345", 3, currency.RoundUp, "12.345"},
+		{"12.345", 3, currency.RoundDown, "12.345"},
+
+		// 0 digits.
+		{"12.345", 0, currency.RoundHalfUp, "12"},
+		{"12.345", 0, currency.RoundHalfDown, "12"},
+		{"12.345", 0, currency.RoundUp, "13"},
+		{"12.345", 0, currency.RoundDown, "12"},
 	}
 
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
 			a, _ := currency.NewAmount(tt.number, "USD")
-			b := a.RoundTo(tt.digits)
+			b := a.RoundTo(tt.digits, tt.mode)
 			if b.Number() != tt.want {
 				t.Errorf("got %v, want %v", b.Number(), tt.want)
 			}

@@ -154,6 +154,46 @@ func TestFormatter_Digits(t *testing.T) {
 	}
 }
 
+func TestFormatter_RoundingMode(t *testing.T) {
+	tests := []struct {
+		number       string
+		currencyCode string
+		localeID     string
+		roundingMode currency.RoundingMode
+		want         string
+	}{
+		{"1234.453", "USD", "en", currency.RoundHalfUp, "$1,234.45"},
+		{"1234.455", "USD", "en", currency.RoundHalfUp, "$1,234.46"},
+		{"1234.456", "USD", "en", currency.RoundHalfUp, "$1,234.46"},
+
+		{"1234.453", "USD", "en", currency.RoundHalfDown, "$1,234.45"},
+		{"1234.455", "USD", "en", currency.RoundHalfDown, "$1,234.45"},
+		{"1234.457", "USD", "en", currency.RoundHalfDown, "$1,234.46"},
+
+		{"1234.453", "USD", "en", currency.RoundUp, "$1,234.46"},
+		{"1234.455", "USD", "en", currency.RoundUp, "$1,234.46"},
+		{"1234.457", "USD", "en", currency.RoundUp, "$1,234.46"},
+
+		{"1234.453", "USD", "en", currency.RoundDown, "$1,234.45"},
+		{"1234.455", "USD", "en", currency.RoundDown, "$1,234.45"},
+		{"1234.457", "USD", "en", currency.RoundDown, "$1,234.45"},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			amount, _ := currency.NewAmount(tt.number, tt.currencyCode)
+			locale := currency.NewLocale(tt.localeID)
+			formatter := currency.NewFormatter(locale)
+			formatter.MaxDigits = currency.DefaultDigits
+			formatter.RoundingMode = tt.roundingMode
+			got := formatter.Format(amount)
+			if got != tt.want {
+				t.Errorf("got %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestFormatter_CurrencyDisplay(t *testing.T) {
 	tests := []struct {
 		number          string

@@ -46,10 +46,14 @@ type Formatter struct {
 	// Defaults to currency.DefaultDigits (e.g. 2 for USD, 0 for RSD).
 	MinDigits uint8
 	// MaxDigits specifies the maximum number of fraction digits.
-	// Formatted currency amounts will be rounded to this number of digits.
+	// Formatted amounts will be rounded to this number of digits.
 	// Defaults to 6, so that most amounts are shown as-is (without rounding).
 	MaxDigits uint8
-	// CurrencyDisplay specifies how the currency should be displayed.
+	// RoundingMode specifies how the formatted amount will be rounded.
+	// One of the currency.Round* constants.
+	// Defaults to currency.RoundHalfUp.
+	RoundingMode RoundingMode
+	// CurrencyDisplay specifies how the currency will be displayed.
 	// One of the currency.Display* constants.
 	// Defaults to curency.DisplaySymbol.
 	CurrencyDisplay Display
@@ -83,6 +87,8 @@ func NewFormatter(locale Locale) *Formatter {
 	}
 	f.MinDigits = DefaultDigits
 	f.MaxDigits = 6
+	f.RoundingMode = RoundHalfUp
+	f.CurrencyDisplay = DisplaySymbol
 	f.SymbolMap = make(map[string]string)
 
 	return f
@@ -184,7 +190,7 @@ func (f Formatter) formatNumber(amount Amount) string {
 	if maxDigits == DefaultDigits {
 		maxDigits, _ = GetDigits(amount.CurrencyCode())
 	}
-	amount = amount.RoundTo(maxDigits)
+	amount = amount.RoundTo(maxDigits, f.RoundingMode)
 	numberParts := strings.Split(amount.Number(), ".")
 	majorDigits := f.groupMajorDigits(numberParts[0])
 	minorDigits := ""
