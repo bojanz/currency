@@ -22,9 +22,6 @@ const (
 	DisplayNone
 )
 
-// DefaultDigits is a placeholder for each currency's number of fraction digits.
-const DefaultDigits uint8 = 255
-
 var localDigits = map[numberingSystem]string{
 	numArab:    "٠١٢٣٤٥٦٧٨٩",
 	numArabExt: "۰۱۲۳۴۵۶۷۸۹",

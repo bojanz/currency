@@ -5,6 +5,9 @@ package currency
 
 import "sort"
 
+// DefaultDigits is a placeholder for each currency's number of fraction digits.
+const DefaultDigits uint8 = 255
+
 // GetCurrencyCodes returns all known currency codes.
 func GetCurrencyCodes() []string {
 	return currencyCodes

@@ -164,14 +164,16 @@ func (a Amount) Div(n string) (Amount, error) {
 	return Amount{result, a.currencyCode}, err
 }
 
-// Round rounds a to its currency's default number of fraction digits.
+// Round is a shortcut for RoundTo(currency.DefaultDigits, currency.RoundHalfUp).
 func (a Amount) Round() Amount {
-	digits, _ := GetDigits(a.currencyCode)
-	return a.RoundTo(digits, RoundHalfUp)
+	return a.RoundTo(DefaultDigits, RoundHalfUp)
 }
 
 // RoundTo rounds a to the given number of fraction digits.
 func (a Amount) RoundTo(digits uint8, mode RoundingMode) Amount {
+	if digits == DefaultDigits {
+		digits, _ = GetDigits(a.currencyCode)
+	}
 	extModes := map[RoundingMode]string{
 		RoundHalfUp:   apd.RoundHalfUp,
 		RoundHalfDown: apd.RoundHalfDown,
