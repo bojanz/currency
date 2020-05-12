@@ -107,6 +107,38 @@ func TestFormatter_Grouping(t *testing.T) {
 	}
 }
 
+func TestFormatter_PlusSign(t *testing.T) {
+	tests := []struct {
+		number       string
+		currencyCode string
+		localeID     string
+		AddPlusSign  bool
+		want         string
+	}{
+		{"123.99", "USD", "en", false, "$123.99"},
+		{"123.99", "USD", "en", true, "+$123.99"},
+
+		{"123.99", "USD", "de-CH", false, "US$\u00a0123.99"},
+		{"123.99", "USD", "de-CH", true, "US$+123.99"},
+
+		{"123.99", "USD", "fr", false, "123,99\u00a0$US"},
+		{"123.99", "USD", "fr", true, "+123,99\u00a0$US"},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			amount, _ := currency.NewAmount(tt.number, tt.currencyCode)
+			locale := currency.NewLocale(tt.localeID)
+			formatter := currency.NewFormatter(locale)
+			formatter.AddPlusSign = tt.AddPlusSign
+			got := formatter.Format(amount)
+			if got != tt.want {
+				t.Errorf("got %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestFormatter_Digits(t *testing.T) {
 	tests := []struct {
 		number       string

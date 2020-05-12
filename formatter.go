@@ -38,6 +38,9 @@ type Formatter struct {
 	// NoGrouping turns off grouping of major digits.
 	// Defaults to false.
 	NoGrouping bool
+	// AddPlusSign inserts the plus sign in front of positive amounts.
+	// Defaults to false.
+	AddPlusSign bool
 	// MinDigits specifies the minimum number of fraction digits.
 	// All zeroes past the minimum will be removed (0 => no trailing zeroes).
 	// Defaults to currency.DefaultDigits (e.g. 2 for USD, 0 for RSD).
@@ -173,6 +176,11 @@ func (f Formatter) getPattern(amount Amount) string {
 			return "-" + patterns[0]
 		}
 		return patterns[1]
+	} else if f.AddPlusSign {
+		if len(patterns) == 1 {
+			return "+" + patterns[0]
+		}
+		return strings.Replace(patterns[1], "-", "+", 1)
 	}
 	return patterns[0]
 }
