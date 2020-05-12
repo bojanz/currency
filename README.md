@@ -1,19 +1,19 @@
-# currency
+# currency [![Build Status](https://travis-ci.org/bojanz/currency.png?branch=master)](https://travis-ci.org/bojanz/currency) [![GoDoc](https://godoc.org/github.com/bojanz/currency?status.svg)](https://godoc.org/github.com/bojanz/currency)
 
 Handles currency amounts, provides currency information and formatting.
 
 Powered by CLDR v37, in just ~30kb of data.
 
-Features:
+## Features
 
-    1. All currency codes, their numeric codes and fraction digits.
-    2. Currency symbols and formats for all locales.
-    3. Amount struct, with value semantics (Fowler's Money pattern)
-    4. Formatter, for formatting amounts and parsing formatted amounts.
+1. All currency codes, their numeric codes and fraction digits.
+2. Currency symbols and formats for all locales.
+3. Amount struct, with value semantics (Fowler's Money pattern)
+4. Formatter, for formatting amounts and parsing formatted amounts.
 
-Design goals:
+## Design goals
 
-    1. Real decimal implementation under the hood.
+1. Real decimal implementation under the hood.
 
 Currency amounts can't be floats. Storing integer minor units (2.99 => 299)
 becomes problematic once there are multiple currencies (difficult to sort in the
@@ -24,17 +24,17 @@ the cockroachdb/apd package. The Amount struct provides an easy to use
 abstraction on top of it, allowing the underlying implementation to be replaced
 in the future without a backwards compatibility break.
 
-    2) English as a priority.
+2. English as a priority.
 
 Where possible, the ``en`` and ``en-US`` locales are given preferred treatment.
 For example, looking up currency symbols is the quickest for these locales,
 since they are the most commonly used.
 
-    3) Automatically generated CLDR data.
+3. Automatically generated CLDR data.
 
 Updating to the latest CLDR release is always one ``go generate`` away.
 
-    4) Smart filtering of CLDR data.
+4. Smart filtering of CLDR data.
 
 CLDR contains 542 locales, not all of which are likely to be used. This list is
 reduced to 381 using a list of ignored locales, containing constructed languages

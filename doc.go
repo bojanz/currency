@@ -23,17 +23,17 @@
 // underlying implementation to be replaced in the future without a backwards compatibility
 // break.
 //
-//   2) English as a priority.
+//   2. English as a priority.
 //
 // Where possible, the ``en`` and ``en-US`` locales are given preferred treatment.
 // For example, looking up currency symbols is the quickest for these locales,
 // since they are the most commonly used.
 //
-//   3) Automatically generated CLDR data.
+//   3. Automatically generated CLDR data.
 //
 // Updating to the latest CLDR release is always one ``go generate`` away.
 //
-//   4) Smart filtering of CLDR data.
+//   4. Smart filtering of CLDR data.
 //
 // CLDR contains 542 locales, not all of which are likely to be used.
 // This list is reduced to 381 using a list of ignored locales, containing
