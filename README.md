@@ -11,6 +11,22 @@ Powered by CLDR v37, in just ~30kb of data.
 3. Amount struct, with value semantics (Fowler's Money pattern)
 4. Formatter, for formatting amounts and parsing formatted amounts.
 
+```go
+    amount, _ := currency.NewAmount("275.98", "EUR")
+    total, _ := amount.Mul("4")
+
+    locale := currency.NewLocale("fr")
+    formatter := currency.NewFormatter(locale)
+    fmt.Println(formatter.Format(total)) // 1 103,92 €
+
+    // Convert the amount to Iranian rial and show it in Farsi.
+    total, _ = total.Convert("IRR", "45.538")
+    total = total.Round()
+    locale = currency.NewLocale("fa")
+    formatter = currency.NewFormatter(locale)
+    fmt.Println(formatter.Format(total)) // ‎ریال ۵۰٬۲۷۰
+```
+
 ## Design goals
 
 1. Real decimal implementation under the hood.
