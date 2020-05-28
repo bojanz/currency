@@ -95,12 +95,12 @@ func NewFormatter(locale Locale) *Formatter {
 }
 
 // Locale returns the locale.
-func (f Formatter) Locale() Locale {
+func (f *Formatter) Locale() Locale {
 	return f.locale
 }
 
 // Format formats a currency amount.
-func (f Formatter) Format(amount Amount) string {
+func (f *Formatter) Format(amount Amount) string {
 	pattern := f.getPattern(amount)
 	if amount.IsNegative() {
 		// The minus sign will be provided by the pattern.
@@ -142,7 +142,7 @@ func (f Formatter) Format(amount Amount) string {
 }
 
 // Parse parses a formatted amount.
-func (f Formatter) Parse(s, currencyCode string) (Amount, error) {
+func (f *Formatter) Parse(s, currencyCode string) (Amount, error) {
 	symbol, _ := GetSymbol(currencyCode, f.locale)
 	replacements := []string{
 		f.format.decimalSeparator, ".",
@@ -169,7 +169,7 @@ func (f Formatter) Parse(s, currencyCode string) (Amount, error) {
 }
 
 // getPattern returns a positive or negative pattern for a currency amount.
-func (f Formatter) getPattern(amount Amount) string {
+func (f *Formatter) getPattern(amount Amount) string {
 	patterns := strings.Split(f.format.pattern, ";")
 	if amount.IsNegative() {
 		if len(patterns) == 1 {
@@ -186,7 +186,7 @@ func (f Formatter) getPattern(amount Amount) string {
 }
 
 // formatNumber formats the number for display.
-func (f Formatter) formatNumber(amount Amount) string {
+func (f *Formatter) formatNumber(amount Amount) string {
 	minDigits := f.MinDigits
 	if minDigits == DefaultDigits {
 		minDigits, _ = GetDigits(amount.CurrencyCode())
@@ -223,7 +223,7 @@ func (f Formatter) formatNumber(amount Amount) string {
 }
 
 // formatCurrency formats the currency for display.
-func (f Formatter) formatCurrency(currencyCode string) string {
+func (f *Formatter) formatCurrency(currencyCode string) string {
 	var formatted string
 	switch f.CurrencyDisplay {
 	case DisplaySymbol:
@@ -242,7 +242,7 @@ func (f Formatter) formatCurrency(currencyCode string) string {
 }
 
 // groupMajorDigits groups major digits according to the currency format.
-func (f Formatter) groupMajorDigits(majorDigits string) string {
+func (f *Formatter) groupMajorDigits(majorDigits string) string {
 	if f.NoGrouping || f.format.primaryGroupingSize == 0 {
 		return majorDigits
 	}
@@ -275,7 +275,7 @@ func (f Formatter) groupMajorDigits(majorDigits string) string {
 }
 
 // localizeDigits replaces digits with their localized equivalents.
-func (f Formatter) localizeDigits(number string) string {
+func (f *Formatter) localizeDigits(number string) string {
 	if f.format.numberingSystem == numLatn {
 		return number
 	}
