@@ -8,7 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/cockroachdb/apd"
+	"github.com/cockroachdb/apd/v2"
 )
 
 // RoundingMode determines how the amount will be rounded.
