@@ -9,6 +9,30 @@ import (
 	"github.com/bojanz/currency"
 )
 
+func TestFormatter_Locale(t *testing.T) {
+	tests := []struct {
+		localeID string
+		want     string
+	}{
+		{"de-CH", "de-CH"},
+		// Fallback due to lack of format data.
+		{"fr-FR", "fr"},
+		// Fallback due to package rules.
+		{"en-US", "en"},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			locale := currency.NewLocale(tt.localeID)
+			formatter := currency.NewFormatter(locale)
+			got := formatter.Locale().String()
+			if got != tt.want {
+				t.Errorf("got %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestFormatter_Format(t *testing.T) {
 	tests := []struct {
 		number       string
@@ -121,8 +145,8 @@ func TestFormatter_PlusSign(t *testing.T) {
 		{"123.99", "USD", "de-CH", false, "US$\u00a0123.99"},
 		{"123.99", "USD", "de-CH", true, "US$+123.99"},
 
-		{"123.99", "USD", "fr", false, "123,99\u00a0$US"},
-		{"123.99", "USD", "fr", true, "+123,99\u00a0$US"},
+		{"123.99", "USD", "fr-FR", false, "123,99\u00a0$US"},
+		{"123.99", "USD", "fr-FR", true, "+123,99\u00a0$US"},
 	}
 
 	for _, tt := range tests {

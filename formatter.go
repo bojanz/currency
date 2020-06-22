@@ -66,7 +66,6 @@ type Formatter struct {
 // NewFormatter creates a new formatter for the given locale.
 func NewFormatter(locale Locale) *Formatter {
 	f := &Formatter{}
-	f.locale = locale
 	for {
 		// CLDR considers "en" and "en-US" to be equivalent.
 		// Fall back immediately for better performance
@@ -85,6 +84,7 @@ func NewFormatter(locale Locale) *Formatter {
 			break
 		}
 	}
+	f.locale = locale
 	f.MinDigits = DefaultDigits
 	f.MaxDigits = 6
 	f.RoundingMode = RoundHalfUp
