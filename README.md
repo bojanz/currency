@@ -1,4 +1,4 @@
-# currency [![Build Status](https://travis-ci.org/bojanz/currency.png?branch=master)](https://travis-ci.org/bojanz/currency) [![Go Report Card](https://goreportcard.com/badge/github.com/bojanz/currency)](https://goreportcard.com/report/github.com/bojanz/currency) [![GoDoc](https://godoc.org/github.com/bojanz/currency?status.svg)](https://godoc.org/github.com/bojanz/currency)
+# currency [![Build Status](https://travis-ci.org/bojanz/currency.png?branch=master)](https://travis-ci.org/bojanz/currency) [![Coverage Status](https://coveralls.io/repos/github/bojanz/currency/badge.svg?branch=master)](https://coveralls.io/github/bojanz/currency?branch=master) [![Go Report Card](https://goreportcard.com/badge/github.com/bojanz/currency)](https://goreportcard.com/report/github.com/bojanz/currency) [![GoDoc](https://godoc.org/github.com/bojanz/currency?status.svg)](https://godoc.org/github.com/bojanz/currency)
 
 Handles currency amounts, provides currency information and formatting.
 
