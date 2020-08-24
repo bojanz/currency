@@ -1,4 +1,4 @@
-# currency [![Build Status](https://travis-ci.org/bojanz/currency.png?branch=master)](https://travis-ci.org/bojanz/currency) [![Coverage Status](https://coveralls.io/repos/github/bojanz/currency/badge.svg?branch=master)](https://coveralls.io/github/bojanz/currency?branch=master) [![Go Report Card](https://goreportcard.com/badge/github.com/bojanz/currency)](https://goreportcard.com/report/github.com/bojanz/currency) [![GoDoc](https://godoc.org/github.com/bojanz/currency?status.svg)](https://godoc.org/github.com/bojanz/currency)
+# currency [![Build Status](https://travis-ci.org/bojanz/currency.png?branch=master)](https://travis-ci.org/bojanz/currency) [![Coverage Status](https://coveralls.io/repos/github/bojanz/currency/badge.svg?branch=master)](https://coveralls.io/github/bojanz/currency?branch=master) [![Go Report Card](https://goreportcard.com/badge/github.com/bojanz/currency)](https://goreportcard.com/report/github.com/bojanz/currency) [![PkgGoDev](https://pkg.go.dev/badge/github.com/bojanz/currency)](https://pkg.go.dev/github.com/bojanz/currency)
 
 Handles currency amounts, provides currency information and formatting.
 
@@ -42,13 +42,13 @@ in the future without a backwards compatibility break.
 
 2. English as a priority.
 
-Where possible, the ``en`` and ``en-US`` locales are given preferred treatment.
+Where possible, the `en` and `en-US` locales are given preferred treatment.
 For example, looking up currency symbols is the quickest for these locales,
 since they are the most commonly used.
 
 3. Automatically generated CLDR data.
 
-Updating to the latest CLDR release is always one ``go generate`` away.
+Updating to the latest CLDR release is always one `go generate` away.
 
 4. Smart filtering of CLDR data.
 
@@ -60,7 +60,7 @@ maintained by community feedback, developers wishing to use an ignored locale
 can open a pull request.
 
 Once gathered, locales are filtered to remove all data not used by this package,
-and then deduplicated by parent (e.g. don't keep ``fr-CH`` if ``fr`` has the
+and then deduplicated by parent (e.g. don't keep `fr-CH` if `fr` has the
 same data).
 
 Currency symbols are grouped together to avoid repetition. For example:
