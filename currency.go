@@ -88,7 +88,8 @@ func contains(a []string, x string) bool {
 		}
 	} else {
 		// Binary search is faster with a large number of elements.
-		if i := sort.SearchStrings(a, x); i < n {
+		i := sort.SearchStrings(a, x)
+		if i < n && a[i] == x {
 			return true
 		}
 	}

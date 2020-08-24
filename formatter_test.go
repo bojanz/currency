@@ -41,25 +41,25 @@ func TestFormatter_Format(t *testing.T) {
 		want         string
 	}{
 		{"1234.59", "USD", "en", "$1,234.59"},
-		{"1234.59", "USD", "de-AT", "US$\u00a01.234,59"},
-		{"1234.59", "USD", "de-CH", "US$\u00a01’234.59"},
+		{"1234.59", "USD", "de-CH", "$\u00a01’234.59"},
+		{"1234.59", "USD", "sr", "1.234,59\u00a0US$"},
 
 		{"-1234.59", "USD", "en", "-$1,234.59"},
-		{"-1234.59", "USD", "de-AT", "-US$\u00a01.234,59"},
-		{"-1234.59", "USD", "de-CH", "US$-1’234.59"},
+		{"-1234.59", "USD", "de-CH", "$-1’234.59"},
+		{"-1234.59", "USD", "sr", "-1.234,59\u00a0US$"},
 
 		{"1234.00", "EUR", "en", "€1,234.00"},
-		{"1234.00", "EUR", "de-AT", "€\u00a01.234,00"},
 		{"1234.00", "EUR", "de-CH", "€\u00a01’234.00"},
+		{"1234.00", "EUR", "sr", "1.234,00\u00a0€"},
 
 		{"1234.00", "CHF", "en", "CHF\u00a01,234.00"},
-		{"1234.00", "CHF", "de-AT", "CHF\u00a01.234,00"},
 		{"1234.00", "CHF", "de-CH", "CHF\u00a01’234.00"},
+		{"1234.00", "CHF", "sr", "1.234,00\u00a0CHF"},
 
 		// Arabic digits.
 		{"12345678.90", "USD", "ar", "١٢٬٣٤٥٬٦٧٨٫٩٠\u00a0US$"},
 		// Arabic extended (Persian) digits.
-		{"12345678.90", "USD", "fa", "\u200eUS$۱۲٬۳۴۵٬۶۷۸٫۹۰"},
+		{"12345678.90", "USD", "fa", "\u200e$۱۲٬۳۴۵٬۶۷۸٫۹۰"},
 		// Bengali digits.
 		{"12345678.90", "USD", "bn", "১,২৩,৪৫,৬৭৮.৯০\u00a0US$"},
 		// Devanagari digits.
@@ -106,10 +106,10 @@ func TestFormatter_Grouping(t *testing.T) {
 		{"1234567.99", "USD", "es", false, "1.234.567,99\u00a0US$"},
 
 		// The "hi" locale has a different secondaryGroupingSize.
-		{"123.99", "USD", "hi", false, "US$123.99"},
-		{"1234.99", "USD", "hi", false, "US$1,234.99"},
-		{"1234567.99", "USD", "hi", false, "US$12,34,567.99"},
-		{"12345678.99", "USD", "hi", false, "US$1,23,45,678.99"},
+		{"123.99", "USD", "hi", false, "$123.99"},
+		{"1234.99", "USD", "hi", false, "$1,234.99"},
+		{"1234567.99", "USD", "hi", false, "$12,34,567.99"},
+		{"12345678.99", "USD", "hi", false, "$1,23,45,678.99"},
 
 		// The "bg" locale doesn't support grouping.
 		{"123.99", "EUR", "bg", false, "123,99\u00a0€"},
@@ -142,8 +142,8 @@ func TestFormatter_PlusSign(t *testing.T) {
 		{"123.99", "USD", "en", false, "$123.99"},
 		{"123.99", "USD", "en", true, "+$123.99"},
 
-		{"123.99", "USD", "de-CH", false, "US$\u00a0123.99"},
-		{"123.99", "USD", "de-CH", true, "US$+123.99"},
+		{"123.99", "USD", "de-CH", false, "$\u00a0123.99"},
+		{"123.99", "USD", "de-CH", true, "$+123.99"},
 
 		{"123.99", "USD", "fr-FR", false, "123,99\u00a0$US"},
 		{"123.99", "USD", "fr-FR", true, "+123,99\u00a0$US"},
@@ -262,7 +262,7 @@ func TestFormatter_CurrencyDisplay(t *testing.T) {
 		{"1234.59", "USD", "en", currency.DisplayCode, "USD\u00a01,234.59"},
 		{"1234.59", "USD", "en", currency.DisplayNone, "1,234.59"},
 
-		{"1234.59", "USD", "de-AT", currency.DisplaySymbol, "US$\u00a01.234,59"},
+		{"1234.59", "USD", "de-AT", currency.DisplaySymbol, "$\u00a01.234,59"},
 		{"1234.59", "USD", "de-AT", currency.DisplayCode, "USD\u00a01.234,59"},
 		{"1234.59", "USD", "de-AT", currency.DisplayNone, "1.234,59"},
 
@@ -331,7 +331,7 @@ func TestFormatter_Parse(t *testing.T) {
 		// Arabic digits.
 		{"١٢٬٣٤٥٬٦٧٨٫٩٠\u00a0US$", "USD", "ar", "12345678.90"},
 		// Arabic extended (Persian) digits.
-		{"\u200eUS$۱۲٬۳۴۵٬۶۷۸٫۹۰", "USD", "fa", "12345678.90"},
+		{"\u200e$۱۲٬۳۴۵٬۶۷۸٫۹۰", "USD", "fa", "12345678.90"},
 		// Bengali digits.
 		{"১,২৩,৪৫,৬৭৮.৯০\u00a0US$", "USD", "bn", "12345678.90"},
 		// Devanagari digits.
