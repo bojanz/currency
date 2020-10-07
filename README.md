@@ -4,6 +4,8 @@ Handles currency amounts, provides currency information and formatting.
 
 Powered by CLDR v37, in just ~30kb of data.
 
+Backstory: https://bojanz.github.io/price-currency-handling-go/
+
 ## Features
 
 1. All currency codes, their numeric codes and fraction digits.
@@ -72,4 +74,4 @@ Currency symbols are grouped together to avoid repetition. For example:
     }
 
 Currency names are not included because they are rarely shown, but need
-significant space.
+significant space. Instead, they can be fetched on the frontend via [Intl.DisplayNames](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DisplayNames).

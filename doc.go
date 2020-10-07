@@ -51,5 +51,6 @@
 //      {"$AR", []string{"fr"}},
 //  }
 // Currency names are not included because they are rarely shown, but need significant space.
+// Instead, they can be fetched on the frontend via ``Intl.DisplayNames``.
 //
 package currency
