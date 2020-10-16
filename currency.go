@@ -14,9 +14,11 @@ func GetCurrencyCodes() []string {
 }
 
 // IsValid checks whether a currencyCode is valid.
+//
+// An empty currencyCode is considered valid.
 func IsValid(currencyCode string) bool {
-	if len(currencyCode) != 3 {
-		return false
+	if currencyCode == "" {
+		return true
 	}
 	_, ok := currencies[currencyCode]
 
@@ -25,7 +27,7 @@ func IsValid(currencyCode string) bool {
 
 // GetNumericCode returns the numeric code for a currencyCode.
 func GetNumericCode(currencyCode string) (numericCode string, ok bool) {
-	if !IsValid(currencyCode) {
+	if currencyCode == "" || !IsValid(currencyCode) {
 		return "000", false
 	}
 	return currencies[currencyCode].numericCode, true
@@ -33,7 +35,7 @@ func GetNumericCode(currencyCode string) (numericCode string, ok bool) {
 
 // GetDigits returns the number of fraction digits for a currencyCode.
 func GetDigits(currencyCode string) (digits uint8, ok bool) {
-	if !IsValid(currencyCode) {
+	if currencyCode == "" || !IsValid(currencyCode) {
 		return 0, false
 	}
 	return currencies[currencyCode].digits, true
@@ -41,7 +43,7 @@ func GetDigits(currencyCode string) (digits uint8, ok bool) {
 
 // GetSymbol returns the symbol for a currencyCode.
 func GetSymbol(currencyCode string, locale Locale) (symbol string, ok bool) {
-	if !IsValid(currencyCode) {
+	if currencyCode == "" || !IsValid(currencyCode) {
 		return currencyCode, false
 	}
 	symbols, ok := currencySymbols[currencyCode]

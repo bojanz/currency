@@ -68,7 +68,7 @@ func NewAmount(n, currencyCode string) (Amount, error) {
 	if err != nil {
 		return Amount{}, InvalidNumberError{"NewAmount", n}
 	}
-	if !IsValid(currencyCode) {
+	if currencyCode == "" || !IsValid(currencyCode) {
 		return Amount{}, InvalidCurrencyCodeError{"NewAmount", currencyCode}
 	}
 
@@ -103,7 +103,7 @@ func (a Amount) ToMinorUnits() int64 {
 
 // Convert converts a to a different currency.
 func (a Amount) Convert(currencyCode, rate string) (Amount, error) {
-	if !IsValid(currencyCode) {
+	if currencyCode == "" || !IsValid(currencyCode) {
 		return Amount{}, InvalidCurrencyCodeError{"Amount.Convert", currencyCode}
 	}
 	result, _, err := apd.NewFromString(rate)
@@ -247,7 +247,7 @@ func (a *Amount) UnmarshalBinary(data []byte) error {
 	if err != nil {
 		return InvalidNumberError{"Amount.UnmarshalBinary", n}
 	}
-	if !IsValid(currencyCode) {
+	if currencyCode == "" || !IsValid(currencyCode) {
 		return InvalidCurrencyCodeError{"Amount.UnmarshalBinary", currencyCode}
 	}
 	a.number = number
@@ -281,7 +281,7 @@ func (a *Amount) UnmarshalJSON(data []byte) error {
 	if err != nil {
 		return InvalidNumberError{"Amount.UnmarshalJSON", aux.Number}
 	}
-	if !IsValid(aux.CurrencyCode) {
+	if aux.CurrencyCode == "" || !IsValid(aux.CurrencyCode) {
 		return InvalidCurrencyCodeError{"Amount.UnmarshalJSON", aux.CurrencyCode}
 	}
 	a.number = number

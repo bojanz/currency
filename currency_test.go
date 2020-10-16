@@ -25,6 +25,7 @@ func TestIsValid(t *testing.T) {
 		currencyCode string
 		want         bool
 	}{
+		{"", true},
 		{"INVALID", false},
 		{"XXX", false},
 		{"usd", false},
