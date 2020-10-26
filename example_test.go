@@ -93,12 +93,12 @@ func ExampleAmount_RoundTo() {
 func ExampleNewLocale() {
 	firstLocale := currency.NewLocale("en-US")
 	fmt.Println(firstLocale)
-	fmt.Println(firstLocale.Language, firstLocale.Region)
+	fmt.Println(firstLocale.Language, firstLocale.Territory)
 
 	// Locale IDs are normalized.
 	secondLocale := currency.NewLocale("sr_rs_latn")
 	fmt.Println(secondLocale)
-	fmt.Println(secondLocale.Language, secondLocale.Script, secondLocale.Region)
+	fmt.Println(secondLocale.Language, secondLocale.Script, secondLocale.Territory)
 	// Output: en-US
 	// en US
 	// sr-Latn-RS

@@ -51,7 +51,7 @@ func GetSymbol(currencyCode string, locale Locale) (symbol string, ok bool) {
 		return currencyCode, true
 	}
 	enLocale := Locale{Language: "en"}
-	enUSLocale := Locale{Language: "en", Region: "US"}
+	enUSLocale := Locale{Language: "en", Territory: "US"}
 	if locale == enLocale || locale == enUSLocale {
 		// The "en"/"en-US" symbol is always first.
 		return symbols[0].symbol, true

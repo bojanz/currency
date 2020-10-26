@@ -69,7 +69,7 @@ func NewFormatter(locale Locale) *Formatter {
 	for {
 		// CLDR considers "en" and "en-US" to be equivalent.
 		// Fall back immediately for better performance
-		enUSLocale := Locale{Language: "en", Region: "US"}
+		enUSLocale := Locale{Language: "en", Territory: "US"}
 		if locale == enUSLocale {
 			locale = Locale{Language: "en"}
 		}

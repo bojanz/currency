@@ -7,9 +7,9 @@ import "strings"
 
 // Locale represents a Unicode locale identifier.
 type Locale struct {
-	Language string
-	Script   string
-	Region   string
+	Language  string
+	Script    string
+	Territory string
 }
 
 // NewLocale creates a new Locale from its string representation.
@@ -29,7 +29,7 @@ func NewLocale(id string) Locale {
 			continue
 		}
 		if partLen == 2 || partLen == 3 {
-			locale.Region = strings.ToUpper(part)
+			locale.Territory = strings.ToUpper(part)
 			continue
 		}
 	}
@@ -45,9 +45,9 @@ func (l Locale) String() string {
 		b.WriteString("-")
 		b.WriteString(l.Script)
 	}
-	if l.Region != "" {
+	if l.Territory != "" {
 		b.WriteString("-")
-		b.WriteString(l.Region)
+		b.WriteString(l.Territory)
 	}
 
 	return b.String()
@@ -55,13 +55,13 @@ func (l Locale) String() string {
 
 // IsEmpty returns whether l is empty.
 func (l Locale) IsEmpty() bool {
-	return l.Language == "" && l.Script == "" && l.Region == ""
+	return l.Language == "" && l.Script == "" && l.Territory == ""
 }
 
 // GetParent returns the parent locale for l.
 //
 //	Order:
-// 	1. Language - Script - Region (e.g. "sr-Cyrl-RS")
+// 	1. Language - Script - Territory (e.g. "sr-Cyrl-RS")
 // 	2. Language - Script (e.g. "sr-Cyrl")
 // 	3. Language (e.g. "sr")
 // 	4. English ("en")
@@ -78,7 +78,7 @@ func (l Locale) GetParent() Locale {
 		return NewLocale(p)
 	}
 
-	if l.Region != "" {
+	if l.Territory != "" {
 		return Locale{Language: l.Language, Script: l.Script}
 	} else if l.Script != "" {
 		return Locale{Language: l.Language}
