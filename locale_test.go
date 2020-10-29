@@ -57,6 +57,54 @@ func TestLocale_String(t *testing.T) {
 	}
 }
 
+func TestLocale_MarshalText(t *testing.T) {
+	tests := []struct {
+		locale currency.Locale
+		want   string
+	}{
+		{currency.Locale{}, ""},
+		{currency.Locale{Language: "de"}, "de"},
+		{currency.Locale{Language: "de", Territory: "CH"}, "de-CH"},
+		{currency.Locale{Language: "sr", Script: "Cyrl"}, "sr-Cyrl"},
+		{currency.Locale{Language: "sr", Script: "Latn", Territory: "RS"}, "sr-Latn-RS"},
+	}
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			b, _ := tt.locale.MarshalText()
+			got := string(b)
+			if got != tt.want {
+				t.Errorf("got %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestLocale_UnmarshalText(t *testing.T) {
+	tests := []struct {
+		id   string
+		want currency.Locale
+	}{
+		{"", currency.Locale{}},
+		{"de", currency.Locale{Language: "de"}},
+		{"de-CH", currency.Locale{Language: "de", Territory: "CH"}},
+		{"sr-Cyrl", currency.Locale{Language: "sr", Script: "Cyrl"}},
+		{"sr-Latn-RS", currency.Locale{Language: "sr", Script: "Latn", Territory: "RS"}},
+		// ID with the wrong case, ordering, delimeter.
+		{"SR_rs_LATN", currency.Locale{Language: "sr", Script: "Latn", Territory: "RS"}},
+		// ID with a variant. Variants are unsupported and ignored.
+		{"ca-ES-VALENCIA", currency.Locale{Language: "ca", Territory: "ES"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.id, func(t *testing.T) {
+			l := currency.Locale{}
+			l.UnmarshalText([]byte(tt.id))
+			if l != tt.want {
+				t.Errorf("got %v, want %v", l, tt.want)
+			}
+		})
+	}
+}
+
 func TestLocale_IsEmpty(t *testing.T) {
 	tests := []struct {
 		locale currency.Locale
