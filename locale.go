@@ -60,11 +60,7 @@ func (l Locale) MarshalText() ([]byte, error) {
 
 // UnmarshalText implements the encoding.TextUnmarshaler interface.
 func (l *Locale) UnmarshalText(b []byte) error {
-	aux := NewLocale(string(b))
-	l.Language = aux.Language
-	l.Script = aux.Script
-	l.Territory = aux.Territory
-
+	*l = NewLocale(string(b))
 	return nil
 }
 
