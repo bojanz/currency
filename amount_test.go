@@ -19,6 +19,10 @@ func TestNewAmount(t *testing.T) {
 		if e.Number != "INVALID" {
 			t.Errorf("got %v, want INVALID", e.Number)
 		}
+		wantError := `currency/NewAmount: invalid number "INVALID"`
+		if e.Error() != wantError {
+			t.Errorf("got %v, want %v", e.Error(), wantError)
+		}
 	} else {
 		t.Errorf("got %T, want currency.InvalidNumberError", err)
 	}
@@ -30,6 +34,10 @@ func TestNewAmount(t *testing.T) {
 		}
 		if e.CurrencyCode != "usd" {
 			t.Errorf("got %v, want usd", e.CurrencyCode)
+		}
+		wantError := `currency/NewAmount: invalid currency code "usd"`
+		if e.Error() != wantError {
+			t.Errorf("got %v, want %v", e.Error(), wantError)
 		}
 	} else {
 		t.Errorf("got %T, want currency.InvalidCurrencyCodeError", err)
@@ -88,6 +96,10 @@ func TestAmount_Convert(t *testing.T) {
 		if e.CurrencyCode != "eur" {
 			t.Errorf("got %v, want eur", e.CurrencyCode)
 		}
+		wantError := `currency/Amount.Convert: invalid currency code "eur"`
+		if e.Error() != wantError {
+			t.Errorf("got %v, want %v", e.Error(), wantError)
+		}
 	} else {
 		t.Errorf("got %T, want currency.InvalidCurrencyCodeError", err)
 	}
@@ -99,6 +111,10 @@ func TestAmount_Convert(t *testing.T) {
 		}
 		if e.Number != "INVALID" {
 			t.Errorf("got %v, want INVALID", e.Number)
+		}
+		wantError := `currency/Amount.Convert: invalid number "INVALID"`
+		if e.Error() != wantError {
+			t.Errorf("got %v, want %v", e.Error(), wantError)
 		}
 	} else {
 		t.Errorf("got %T, want currency.InvalidNumberError", err)
@@ -132,6 +148,10 @@ func TestAmount_Add(t *testing.T) {
 		}
 		if e.B != x {
 			t.Errorf("got %v, want %v", e.B, x)
+		}
+		wantError := `currency/Amount.Add: "20.99 USD" and "99.99 EUR" have mismatched currency codes`
+		if e.Error() != wantError {
+			t.Errorf("got %v, want %v", e.Error(), wantError)
 		}
 	} else {
 		t.Errorf("got %T, want currency.MismatchError", err)
@@ -169,6 +189,10 @@ func TestAmount_Sub(t *testing.T) {
 		if e.B != x {
 			t.Errorf("got %v, want %v", e.B, x)
 		}
+		wantError := `currency/Amount.Sub: "20.99 USD" and "99.99 EUR" have mismatched currency codes`
+		if e.Error() != wantError {
+			t.Errorf("got %v, want %v", e.Error(), wantError)
+		}
 	} else {
 		t.Errorf("got %T, want currency.MismatchError", err)
 	}
@@ -199,6 +223,10 @@ func TestAmount_Mul(t *testing.T) {
 		}
 		if e.Number != "INVALID" {
 			t.Errorf("got %v, want INVALID", e.Number)
+		}
+		wantError := `currency/Amount.Mul: invalid number "INVALID"`
+		if e.Error() != wantError {
+			t.Errorf("got %v, want %v", e.Error(), wantError)
 		}
 	} else {
 		t.Errorf("got %T, want currency.InvalidNumberError", err)
@@ -347,6 +375,10 @@ func TestAmount_Cmp(t *testing.T) {
 		if e.B != b {
 			t.Errorf("got %v, want %v", e.B, b)
 		}
+		wantError := `currency/Amount.Cmp: "3.33 USD" and "3.33 EUR" have mismatched currency codes`
+		if e.Error() != wantError {
+			t.Errorf("got %v, want %v", e.Error(), wantError)
+		}
 	} else {
 		t.Errorf("got %T, want currency.MismatchError", err)
 	}
@@ -457,6 +489,10 @@ func TestAmount_UnmarshalBinary(t *testing.T) {
 		if e.CurrencyCode != "US" {
 			t.Errorf("got %v, want US", e.CurrencyCode)
 		}
+		wantError := `currency/Amount.UnmarshalBinary: invalid currency code "US"`
+		if e.Error() != wantError {
+			t.Errorf("got %v, want %v", e.Error(), wantError)
+		}
 	} else {
 		t.Errorf("got %T, want currency.InvalidCurrencyCodeError", err)
 	}
@@ -470,6 +506,10 @@ func TestAmount_UnmarshalBinary(t *testing.T) {
 		if e.Number != "3,60" {
 			t.Errorf("got %v, want 3,60", e.Number)
 		}
+		wantError := `currency/Amount.UnmarshalBinary: invalid number "3,60"`
+		if e.Error() != wantError {
+			t.Errorf("got %v, want %v", e.Error(), wantError)
+		}
 	} else {
 		t.Errorf("got %T, want currency.InvalidNumberError", err)
 	}
@@ -482,6 +522,10 @@ func TestAmount_UnmarshalBinary(t *testing.T) {
 		}
 		if e.CurrencyCode != "XXX" {
 			t.Errorf("got %v, want XXX", e.CurrencyCode)
+		}
+		wantError := `currency/Amount.UnmarshalBinary: invalid currency code "XXX"`
+		if e.Error() != wantError {
+			t.Errorf("got %v, want %v", e.Error(), wantError)
 		}
 	} else {
 		t.Errorf("got %T, want currency.InvalidCurrencyCodeError", err)
@@ -524,6 +568,10 @@ func TestAmount_UnmarshalJSON(t *testing.T) {
 		if e.Number != "INVALID" {
 			t.Errorf("got %v, want INVALID", e.Number)
 		}
+		wantError := `currency/Amount.UnmarshalJSON: invalid number "INVALID"`
+		if e.Error() != wantError {
+			t.Errorf("got %v, want %v", e.Error(), wantError)
+		}
 	} else {
 		t.Errorf("got %T, want currency.InvalidNumberError", err)
 	}
@@ -536,6 +584,10 @@ func TestAmount_UnmarshalJSON(t *testing.T) {
 		}
 		if e.CurrencyCode != "usd" {
 			t.Errorf("got %v, want usd", e.CurrencyCode)
+		}
+		wantError := `currency/Amount.UnmarshalJSON: invalid currency code "usd"`
+		if e.Error() != wantError {
+			t.Errorf("got %v, want %v", e.Error(), wantError)
 		}
 	} else {
 		t.Errorf("got %T, want currency.InvalidCurrencyCodeError", err)
