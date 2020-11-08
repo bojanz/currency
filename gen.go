@@ -261,7 +261,7 @@ func fetchCLDR(dir string) (string, error) {
 		"https://github.com/unicode-cldr/cldr-numbers-full.git",
 	}
 	for _, repo := range repos {
-		cmd := exec.Command("git", "clone", repo)
+		cmd := exec.Command("git", "clone", repo, "--depth", "1")
 		cmd.Dir = dir
 		cmd.Stderr = os.Stderr
 		_, err := cmd.Output()
