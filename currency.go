@@ -1,6 +1,7 @@
 // Copyright (c) 2020 Bojan Zivanovic and contributors
 // SPDX-License-Identifier: MIT
 
+// Package currency handles currency amounts, provides currency information and formatting.
 package currency
 
 import "sort"
