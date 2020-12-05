@@ -28,7 +28,6 @@ var localDigits = map[numberingSystem]string{
 	numBeng:    "০১২৩৪৫৬৭৮৯",
 	numDeva:    "०१२३४५६७८९",
 	numMymr:    "၀၁၂၃၄၅၆၇၈၉",
-	numTibt:    "༠༡༢༣༤༥༦༧༨༩",
 }
 
 // Formatter formats and parses currency amounts.

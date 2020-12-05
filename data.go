@@ -15,7 +15,6 @@ const (
 	numBeng
 	numDeva
 	numMymr
-	numTibt
 )
 
 type currencyInfo struct {

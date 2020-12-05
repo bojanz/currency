@@ -66,8 +66,6 @@ func TestFormatter_Format(t *testing.T) {
 		{"12345678.90", "USD", "ne", "US$\u00a0१,२३,४५,६७८.९०"},
 		// Myanmar (Burmese) digits.
 		{"12345678.90", "USD", "my", "၁၂,၃၄၅,၆၇၈.၉၀\u00a0US$"},
-		// Tibetan digits.
-		{"12345678.90", "USD", "dz", "US$༡,༢༣,༤༥,༦༧༨.༩༠"},
 	}
 
 	for _, tt := range tests {
@@ -338,8 +336,6 @@ func TestFormatter_Parse(t *testing.T) {
 		{"US$\u00a0१,२३,४५,६७८.९०", "USD", "ne", "12345678.90"},
 		// Myanmar (Burmese) digits.
 		{"၁၂,၃၄၅,၆၇၈.၉၀\u00a0US$", "USD", "my", "12345678.90"},
-		// Tibetan digits.
-		{"US$༡,༢༣,༤༥,༦༧༨.༩༠", "USD", "dz", "12345678.90"},
 	}
 
 	for _, tt := range tests {

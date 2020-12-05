@@ -44,7 +44,6 @@ const (
 	numBeng
 	numDeva
 	numMymr
-	numTibt
 )
 
 type currencyInfo struct {
@@ -136,7 +135,6 @@ const (
 	numBeng
 	numDeva
 	numMymr
-	numTibt
 )
 
 type currencyFormat struct {
@@ -577,14 +575,12 @@ func readFormat(dir string, locale string) (currencyFormat, error) {
 			PatternBeng            cldrPattern       `json:"currencyFormats-numberSystem-beng"`
 			PatternDeva            cldrPattern       `json:"currencyFormats-numberSystem-deva"`
 			PatternMymr            cldrPattern       `json:"currencyFormats-numberSystem-mymr"`
-			PatternTibt            cldrPattern       `json:"currencyFormats-numberSystem-tibt"`
 			SymbolsLatn            map[string]string `json:"symbols-numberSystem-latn"`
 			SymbolsArab            map[string]string `json:"symbols-numberSystem-arab"`
 			SymbolsArabExt         map[string]string `json:"symbols-numberSystem-arabext"`
 			SymbolsBeng            map[string]string `json:"symbols-numberSystem-beng"`
 			SymbolsDeva            map[string]string `json:"symbols-numberSystem-deva"`
 			SymbolsMymr            map[string]string `json:"symbols-numberSystem-mymr"`
-			SymbolsTibt            map[string]string `json:"symbols-numberSystem-tibt"`
 		}
 	}
 	aux := struct {
@@ -623,10 +619,6 @@ func readFormat(dir string, locale string) (currencyFormat, error) {
 		numSystem = numMymr
 		pattern = extFormat.PatternMymr.Standard
 		symbols = extFormat.SymbolsMymr
-	case "tibt":
-		numSystem = numTibt
-		pattern = extFormat.PatternTibt.Standard
-		symbols = extFormat.SymbolsTibt
 	default:
 		return currencyFormat{}, fmt.Errorf("readFormat: unknown numbering system %q in locale %q", extFormat.DefaultNumberingSystem, locale)
 	}
