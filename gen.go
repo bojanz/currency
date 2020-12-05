@@ -258,7 +258,7 @@ func main() {
 func fetchCLDR(dir string) (string, error) {
 	repos := []string{
 		"https://github.com/unicode-cldr/cldr-core.git",
-		"https://github.com/unicode-cldr/cldr-numbers-full.git",
+		"https://github.com/unicode-cldr/cldr-numbers-modern.git",
 	}
 	for _, repo := range repos {
 		cmd := exec.Command("git", "clone", repo, "--depth", "1")
@@ -385,7 +385,7 @@ func replaceDigits(currencies map[string]*currencyInfo, dir string) error {
 // Symbols are grouped by locale, and deduplicated by parent.
 func generateSymbols(currencies map[string]*currencyInfo, dir string) (map[string]symbolInfoSlice, error) {
 	symbols := make(map[string]map[string][]string)
-	files, err := ioutil.ReadDir(dir + "/cldr-numbers-full/main")
+	files, err := ioutil.ReadDir(dir + "/cldr-numbers-modern/main")
 	if err != nil {
 		return nil, fmt.Errorf("generateSymbols: %w", err)
 	}
@@ -497,7 +497,7 @@ func generateSymbols(currencies map[string]*currencyInfo, dir string) (map[strin
 //
 // Discards symbols belonging to inactive currencies.
 func readSymbols(currencies map[string]*currencyInfo, dir string, locale string) (map[string]string, error) {
-	filename := fmt.Sprintf("%v/cldr-numbers-full/main/%v/currencies.json", dir, locale)
+	filename := fmt.Sprintf("%v/cldr-numbers-modern/main/%v/currencies.json", dir, locale)
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, fmt.Errorf("readSymbols: %w", err)
@@ -530,7 +530,7 @@ func readSymbols(currencies map[string]*currencyInfo, dir string, locale string)
 // Formats are deduplicated by parent.
 func generateFormats(dir string) (map[string]currencyFormat, error) {
 	formats := make(map[string]currencyFormat)
-	files, err := ioutil.ReadDir(dir + "/cldr-numbers-full/main")
+	files, err := ioutil.ReadDir(dir + "/cldr-numbers-modern/main")
 	if err != nil {
 		return nil, fmt.Errorf("generateFormats: %w", err)
 	}
@@ -564,7 +564,7 @@ func generateFormats(dir string) (map[string]currencyFormat, error) {
 
 // readFormat reads the given locale's currency format from CLDR data.
 func readFormat(dir string, locale string) (currencyFormat, error) {
-	filename := fmt.Sprintf("%v/cldr-numbers-full/main/%v/numbers.json", dir, locale)
+	filename := fmt.Sprintf("%v/cldr-numbers-modern/main/%v/numbers.json", dir, locale)
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return currencyFormat{}, fmt.Errorf("readFormat: %w", err)
@@ -725,23 +725,12 @@ func shouldIgnoreLocale(locale string) bool {
 		// Valencian differs from its parent only by a single character (è/é).
 		"ca-ES-VALENCIA",
 		// Africa secondary languages.
-		"agq", "ak", "am", "asa", "bas", "bem", "bez", "bm", "cgg", "dav",
-		"dje", "dua", "dyo", "ebu", "ee", "ewo", "ff", "ff-Latn", "guz",
-		"ha", "ig", "jgo", "jmc", "kab", "kam", "kea", "kde", "ki", "kkj",
-		"kln", "khq", "ksb", "ksf", "lag", "luo", "luy", "lu", "lg", "ln",
-		"mas", "mer", "mua", "mgo", "mgh", "mfe", "naq", "nd", "nmg", "nnh",
-		"nus", "nyn", "om", "pcm", "rof", "rwk", "saq", "seh", "ses", "sbp",
-		"sg", "shi", "sn", "teo", "ti", "tzm", "twq", "vai", "vai-Latn", "vun",
-		"wo", "xog", "xh", "zgh", "yav", "yo", "zu",
-		// Europe secondary languages.
-		"br", "dsb", "fo", "fur", "fy", "hsb", "ksh", "kw", "nds", "or",
-		"rm", "se", "smn", "wae",
+		// Not present in "modern" data, just listed in parentLocales.
+		"bm", "byn", "dje", "dyo", "ff", "ha", "shi", "vai", "wo", "yo",
 		// India secondary languages.
-		"as", "brx", "gu", "kok", "ks", "mai", "ml", "mni", "mr", "sat",
-		"sd", "te",
-		// Other infrequently used locales.
-		"ceb", "ccp", "chr", "ckb", "haw", "ii", "jv", "kl", "kn", "lkt",
-		"lrc", "mi", "mzn", "os", "qu", "row", "sah", "su", "tt", "ug", "yi",
+		"as", "gu", "ml", "mr", "or", "sat", "sd", "te",
+		// Infrequently used locales.
+		"jv", "kn", "row",
 		// Special "grouping" locales.
 		"root", "en-US-POSIX",
 	}

@@ -44,11 +44,11 @@ in the future without a backwards compatibility break.
 
 ### Smart filtering of CLDR data.
 
-CLDR contains 542 locales, not all of which are likely to be used. This list is
-reduced to 381 using a list of ignored locales, containing constructed languages
-(Esperanto, Volapuk), historical languages (Church Slavic, Prussian), secondary
-non-official languages (Cornish, Gujarati, Cherokee). The ignore list is
-maintained by community feedback, developers wishing to use an ignored locale
+The "modern" subset of CLDR locales is used, reducing the list from 562 to 370 locales.
+
+This list is further reduced to 359 using a list of ignored locales, containing
+secondary non-official languages (e.g. Gujarati, Javanese). The ignore list
+is maintained by community feedback, developers wishing to use an ignored locale
 can open a pull request.
 
 Once gathered, locales are filtered to remove all data not used by this package,
