@@ -412,7 +412,7 @@ var currencySymbols = map[string][]symbolInfo{
 	},
 	"JPY": {
 		{"¥", []string{"en", "en-AU"}},
-		{"JP¥", []string{"af", "am", "ar", "az", "bn", "cs", "cy", "da", "el", "en-001", "eu", "gl", "hi", "hy", "id", "is", "kk", "km", "ko", "ky", "lo", "mn", "ms", "my", "ne", "nl", "pa", "ps", "pt", "si", "so", "sq", "sw", "tk", "ur", "uz", "zh", "zu"}},
+		{"JP¥", []string{"af", "am", "ar", "as", "az", "bn", "cs", "cy", "da", "el", "en-001", "eu", "gl", "gu", "hi", "hy", "id", "is", "kk", "km", "ko", "ky", "lo", "mn", "mr", "ms", "my", "ne", "nl", "pa", "ps", "pt", "si", "so", "sq", "sw", "te", "tk", "ur", "uz", "zh", "zu"}},
 		{"￥", []string{"ja"}},
 	},
 	"KES": {
@@ -666,7 +666,7 @@ var currencySymbols = map[string][]symbolInfo{
 	},
 	"THB": {
 		{"THB", []string{"en", "es-419"}},
-		{"฿", []string{"af", "am", "ar", "az", "bn", "bs", "ca", "cy", "da", "de", "el", "es", "et", "eu", "fa", "fil", "ga", "gl", "he", "hi", "hy", "id", "it", "kk", "km", "ky", "lo", "lv", "mn", "my", "ne", "nl", "pa", "pt", "ru", "si", "sq", "sw", "ta", "th", "tr", "ur", "vi", "zu"}},
+		{"฿", []string{"af", "am", "ar", "az", "bn", "bs", "ca", "cy", "da", "de", "el", "es", "et", "eu", "fa", "fil", "ga", "gl", "gu", "he", "hi", "hy", "id", "it", "kk", "km", "ky", "lo", "lv", "mn", "mr", "my", "ne", "nl", "pa", "pt", "ru", "si", "sq", "sw", "ta", "te", "th", "tr", "ur", "vi", "zu"}},
 	},
 	"TMT": {
 		{"TMT", []string{"en"}},
@@ -711,7 +711,7 @@ var currencySymbols = map[string][]symbolInfo{
 		{"$", []string{"en", "en-IN", "es-419", "nl-BQ", "sw-KE"}},
 		{"$US", []string{"fr"}},
 		{"$\u00a0US", []string{"fr-CA"}},
-		{"US$", []string{"am", "ar", "az", "bn", "cs", "cy", "da", "en-001", "es", "es-AR", "es-CL", "es-CO", "es-CU", "es-DO", "es-UY", "eu", "id", "ka", "ko", "lo", "mk", "my", "ne", "nl", "pa", "pt", "si", "so", "sq", "sr", "sr-Latn", "sv", "sw", "ta-SG", "th", "tk", "uz", "vi", "yue", "zh", "zh-Hant"}},
+		{"US$", []string{"am", "ar", "as", "az", "bn", "cs", "cy", "da", "en-001", "es", "es-AR", "es-CL", "es-CO", "es-CU", "es-DO", "es-UY", "eu", "gu", "id", "ka", "ko", "lo", "mk", "my", "ne", "nl", "pa", "pt", "si", "so", "sq", "sr", "sr-Latn", "sv", "sw", "ta-SG", "th", "tk", "uz", "vi", "yue", "zh", "zh-Hant"}},
 		{"щ.д.", []string{"bg"}},
 	},
 	"UYU": {
@@ -782,6 +782,7 @@ var currencyFormats = map[string]currencyFormat{
 	"ar-LY":   {"¤\u00a00.00", 0, 1, 3, 3, ",", ".", "\u200e+", "\u200e-"},
 	"ar-MA":   {"¤\u00a00.00", 0, 1, 3, 3, ",", ".", "\u200e+", "\u200e-"},
 	"ar-TN":   {"¤\u00a00.00", 0, 1, 3, 3, ",", ".", "\u200e+", "\u200e-"},
+	"as":      {"¤\u00a00.00", 3, 1, 3, 2, ".", ",", "+", "-"},
 	"az":      {"0.00\u00a0¤", 0, 1, 3, 3, ",", ".", "+", "-"},
 	"be":      {"0.00\u00a0¤", 0, 2, 3, 3, ",", "\u00a0", "+", "-"},
 	"bg":      {"0.00\u00a0¤", 0, 2, 0, 0, ",", "\u00a0", "+", "-"},
@@ -832,6 +833,7 @@ var currencyFormats = map[string]currencyFormat{
 	"fr-LU":   {"0.00\u00a0¤", 0, 1, 3, 3, ",", ".", "+", "-"},
 	"fr-MA":   {"0.00\u00a0¤", 0, 1, 3, 3, ",", ".", "+", "-"},
 	"gl":      {"0.00\u00a0¤", 0, 1, 3, 3, ",", ".", "+", "-"},
+	"gu":      {"¤0.00", 0, 1, 3, 2, ".", ",", "+", "-"},
 	"he":      {"\u200f0.00\u00a0¤;\u200f-0.00\u00a0¤", 0, 1, 3, 3, ".", ",", "\u200e+", "\u200e-"},
 	"hi":      {"¤0.00", 0, 1, 3, 2, ".", ",", "+", "-"},
 	"hr":      {"0.00\u00a0¤", 0, 1, 3, 3, ",", ".", "+", "−"},
@@ -850,6 +852,7 @@ var currencyFormats = map[string]currencyFormat{
 	"lv":      {"0.00\u00a0¤", 0, 2, 3, 3, ",", "\u00a0", "+", "-"},
 	"mk":      {"0.00\u00a0¤", 0, 1, 3, 3, ",", ".", "+", "-"},
 	"mn":      {"¤\u00a00.00", 0, 1, 3, 3, ".", ",", "+", "-"},
+	"mr":      {"¤0.00", 4, 1, 3, 3, ".", ",", "+", "-"},
 	"ms-BN":   {"¤\u00a00.00", 0, 1, 3, 3, ",", ".", "+", "-"},
 	"ms-ID":   {"¤0.00", 0, 1, 3, 3, ",", ".", "+", "-"},
 	"my":      {"0.00\u00a0¤", 5, 1, 3, 3, ".", ",", "+", "-"},
@@ -876,6 +879,7 @@ var currencyFormats = map[string]currencyFormat{
 	"ta":      {"¤\u00a00.00", 0, 1, 3, 2, ".", ",", "+", "-"},
 	"ta-MY":   {"¤\u00a00.00", 0, 1, 3, 3, ".", ",", "+", "-"},
 	"ta-SG":   {"¤\u00a00.00", 0, 1, 3, 3, ".", ",", "+", "-"},
+	"te":      {"¤0.00", 0, 1, 3, 2, ".", ",", "+", "-"},
 	"tk":      {"0.00\u00a0¤", 0, 1, 3, 3, ",", "\u00a0", "+", "-"},
 	"tr":      {"¤0.00", 0, 1, 3, 3, ",", ".", "+", "-"},
 	"uk":      {"0.00\u00a0¤", 0, 1, 3, 3, ",", "\u00a0", "+", "-"},

@@ -713,10 +713,8 @@ func shouldIgnoreLocale(locale string) bool {
 		// Africa secondary languages.
 		// Not present in "modern" data, just listed in parentLocales.
 		"bm", "byn", "dje", "dyo", "ff", "ha", "shi", "vai", "wo", "yo",
-		// India secondary languages.
-		"as", "gu", "ml", "mr", "or", "sat", "sd", "te",
 		// Infrequently used locales.
-		"jv", "kn", "row",
+		"jv", "kn", "ml", "row", "sat", "sd",
 		// Special "grouping" locales.
 		"root", "en-US-POSIX",
 	}

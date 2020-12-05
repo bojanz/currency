@@ -44,12 +44,7 @@ in the future without a backwards compatibility break.
 
 ### Smart filtering of CLDR data.
 
-The "modern" subset of CLDR locales is used, reducing the list from 562 to 370 locales.
-
-This list is further reduced to 359 using a list of ignored locales, containing
-secondary non-official languages (e.g. Gujarati, Javanese). The ignore list
-is maintained by community feedback, developers wishing to use an ignored locale
-can open a pull request.
+The "modern" subset of CLDR locales is used, reducing the list from ~560 to ~370 locales.
 
 Once gathered, locales are filtered to remove all data not used by this package,
 and then deduplicated by parent (e.g. don't keep `fr-CH` if `fr` has the
