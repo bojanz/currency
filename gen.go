@@ -254,23 +254,17 @@ func main() {
 // fetchCLDR fetches the CLDR data from GitHub and returns its version.
 //
 // The JSON version of the data is used because it is more convenient
-// to parse. See https://github.com/unicode-cldr/cldr-json for details.
+// to parse. See https://github.com/unicode-org/cldr-json for details.
 func fetchCLDR(dir string) (string, error) {
-	repos := []string{
-		"https://github.com/unicode-cldr/cldr-core.git",
-		"https://github.com/unicode-cldr/cldr-numbers-modern.git",
-	}
-	for _, repo := range repos {
-		cmd := exec.Command("git", "clone", repo, "--depth", "1")
-		cmd.Dir = dir
-		cmd.Stderr = os.Stderr
-		_, err := cmd.Output()
-		if err != nil {
-			return "", err
-		}
+	repo := "https://github.com/unicode-org/cldr-json.git"
+	cmd := exec.Command("git", "clone", repo, "--depth", "1", dir)
+	cmd.Stderr = os.Stderr
+	_, err := cmd.Output()
+	if err != nil {
+		return "", err
 	}
 
-	data, err := ioutil.ReadFile(dir + "/cldr-core/package.json")
+	data, err := ioutil.ReadFile(dir + "/cldr-json/cldr-core/package.json")
 	if err != nil {
 		return "", fmt.Errorf("fetchCLDR: %w", err)
 	}
@@ -355,7 +349,7 @@ func fetchURL(url string) ([]byte, error) {
 // CLDR data reflects real life usage more closely, specifying 0 digits
 // (instead of 2 in ISO data) for ~14 currencies, such as ALL and RSD.
 func replaceDigits(currencies map[string]*currencyInfo, dir string) error {
-	data, err := ioutil.ReadFile(dir + "/cldr-core/supplemental/currencyData.json")
+	data, err := ioutil.ReadFile(dir + "/cldr-json/cldr-core/supplemental/currencyData.json")
 	if err != nil {
 		return fmt.Errorf("replaceDigits: %w", err)
 	}
@@ -385,7 +379,7 @@ func replaceDigits(currencies map[string]*currencyInfo, dir string) error {
 // Symbols are grouped by locale, and deduplicated by parent.
 func generateSymbols(currencies map[string]*currencyInfo, dir string) (map[string]symbolInfoSlice, error) {
 	symbols := make(map[string]map[string][]string)
-	files, err := ioutil.ReadDir(dir + "/cldr-numbers-modern/main")
+	files, err := ioutil.ReadDir(dir + "/cldr-json/cldr-numbers-modern/main")
 	if err != nil {
 		return nil, fmt.Errorf("generateSymbols: %w", err)
 	}
@@ -497,7 +491,7 @@ func generateSymbols(currencies map[string]*currencyInfo, dir string) (map[strin
 //
 // Discards symbols belonging to inactive currencies.
 func readSymbols(currencies map[string]*currencyInfo, dir string, locale string) (map[string]string, error) {
-	filename := fmt.Sprintf("%v/cldr-numbers-modern/main/%v/currencies.json", dir, locale)
+	filename := fmt.Sprintf("%v/cldr-json/cldr-numbers-modern/main/%v/currencies.json", dir, locale)
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, fmt.Errorf("readSymbols: %w", err)
@@ -530,7 +524,7 @@ func readSymbols(currencies map[string]*currencyInfo, dir string, locale string)
 // Formats are deduplicated by parent.
 func generateFormats(dir string) (map[string]currencyFormat, error) {
 	formats := make(map[string]currencyFormat)
-	files, err := ioutil.ReadDir(dir + "/cldr-numbers-modern/main")
+	files, err := ioutil.ReadDir(dir + "/cldr-json/cldr-numbers-modern/main")
 	if err != nil {
 		return nil, fmt.Errorf("generateFormats: %w", err)
 	}
@@ -564,7 +558,7 @@ func generateFormats(dir string) (map[string]currencyFormat, error) {
 
 // readFormat reads the given locale's currency format from CLDR data.
 func readFormat(dir string, locale string) (currencyFormat, error) {
-	filename := fmt.Sprintf("%v/cldr-numbers-modern/main/%v/numbers.json", dir, locale)
+	filename := fmt.Sprintf("%v/cldr-json/cldr-numbers-modern/main/%v/numbers.json", dir, locale)
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return currencyFormat{}, fmt.Errorf("readFormat: %w", err)
@@ -684,7 +678,7 @@ func readFormat(dir string, locale string) (currencyFormat, error) {
 // Ensures ignored locales are skipped.
 // Replaces "root" with "en", since this package treats them as equivalent.
 func generateParentLocales(dir string) (map[string]string, error) {
-	data, err := ioutil.ReadFile(dir + "/cldr-core/supplemental/parentLocales.json")
+	data, err := ioutil.ReadFile(dir + "/cldr-json/cldr-core/supplemental/parentLocales.json")
 	if err != nil {
 		return nil, fmt.Errorf("generateParentLocales: %w", err)
 	}
