@@ -8,6 +8,7 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
+	"math/big"
 	"strings"
 
 	"github.com/cockroachdb/apd/v2"
@@ -77,6 +78,24 @@ func NewAmount(n, currencyCode string) (Amount, error) {
 	return Amount{number, currencyCode}, nil
 }
 
+// NewAmountFromBigInt creates a new Amount from a big integer and a currency code.
+func NewAmountFromBigInt(amt *big.Int, currencyCode string) (Amount, error) {
+	if amt == nil {
+		return Amount{}, InvalidNumberError{"NewAmountFromBigInt", fmt.Sprint(amt)}
+	}
+	if currencyCode == "" || !IsValid(currencyCode) {
+		return Amount{}, InvalidCurrencyCodeError{"NewAmountFromBigInt", currencyCode}
+	}
+	d, _ := GetDigits(currencyCode)
+
+	return Amount{apd.NewWithBigInt(amt, -int32(d)), currencyCode}, nil
+}
+
+// NewAmount creates a new Amount from an int64 and a currency code.
+func NewAmountFromInt64(amt int64, currencyCode string) (Amount, error) {
+	return NewAmountFromBigInt(big.NewInt(amt), currencyCode)
+}
+
 // Number returns the number as a numeric string.
 func (a Amount) Number() string {
 	if a.number == nil {
@@ -96,11 +115,25 @@ func (a Amount) String() string {
 }
 
 // ToMinorUnits returns a in minor units.
+// Deprecated: Result may be undefined if the value can't be expressed as a 64-bit integer.
+// Will be removed in a future release.
 func (a Amount) ToMinorUnits() int64 {
 	if a.number == nil {
 		return 0
 	}
 	return a.Round().number.Coeff.Int64()
+}
+
+// BigInt returns the integer value in minor units.
+func (a Amount) BigInt() *big.Int {
+	i := a.Round().number.Coeff
+	return &i
+}
+
+// Int64 returns the integer value of a in minor units.
+// Returns an error if value can't be expressed as a 64-bit integer.
+func (a Amount) Int64() (int64, error) {
+	return a.Round().number.Int64()
 }
 
 // Convert converts a to a different currency.
