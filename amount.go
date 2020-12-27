@@ -8,6 +8,7 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
+	"math"
 	"math/big"
 	"strings"
 
@@ -79,21 +80,21 @@ func NewAmount(n, currencyCode string) (Amount, error) {
 }
 
 // NewAmountFromBigInt creates a new Amount from a big integer and a currency code.
-func NewAmountFromBigInt(amt *big.Int, currencyCode string) (Amount, error) {
-	if amt == nil {
-		return Amount{}, InvalidNumberError{"NewAmountFromBigInt", fmt.Sprint(amt)}
+func NewAmountFromBigInt(n *big.Int, currencyCode string) (Amount, error) {
+	if n == nil {
+		return Amount{}, InvalidNumberError{"NewAmountFromBigInt", fmt.Sprint(n)}
 	}
 	if currencyCode == "" || !IsValid(currencyCode) {
 		return Amount{}, InvalidCurrencyCodeError{"NewAmountFromBigInt", currencyCode}
 	}
 	d, _ := GetDigits(currencyCode)
 
-	return Amount{apd.NewWithBigInt(amt, -int32(d)), currencyCode}, nil
+	return Amount{apd.NewWithBigInt(n, -int32(d)), currencyCode}, nil
 }
 
-// NewAmount creates a new Amount from an int64 and a currency code.
-func NewAmountFromInt64(amt int64, currencyCode string) (Amount, error) {
-	return NewAmountFromBigInt(big.NewInt(amt), currencyCode)
+// NewAmountFromInt64 creates a new Amount from an int64 and a currency code.
+func NewAmountFromInt64(n int64, currencyCode string) (Amount, error) {
+	return NewAmountFromBigInt(big.NewInt(n), currencyCode)
 }
 
 // Number returns the number as a numeric string.
@@ -133,7 +134,9 @@ func (a Amount) BigInt() *big.Int {
 // Int64 returns the integer value of a in minor units.
 // Returns an error if value can't be expressed as a 64-bit integer.
 func (a Amount) Int64() (int64, error) {
-	return a.Round().number.Int64()
+	n := *a.Round().number
+	n.Exponent = 0
+	return n.Int64()
 }
 
 // Convert converts a to a different currency.
@@ -145,7 +148,7 @@ func (a Amount) Convert(currencyCode, rate string) (Amount, error) {
 	if err != nil {
 		return Amount{}, InvalidNumberError{"Amount.Convert", rate}
 	}
-	ctx := apd.BaseContext.WithPrecision(16)
+	ctx := contextPrecision(a.number.NumDigits(), result.NumDigits())
 	ctx.Mul(result, a.number, result)
 
 	return Amount{result, currencyCode}, nil
@@ -157,7 +160,7 @@ func (a Amount) Add(b Amount) (Amount, error) {
 		return Amount{}, MismatchError{"Amount.Add", a, b}
 	}
 	result := apd.New(0, 0)
-	ctx := apd.BaseContext.WithPrecision(16)
+	ctx := contextPrecision(a.number.NumDigits(), b.number.NumDigits())
 	ctx.Add(result, a.number, b.number)
 
 	return Amount{result, a.currencyCode}, nil
@@ -169,7 +172,7 @@ func (a Amount) Sub(b Amount) (Amount, error) {
 		return Amount{}, MismatchError{"Amount.Sub", a, b}
 	}
 	result := apd.New(0, 0)
-	ctx := apd.BaseContext.WithPrecision(16)
+	ctx := contextPrecision(a.number.NumDigits(), result.NumDigits())
 	ctx.Sub(result, a.number, b.number)
 
 	return Amount{result, a.currencyCode}, nil
@@ -181,7 +184,7 @@ func (a Amount) Mul(n string) (Amount, error) {
 	if err != nil {
 		return Amount{}, InvalidNumberError{"Amount.Mul", n}
 	}
-	ctx := apd.BaseContext.WithPrecision(16)
+	ctx := contextPrecision(a.number.NumDigits(), result.NumDigits())
 	ctx.Mul(result, a.number, result)
 
 	return Amount{result, a.currencyCode}, err
@@ -193,7 +196,7 @@ func (a Amount) Div(n string) (Amount, error) {
 	if err != nil || result.IsZero() {
 		return Amount{}, InvalidNumberError{"Amount.Div", n}
 	}
-	ctx := apd.BaseContext.WithPrecision(16)
+	ctx := contextPrecision(a.number.NumDigits(), result.NumDigits())
 	ctx.Quo(result, a.number, result)
 
 	return Amount{result, a.currencyCode}, err
@@ -216,11 +219,26 @@ func (a Amount) RoundTo(digits uint8, mode RoundingMode) Amount {
 		RoundDown:     apd.RoundDown,
 	}
 	result := apd.New(0, 0)
-	ctx := apd.BaseContext.WithPrecision(16)
+	ctx := contextPrecision(a.number.NumDigits())
 	ctx.Rounding = extModes[mode]
 	ctx.Quantize(result, a.number, -int32(digits))
 
 	return Amount{result, a.currencyCode}
+}
+
+func contextPrecision(digits ...int64) *apd.Context {
+	dg := big.NewInt(0)
+	for _, d := range digits {
+		dg = dg.Add(dg, big.NewInt(d))
+	}
+	switch {
+	case !dg.IsInt64(), dg.Int64() > math.MaxUint32:
+		return apd.BaseContext.WithPrecision(math.MaxUint32)
+	case dg.Int64() < 16:
+		return apd.BaseContext.WithPrecision(16)
+	default:
+		return apd.BaseContext.WithPrecision(uint32(dg.Int64()))
+	}
 }
 
 // Cmp compares a and b and returns:

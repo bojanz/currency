@@ -5,6 +5,10 @@ package currency_test
 
 import (
 	"encoding/json"
+	"fmt"
+	"math"
+	"math/big"
+	"strconv"
 	"testing"
 
 	"github.com/bojanz/currency"
@@ -55,6 +59,68 @@ func TestNewAmount(t *testing.T) {
 	}
 	if a.String() != "10.99 USD" {
 		t.Errorf("got %v, want 10.99 USD", a.String())
+	}
+}
+
+func TestAmount_Int(t *testing.T) {
+	const cur = "EUR"
+	tests := []struct {
+		number string
+		want   string
+	}{
+		{"1099", "10.99"},
+		{"1234567890123456789034", "12345678901234567890.34"},
+		{strconv.Itoa(math.MaxInt64), "92233720368547758.07"},
+	}
+
+	for _, tt := range tests {
+		bi, ok := big.NewInt(0).SetString(tt.number, 10)
+		if !ok {
+			t.Fatalf("invalid big int %v", tt.number)
+		}
+		a, err := currency.NewAmountFromBigInt(bi, cur)
+		if err != nil {
+			t.Errorf("unexpected error %v", err)
+		}
+		if a.Number() != tt.want {
+			t.Errorf("got %v want %v", a.Number(), tt.want)
+		}
+		wantStr := tt.want + " " + cur
+		if a.String() != wantStr {
+			t.Errorf("got %v want %v", a.Number(), wantStr)
+		}
+
+		if a.BigInt().Cmp(bi) != 0 {
+			t.Errorf("got %v want %v", a.BigInt(), bi)
+		}
+
+		// only test valid int64 values
+		if !bi.IsInt64() {
+			continue
+		}
+		ai, err := currency.NewAmountFromInt64(bi.Int64(), cur)
+		if err != nil {
+			t.Errorf("unexpected error %v", err)
+		}
+		if ai.Number() != tt.want {
+			t.Errorf("got %v want %v", ai.Number(), tt.want)
+		}
+		if ai.String() != wantStr {
+			t.Errorf("got %v want %v", ai.Number(), wantStr)
+		}
+
+		ival, err := ai.Int64()
+		if err != nil {
+			t.Fatalf("unexpected Int64 error %v", err)
+		}
+
+		if ival != bi.Int64() {
+			t.Errorf("got %v want %v", ival, bi.Int64())
+		}
+
+		if !ai.Equal(a) {
+			t.Errorf("%v (int64) != %v (bigInt)", ai, a)
+		}
 	}
 }
 
@@ -344,6 +410,12 @@ func TestAmount_RoundTo(t *testing.T) {
 		{"12.345", 0, currency.RoundHalfDown, "12"},
 		{"12.345", 0, currency.RoundUp, "13"},
 		{"12.345", 0, currency.RoundDown, "12"},
+
+		// large amounts (> max int64).
+		{"12345678901234567890.0345", 3, currency.RoundHalfUp, "12345678901234567890.035"},
+		{"12345678901234567890.0345", 3, currency.RoundHalfDown, "12345678901234567890.034"},
+		{"12345678901234567890.0345", 3, currency.RoundUp, "12345678901234567890.035"},
+		{"12345678901234567890.0345", 3, currency.RoundDown, "12345678901234567890.034"},
 	}
 
 	for _, tt := range tests {
@@ -651,6 +723,54 @@ func TestAmount_Scan(t *testing.T) {
 			}
 			if errStr != tt.wantError {
 				t.Errorf("error: got %v, want %v", errStr, tt.wantError)
+			}
+		})
+	}
+}
+
+func TestAmount_BigInt(t *testing.T) {
+	tests := []struct {
+		n         string
+		cur       string
+		minor     int64
+		wantError error
+	}{
+		{"", "USD", 0, currency.InvalidNumberError{"NewAmountFromBigInt", fmt.Sprint(nil)}},
+		{"100", "UST", 0, currency.InvalidCurrencyCodeError{"NewAmountFromBigInt", "UST"}},
+		{"100", "JPY", 100, nil},
+	}
+	for _, tt := range tests {
+		t.Run(tt.n+tt.cur, func(t *testing.T) {
+			bi, ok := big.NewInt(0).SetString(tt.n, 10)
+			if !ok {
+				if tt.n != "" {
+					t.Fatal("number not parsed", tt.n)
+				}
+				bi = nil
+			}
+			amt, err := currency.NewAmountFromBigInt(bi, tt.cur)
+			if err != tt.wantError {
+				t.Errorf("error: got %v, want %v", err, tt.wantError)
+			}
+			if tt.n == "" {
+				empty := currency.Amount{}
+				switch {
+				case amt != empty:
+					t.Errorf("error: got %v, want %v", err, tt.wantError)
+				case amt.ToMinorUnits() != tt.minor:
+					t.Errorf("minor: got %v, want %v", amt.ToMinorUnits(), tt.minor)
+				}
+				return
+			}
+			if tt.wantError != nil {
+				return
+			}
+			exAmt, err := currency.NewAmount(tt.n, tt.cur)
+			if err != tt.wantError {
+				t.Errorf("error: got %v, want %v", err, tt.wantError)
+			}
+			if !amt.Equal(exAmt) {
+				t.Errorf("amt: got %v, want %v", amt, exAmt)
 			}
 		})
 	}
