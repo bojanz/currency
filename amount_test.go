@@ -605,3 +605,53 @@ func TestAmount_UnmarshalJSON(t *testing.T) {
 		t.Errorf("got %v, want USD", unmarshalled.CurrencyCode())
 	}
 }
+
+func TestAmount_Value(t *testing.T) {
+	a, _ := currency.NewAmount("3.45", "USD")
+	got, _ := a.Value()
+	want := "(3.45,USD)"
+	if got != want {
+		t.Errorf("got %v, want %v", got, want)
+	}
+
+	var b currency.Amount
+	got, _ = b.Value()
+	want = "(0,)"
+	if got != want {
+		t.Errorf("got %v, want %v", got, want)
+	}
+}
+
+func TestAmount_Scan(t *testing.T) {
+	tests := []struct {
+		src              string
+		wantNumber       string
+		wantCurrencyCode string
+		wantError        string
+	}{
+		{"", "0", "", ""},
+		{"(3.45,USD)", "3.45", "USD", ""},
+		{"(3.45,)", "0", "", `currency/Amount.Scan: invalid currency code ""`},
+		{"(,USD)", "0", "", `currency/Amount.Scan: invalid number ""`},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			var a currency.Amount
+			err := a.Scan(tt.src)
+			if a.Number() != tt.wantNumber {
+				t.Errorf("number: got %v, want %v", a.Number(), tt.wantNumber)
+			}
+			if a.CurrencyCode() != tt.wantCurrencyCode {
+				t.Errorf("currency code: got %v, want %v", a.CurrencyCode(), tt.wantCurrencyCode)
+			}
+			errStr := ""
+			if err != nil {
+				errStr = err.Error()
+			}
+			if errStr != tt.wantError {
+				t.Errorf("error: got %v, want %v", errStr, tt.wantError)
+			}
+		})
+	}
+}

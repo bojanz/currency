@@ -5,8 +5,10 @@ package currency
 
 import (
 	"bytes"
+	"database/sql/driver"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/cockroachdb/apd/v2"
 )
@@ -286,6 +288,39 @@ func (a *Amount) UnmarshalJSON(data []byte) error {
 	}
 	a.number = number
 	a.currencyCode = aux.CurrencyCode
+
+	return nil
+}
+
+// Value implements the database/driver.Valuer interface.
+//
+// Allows storing amounts in a PostgreSQL composite type.
+func (a Amount) Value() (driver.Value, error) {
+	return fmt.Sprintf("(%v,%v)", a.Number(), a.CurrencyCode()), nil
+}
+
+// Scan implements the database/sql.Scanner interface.
+//
+// Allows scanning amounts from a PostgreSQL composite type.
+func (a *Amount) Scan(src interface{}) error {
+	// Wire format: "(9.99,USD)".
+	input := src.(string)
+	if len(input) == 0 {
+		return nil
+	}
+	input = strings.Trim(input, "()")
+	values := strings.Split(input, ",")
+	n := values[0]
+	currencyCode := values[1]
+	number, _, err := apd.NewFromString(n)
+	if err != nil {
+		return InvalidNumberError{"Amount.Scan", n}
+	}
+	if currencyCode == "" || !IsValid(currencyCode) {
+		return InvalidCurrencyCodeError{"Amount.Scan", currencyCode}
+	}
+	a.number = number
+	a.currencyCode = currencyCode
 
 	return nil
 }
