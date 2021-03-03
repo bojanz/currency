@@ -79,17 +79,18 @@ func NewAmount(n, currencyCode string) (Amount, error) {
 	return Amount{number, currencyCode}, nil
 }
 
-// NewAmountFromBigInt creates a new Amount from a big integer and a currency code.
+// NewAmountFromBigInt creates a new Amount from a big.Int and a currency code.
 func NewAmountFromBigInt(n *big.Int, currencyCode string) (Amount, error) {
 	if n == nil {
 		return Amount{}, InvalidNumberError{"NewAmountFromBigInt", fmt.Sprint(n)}
 	}
-	if currencyCode == "" || !IsValid(currencyCode) {
+	d, ok := GetDigits(currencyCode)
+	if !ok {
 		return Amount{}, InvalidCurrencyCodeError{"NewAmountFromBigInt", currencyCode}
 	}
-	d, _ := GetDigits(currencyCode)
+	number := apd.NewWithBigInt(n, -int32(d))
 
-	return Amount{apd.NewWithBigInt(n, -int32(d)), currencyCode}, nil
+	return Amount{number, currencyCode}, nil
 }
 
 // NewAmountFromInt64 creates a new Amount from an int64 and a currency code.
@@ -116,8 +117,9 @@ func (a Amount) String() string {
 }
 
 // ToMinorUnits returns a in minor units.
-// Deprecated: Result may be undefined if the value can't be expressed as a 64-bit integer.
-// Will be removed in a future release.
+// If a cannot be represented in an int64, the result is undefined.
+//
+// Deprecated: Will be removed before v1.0.0. Use Int64() instead.
 func (a Amount) ToMinorUnits() int64 {
 	if a.number == nil {
 		return 0
@@ -125,14 +127,13 @@ func (a Amount) ToMinorUnits() int64 {
 	return a.Round().number.Coeff.Int64()
 }
 
-// BigInt returns the integer value in minor units.
+// BigInt returns a in minor units, as a big.Int.
 func (a Amount) BigInt() *big.Int {
-	i := a.Round().number.Coeff
-	return &i
+	return &a.Round().number.Coeff
 }
 
-// Int64 returns the integer value of a in minor units.
-// Returns an error if value can't be expressed as a 64-bit integer.
+// Int64 returns a in minor units, as an int64.
+// If a cannot be represented in an int64, an error is returned.
 func (a Amount) Int64() (int64, error) {
 	n := *a.Round().number
 	n.Exponent = 0
