@@ -82,7 +82,7 @@ func NewAmount(n, currencyCode string) (Amount, error) {
 // NewAmountFromBigInt creates a new Amount from a big.Int and a currency code.
 func NewAmountFromBigInt(n *big.Int, currencyCode string) (Amount, error) {
 	if n == nil {
-		return Amount{}, InvalidNumberError{"NewAmountFromBigInt", fmt.Sprint(n)}
+		return Amount{}, InvalidNumberError{"NewAmountFromBigInt", "nil"}
 	}
 	d, ok := GetDigits(currencyCode)
 	if !ok {
@@ -95,7 +95,13 @@ func NewAmountFromBigInt(n *big.Int, currencyCode string) (Amount, error) {
 
 // NewAmountFromInt64 creates a new Amount from an int64 and a currency code.
 func NewAmountFromInt64(n int64, currencyCode string) (Amount, error) {
-	return NewAmountFromBigInt(big.NewInt(n), currencyCode)
+	d, ok := GetDigits(currencyCode)
+	if !ok {
+		return Amount{}, InvalidCurrencyCodeError{"NewAmountFromInt64", currencyCode}
+	}
+	number := apd.New(n, -int32(d))
+
+	return Amount{number, currencyCode}, nil
 }
 
 // Number returns the number as a numeric string.
