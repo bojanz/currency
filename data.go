@@ -4,7 +4,7 @@
 package currency
 
 // CLDRVersion is the CLDR version from which the data is derived.
-const CLDRVersion = "38.0.0"
+const CLDRVersion = "39.0.0"
 
 type numberingSystem uint8
 
@@ -540,7 +540,7 @@ var currencySymbols = map[string][]symbolInfo{
 	"NOK": {
 		{"NOK", []string{"en"}},
 		{"Nkr", []string{"sv"}},
-		{"kr", []string{"nb"}},
+		{"kr", []string{"nb", "nn", "no"}},
 	},
 	"NPR": {
 		{"NPR", []string{"en"}},
@@ -569,8 +569,7 @@ var currencySymbols = map[string][]symbolInfo{
 		{"K", []string{"en-PG"}},
 	},
 	"PHP": {
-		{"PHP", []string{"en"}},
-		{"₱", []string{"en-PH", "es-PH", "fil"}},
+		{"₱", []string{"en"}},
 	},
 	"PKR": {
 		{"PKR", []string{"en", "ur-IN"}},
@@ -752,7 +751,7 @@ var currencySymbols = map[string][]symbolInfo{
 		{"$EC", []string{"fa"}},
 	},
 	"XOF": {
-		{"CFA", []string{"en"}},
+		{"F\u202fCFA", []string{"en"}},
 		{"සිෆ්එ", []string{"si"}},
 	},
 	"XPF": {
@@ -810,18 +809,18 @@ var currencyFormats = map[string]currencyFormat{
 	"en-SI":   {"0.00\u00a0¤", 0, 1, 3, 3, ",", ".", "+", "-"},
 	"en-ZA":   {"¤0.00", 0, 1, 3, 3, ",", "\u00a0", "+", "-"},
 	"es":      {"0.00\u00a0¤", 0, 2, 3, 3, ",", ".", "+", "-"},
-	"es-419":  {"¤0.00", 0, 2, 3, 3, ".", ",", "+", "-"},
-	"es-AR":   {"¤\u00a00.00", 0, 2, 3, 3, ",", ".", "+", "-"},
-	"es-BO":   {"¤0.00", 0, 2, 3, 3, ",", ".", "+", "-"},
-	"es-CL":   {"¤0.00;¤-0.00", 0, 2, 3, 3, ",", ".", "+", "-"},
-	"es-CO":   {"¤\u00a00.00", 0, 2, 3, 3, ",", ".", "+", "-"},
-	"es-CR":   {"¤0.00", 0, 2, 3, 3, ",", "\u00a0", "+", "-"},
-	"es-EC":   {"¤0.00;¤-0.00", 0, 2, 3, 3, ",", ".", "+", "-"},
+	"es-419":  {"¤0.00", 0, 1, 3, 3, ".", ",", "+", "-"},
+	"es-AR":   {"¤\u00a00.00", 0, 1, 3, 3, ",", ".", "+", "-"},
+	"es-BO":   {"¤0.00", 0, 1, 3, 3, ",", ".", "+", "-"},
+	"es-CL":   {"¤0.00;¤-0.00", 0, 1, 3, 3, ",", ".", "+", "-"},
+	"es-CO":   {"¤\u00a00.00", 0, 1, 3, 3, ",", ".", "+", "-"},
+	"es-CR":   {"¤0.00", 0, 1, 3, 3, ",", "\u00a0", "+", "-"},
+	"es-EC":   {"¤0.00;¤-0.00", 0, 1, 3, 3, ",", ".", "+", "-"},
 	"es-GQ":   {"¤0.00", 0, 2, 3, 3, ",", ".", "+", "-"},
-	"es-PE":   {"¤\u00a00.00", 0, 2, 3, 3, ".", ",", "+", "-"},
-	"es-PY":   {"¤\u00a00.00;¤\u00a0-0.00", 0, 2, 3, 3, ",", ".", "+", "-"},
-	"es-UY":   {"¤\u00a00.00", 0, 2, 3, 3, ",", ".", "+", "-"},
-	"es-VE":   {"¤0.00;¤-0.00", 0, 2, 3, 3, ",", ".", "+", "-"},
+	"es-PE":   {"¤\u00a00.00", 0, 1, 3, 3, ".", ",", "+", "-"},
+	"es-PY":   {"¤\u00a00.00;¤\u00a0-0.00", 0, 1, 3, 3, ",", ".", "+", "-"},
+	"es-UY":   {"¤\u00a00.00", 0, 1, 3, 3, ",", ".", "+", "-"},
+	"es-VE":   {"¤0.00;¤-0.00", 0, 1, 3, 3, ",", ".", "+", "-"},
 	"et":      {"0.00\u00a0¤", 0, 2, 3, 3, ",", "\u00a0", "+", "−"},
 	"eu":      {"0.00\u00a0¤", 0, 1, 3, 3, ",", ".", "+", "−"},
 	"fa":      {"\u200e¤0.00", 2, 1, 3, 3, "٫", "٬", "\u200e+", "\u200e−"},
@@ -859,6 +858,8 @@ var currencyFormats = map[string]currencyFormat{
 	"nb":      {"¤\u00a00.00", 0, 1, 3, 3, ",", "\u00a0", "+", "−"},
 	"ne":      {"¤\u00a00.00", 4, 1, 3, 2, ".", ",", "+", "-"},
 	"nl":      {"¤\u00a00.00;¤\u00a0-0.00", 0, 1, 3, 3, ",", ".", "+", "-"},
+	"nn":      {"0.00\u00a0¤", 0, 1, 3, 3, ",", "\u00a0", "+", "−"},
+	"no":      {"¤\u00a00.00", 0, 1, 3, 3, ",", "\u00a0", "+", "−"},
 	"pa":      {"¤\u00a00.00", 0, 1, 3, 2, ".", ",", "+", "-"},
 	"pl":      {"0.00\u00a0¤", 0, 2, 3, 3, ",", "\u00a0", "+", "-"},
 	"ps":      {"0.00\u00a0¤", 2, 1, 3, 3, "٫", "٬", "\u200e+\u200e", "\u200e-\u200e"},
@@ -933,12 +934,13 @@ var parentLocales = map[string]string{
 	"hi-Latn": "en", "iu-Latn": "en", "kk-Arab": "en",
 	"ks-Deva": "en", "ku-Arab": "en", "ky-Arab": "en",
 	"ky-Latn": "en", "mn-Mong": "en", "mni-Mtei": "en",
-	"ms-Arab": "en", "pa-Arab": "en", "pt-AO": "pt-PT",
-	"pt-CH": "pt-PT", "pt-CV": "pt-PT", "pt-FR": "pt-PT",
-	"pt-GQ": "pt-PT", "pt-GW": "pt-PT", "pt-LU": "pt-PT",
-	"pt-MO": "pt-PT", "pt-MZ": "pt-PT", "pt-ST": "pt-PT",
-	"pt-TL": "pt-PT", "so-Arab": "en", "sr-Latn": "en",
-	"sw-Arab": "en", "tg-Arab": "en", "ug-Cyrl": "en",
-	"uz-Arab": "en", "uz-Cyrl": "en", "yue-Hans": "en",
-	"zh-Hant": "en", "zh-Hant-MO": "zh-Hant-HK",
+	"ms-Arab": "en", "nb": "no", "nn": "no",
+	"pa-Arab": "en", "pt-AO": "pt-PT", "pt-CH": "pt-PT",
+	"pt-CV": "pt-PT", "pt-FR": "pt-PT", "pt-GQ": "pt-PT",
+	"pt-GW": "pt-PT", "pt-LU": "pt-PT", "pt-MO": "pt-PT",
+	"pt-MZ": "pt-PT", "pt-ST": "pt-PT", "pt-TL": "pt-PT",
+	"so-Arab": "en", "sr-Latn": "en", "sw-Arab": "en",
+	"tg-Arab": "en", "ug-Cyrl": "en", "uz-Arab": "en",
+	"uz-Cyrl": "en", "yue-Hans": "en", "zh-Hant": "en",
+	"zh-Hant-MO": "zh-Hant-HK",
 }
