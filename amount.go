@@ -8,6 +8,7 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
+	"math/big"
 	"strings"
 
 	"github.com/cockroachdb/apd/v2"
@@ -77,6 +78,31 @@ func NewAmount(n, currencyCode string) (Amount, error) {
 	return Amount{number, currencyCode}, nil
 }
 
+// NewAmountFromBigInt creates a new Amount from a big.Int and a currency code.
+func NewAmountFromBigInt(n *big.Int, currencyCode string) (Amount, error) {
+	if n == nil {
+		return Amount{}, InvalidNumberError{"NewAmountFromBigInt", "nil"}
+	}
+	d, ok := GetDigits(currencyCode)
+	if !ok {
+		return Amount{}, InvalidCurrencyCodeError{"NewAmountFromBigInt", currencyCode}
+	}
+	number := apd.NewWithBigInt(n, -int32(d))
+
+	return Amount{number, currencyCode}, nil
+}
+
+// NewAmountFromInt64 creates a new Amount from an int64 and a currency code.
+func NewAmountFromInt64(n int64, currencyCode string) (Amount, error) {
+	d, ok := GetDigits(currencyCode)
+	if !ok {
+		return Amount{}, InvalidCurrencyCodeError{"NewAmountFromInt64", currencyCode}
+	}
+	number := apd.New(n, -int32(d))
+
+	return Amount{number, currencyCode}, nil
+}
+
 // Number returns the number as a numeric string.
 func (a Amount) Number() string {
 	if a.number == nil {
@@ -95,12 +121,17 @@ func (a Amount) String() string {
 	return a.Number() + " " + a.CurrencyCode()
 }
 
-// ToMinorUnits returns a in minor units.
-func (a Amount) ToMinorUnits() int64 {
-	if a.number == nil {
-		return 0
-	}
-	return a.Round().number.Coeff.Int64()
+// BigInt returns a in minor units, as a big.Int.
+func (a Amount) BigInt() *big.Int {
+	return &a.Round().number.Coeff
+}
+
+// Int64 returns a in minor units, as an int64.
+// If a cannot be represented in an int64, an error is returned.
+func (a Amount) Int64() (int64, error) {
+	n := *a.Round().number
+	n.Exponent = 0
+	return n.Int64()
 }
 
 // Convert converts a to a different currency.

@@ -19,13 +19,27 @@ func ExampleNewAmount() {
 	// USD
 }
 
-func ExampleAmount_ToMinorUnits() {
-	firstAmount, _ := currency.NewAmount("20.99", "USD")
+func ExampleNewAmountFromInt64() {
+	firstAmount, _ := currency.NewAmountFromInt64(2449, "USD")
+	secondAmount, _ := currency.NewAmountFromInt64(5000, "USD")
+	thirdAmount, _ := currency.NewAmountFromInt64(60, "JPY")
+	fmt.Println(firstAmount)
+	fmt.Println(secondAmount)
+	fmt.Println(thirdAmount)
+	// Output: 24.49 USD
+	// 50.00 USD
+	// 60 JPY
+}
+
+func ExampleAmount_Int64() {
+	firstAmount, _ := currency.NewAmount("24.49", "USD")
 	secondAmount, _ := currency.NewAmount("50", "USD")
-	fmt.Println(firstAmount.ToMinorUnits())
-	fmt.Println(secondAmount.ToMinorUnits())
-	// Output: 2099
-	// 5000
+	thirdAmount, _ := currency.NewAmount("60", "JPY")
+	firstInt, _ := firstAmount.Int64()
+	secondInt, _ := secondAmount.Int64()
+	thirdInt, _ := thirdAmount.Int64()
+	fmt.Println(firstInt, secondInt, thirdInt)
+	// Output: 2449 5000 60
 }
 
 func ExampleAmount_Convert() {

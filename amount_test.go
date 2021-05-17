@@ -5,6 +5,7 @@ package currency_test
 
 import (
 	"encoding/json"
+	"math/big"
 	"testing"
 
 	"github.com/bojanz/currency"
@@ -58,22 +59,168 @@ func TestNewAmount(t *testing.T) {
 	}
 }
 
-func TestAmount_ToMinorUnits(t *testing.T) {
+func TestNewAmountFromBigInt(t *testing.T) {
+	_, err := currency.NewAmountFromBigInt(nil, "USD")
+	if e, ok := err.(currency.InvalidNumberError); ok {
+		if e.Op != "NewAmountFromBigInt" {
+			t.Errorf("got %v, want NewAmountFromBigInt", e.Op)
+		}
+		if e.Number != "nil" {
+			t.Errorf("got %v, want nil", e.Number)
+		}
+		wantError := `currency/NewAmountFromBigInt: invalid number "nil"`
+		if e.Error() != wantError {
+			t.Errorf("got %v, want %v", e.Error(), wantError)
+		}
+	} else {
+		t.Errorf("got %T, want currency.InvalidNumberError", err)
+	}
+
+	_, err = currency.NewAmountFromBigInt(big.NewInt(1099), "usd")
+	if e, ok := err.(currency.InvalidCurrencyCodeError); ok {
+		if e.Op != "NewAmountFromBigInt" {
+			t.Errorf("got %v, want NewAmountFromBigInt", e.Op)
+		}
+		if e.CurrencyCode != "usd" {
+			t.Errorf("got %v, want usd", e.CurrencyCode)
+		}
+		wantError := `currency/NewAmountFromBigInt: invalid currency code "usd"`
+		if e.Error() != wantError {
+			t.Errorf("got %v, want %v", e.Error(), wantError)
+		}
+	} else {
+		t.Errorf("got %T, want currency.InvalidCurrencyCodeError", err)
+	}
+
+	// An integer larger than math.MaxInt64.
+	hugeInt, _ := big.NewInt(0).SetString("922337203685477598799", 10)
 	tests := []struct {
-		number string
-		want   int64
+		n            *big.Int
+		currencyCode string
+		wantNumber   string
 	}{
-		{"20.99", 2099},
-		// Number with additional decimals.
-		{"12.3564", 1236},
-		// Number with no decimals.
-		{"50", 5000},
+		{big.NewInt(2099), "USD", "20.99"},
+		{big.NewInt(5000), "USD", "50.00"},
+		{big.NewInt(50), "JPY", "50"},
+		{hugeInt, "USD", "9223372036854775987.99"},
 	}
 
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
-			a, _ := currency.NewAmount(tt.number, "USD")
-			got := a.ToMinorUnits()
+			a, err := currency.NewAmountFromBigInt(tt.n, tt.currencyCode)
+			if err != nil {
+				t.Errorf("unexpected error %v", err)
+			}
+			if a.Number() != tt.wantNumber {
+				t.Errorf("got %v, want %v", a.Number(), tt.wantNumber)
+			}
+			if a.CurrencyCode() != tt.currencyCode {
+				t.Errorf("got %v, want %v", a.CurrencyCode(), tt.currencyCode)
+			}
+		})
+	}
+}
+
+func TestNewAmountFromInt64(t *testing.T) {
+	_, err := currency.NewAmountFromInt64(1099, "usd")
+	if e, ok := err.(currency.InvalidCurrencyCodeError); ok {
+		if e.Op != "NewAmountFromInt64" {
+			t.Errorf("got %v, want NewAmountFromInt64", e.Op)
+		}
+		if e.CurrencyCode != "usd" {
+			t.Errorf("got %v, want usd", e.CurrencyCode)
+		}
+		wantError := `currency/NewAmountFromInt64: invalid currency code "usd"`
+		if e.Error() != wantError {
+			t.Errorf("got %v, want %v", e.Error(), wantError)
+		}
+	} else {
+		t.Errorf("got %T, want currency.InvalidCurrencyCodeError", err)
+	}
+
+	tests := []struct {
+		n            int64
+		currencyCode string
+		wantNumber   string
+	}{
+		{2099, "USD", "20.99"},
+		{5000, "USD", "50.00"},
+		{50, "JPY", "50"},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			a, err := currency.NewAmountFromInt64(tt.n, tt.currencyCode)
+			if err != nil {
+				t.Errorf("unexpected error %v", err)
+			}
+			if a.Number() != tt.wantNumber {
+				t.Errorf("got %v, want %v", a.Number(), tt.wantNumber)
+			}
+			if a.CurrencyCode() != tt.currencyCode {
+				t.Errorf("got %v, want %v", a.CurrencyCode(), tt.currencyCode)
+			}
+		})
+	}
+}
+
+func TestAmount_BigInt(t *testing.T) {
+	tests := []struct {
+		number       string
+		currencyCode string
+		want         *big.Int
+	}{
+		{"20.99", "USD", big.NewInt(2099)},
+		// Number with additional decimals.
+		{"12.3564", "USD", big.NewInt(1236)},
+		// Number with no decimals.
+		{"50", "USD", big.NewInt(5000)},
+		{"50", "JPY", big.NewInt(50)},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			a, _ := currency.NewAmount(tt.number, tt.currencyCode)
+			got := a.BigInt()
+			if got.Cmp(tt.want) != 0 {
+				t.Errorf("got %v, want %v", got, tt.want)
+			}
+			// Confirm that a is unchanged.
+			if a.Number() != tt.number {
+				t.Errorf("got %v, want %v", a.Number(), tt.number)
+			}
+		})
+	}
+}
+
+func TestAmount_Int64(t *testing.T) {
+	// Number that can't be represented as an int64.
+	a, _ := currency.NewAmount("922337203685477598799", "USD")
+	n, err := a.Int64()
+	if n != 0 {
+		t.Error("expected a.Int64() to be 0")
+	}
+	if err == nil {
+		t.Error("expected a.Int64() to return an error")
+	}
+
+	tests := []struct {
+		number       string
+		currencyCode string
+		want         int64
+	}{
+		{"20.99", "USD", 2099},
+		// Number with additional decimals.
+		{"12.3564", "USD", 1236},
+		// Number with no decimals.
+		{"50", "USD", 5000},
+		{"50", "JPY", 50},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			a, _ := currency.NewAmount(tt.number, tt.currencyCode)
+			got, _ := a.Int64()
 			if got != tt.want {
 				t.Errorf("got %v, want %v", got, tt.want)
 			}
