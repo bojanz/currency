@@ -60,3 +60,45 @@ Currency symbols are grouped together to avoid repetition. For example:
 
 Currency names are not included because they are rarely shown, but need
 significant space. Instead, they can be fetched on the frontend via [Intl.DisplayNames](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DisplayNames).
+
+### Easy to compare.
+
+Amount structs can be compared via [google/go-cmp](https://github.com/google/go-cmp) thanks to the built-in Equal() method.
+
+### Usable with a PostgreSQL composite type.
+
+Thanks to the driver.Valuer and sql.Scanner interfaces, applications using the [pgx](https://github.com/jackc/pgx) driver can store amounts in a composite type.
+
+Example schema:
+```
+CREATE TYPE price AS (
+   number NUMERIC,
+   currency_code CHAR(3)
+);
+
+CREATE TABLE products (
+   id CHAR(26) PRIMARY KEY,
+   name TEXT NOT NULL,
+   price price NOT NULL,
+   created_at TIMESTAMPTZ NOT NULL,
+   updated_at TIMESTAMPTZ
+);
+```
+
+Example struct:
+```go
+type Product struct {
+	ID          string
+	Name        string
+	Price       currency.Amount
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+```
+
+Example scan:
+```go
+p := Product{}
+row := tx.QueryRow(ctx, `SELECT id, name, price, created_at, updated_at FROM products WHERE id = $1`, id)
+err := row.Scan(&p.ID, &p.Name, &p.Price, &p.CreatedAt, &p.UpdatedAt)
+```
