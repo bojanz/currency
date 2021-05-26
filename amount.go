@@ -143,7 +143,7 @@ func (a Amount) Convert(currencyCode, rate string) (Amount, error) {
 	if err != nil {
 		return Amount{}, InvalidNumberError{"Amount.Convert", rate}
 	}
-	ctx := apd.BaseContext.WithPrecision(16)
+	ctx := decimalContext(a.number, result)
 	ctx.Mul(result, a.number, result)
 
 	return Amount{result, currencyCode}, nil
@@ -155,7 +155,7 @@ func (a Amount) Add(b Amount) (Amount, error) {
 		return Amount{}, MismatchError{"Amount.Add", a, b}
 	}
 	result := apd.New(0, 0)
-	ctx := apd.BaseContext.WithPrecision(16)
+	ctx := decimalContext(a.number, b.number)
 	ctx.Add(result, a.number, b.number)
 
 	return Amount{result, a.currencyCode}, nil
@@ -167,7 +167,7 @@ func (a Amount) Sub(b Amount) (Amount, error) {
 		return Amount{}, MismatchError{"Amount.Sub", a, b}
 	}
 	result := apd.New(0, 0)
-	ctx := apd.BaseContext.WithPrecision(16)
+	ctx := decimalContext(a.number, b.number)
 	ctx.Sub(result, a.number, b.number)
 
 	return Amount{result, a.currencyCode}, nil
@@ -179,7 +179,7 @@ func (a Amount) Mul(n string) (Amount, error) {
 	if err != nil {
 		return Amount{}, InvalidNumberError{"Amount.Mul", n}
 	}
-	ctx := apd.BaseContext.WithPrecision(16)
+	ctx := decimalContext(a.number, result)
 	ctx.Mul(result, a.number, result)
 
 	return Amount{result, a.currencyCode}, err
@@ -191,7 +191,7 @@ func (a Amount) Div(n string) (Amount, error) {
 	if err != nil || result.IsZero() {
 		return Amount{}, InvalidNumberError{"Amount.Div", n}
 	}
-	ctx := apd.BaseContext.WithPrecision(16)
+	ctx := decimalContext(a.number, result)
 	ctx.Quo(result, a.number, result)
 
 	return Amount{result, a.currencyCode}, err
@@ -214,7 +214,7 @@ func (a Amount) RoundTo(digits uint8, mode RoundingMode) Amount {
 		RoundDown:     apd.RoundDown,
 	}
 	result := apd.New(0, 0)
-	ctx := apd.BaseContext.WithPrecision(16)
+	ctx := decimalContext(a.number)
 	ctx.Rounding = extModes[mode]
 	ctx.Quantize(result, a.number, -int32(digits))
 
@@ -354,4 +354,16 @@ func (a *Amount) Scan(src interface{}) error {
 	a.currencyCode = currencyCode
 
 	return nil
+}
+
+// decimalContext returns the decimal context to use for a calculation.
+func decimalContext(decimals ...*apd.Decimal) *apd.Context {
+	// Choose between decimal64 (19 digits) and decimal128 (39 digits)
+	// based on operand size, for increased performance.
+	for _, d := range decimals {
+		if d.Coeff.BitLen() > 31 {
+			return apd.BaseContext.WithPrecision(39)
+		}
+	}
+	return apd.BaseContext.WithPrecision(19)
 }

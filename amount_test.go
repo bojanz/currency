@@ -278,6 +278,16 @@ func TestAmount_Convert(t *testing.T) {
 	if a.String() != "20.99 USD" {
 		t.Errorf("got %v, want 20.99 USD", a.String())
 	}
+
+	// An amount larger than math.MaxInt64.
+	c, _ := currency.NewAmount("922337203685477598799", "USD")
+	d, err := c.Convert("RSD", "100")
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+	if d.String() != "92233720368547759879900 RSD" {
+		t.Errorf("got %v, want 92233720368547759879900 RSD", d.String())
+	}
 }
 
 func TestAmount_Add(t *testing.T) {
@@ -317,6 +327,16 @@ func TestAmount_Add(t *testing.T) {
 	}
 	if b.String() != "3.50 USD" {
 		t.Errorf("got %v, want 3.50 USD", b.String())
+	}
+
+	// An amount equal to math.MaxInt64.
+	d, _ := currency.NewAmount("9223372036854775807", "USD")
+	e, err := d.Add(a)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+	if e.String() != "9223372036854775827.99 USD" {
+		t.Errorf("got %v, want 9223372036854775827.99 USD", e.String())
 	}
 }
 
@@ -358,6 +378,16 @@ func TestAmount_Sub(t *testing.T) {
 	if b.String() != "3.50 USD" {
 		t.Errorf("got %v, want 3.50 USD", b.String())
 	}
+
+	// An amount larger than math.MaxInt64.
+	d, _ := currency.NewAmount("922337203685477598799", "USD")
+	e, err := d.Sub(a)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+	if e.String() != "922337203685477598778.01 USD" {
+		t.Errorf("got %v, want 922337203685477598778.01 USD", e.String())
+	}
 }
 
 func TestAmount_Mul(t *testing.T) {
@@ -390,6 +420,16 @@ func TestAmount_Mul(t *testing.T) {
 	if a.String() != "20.99 USD" {
 		t.Errorf("got %v, want 20.99 USD", a.String())
 	}
+
+	// An amount equal to math.MaxInt64.
+	d, _ := currency.NewAmount("9223372036854775807", "USD")
+	e, err := d.Mul("10")
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+	if e.String() != "92233720368547758070 USD" {
+		t.Errorf("got %v, want 92233720368547758070 USD", e.String())
+	}
 }
 
 func TestAmount_Div(t *testing.T) {
@@ -419,6 +459,16 @@ func TestAmount_Div(t *testing.T) {
 	// Confirm that a is unchanged.
 	if a.String() != "99.99 USD" {
 		t.Errorf("got %v, want 99.99 USD", a.String())
+	}
+
+	// An amount equal to math.MaxInt64.
+	d, _ := currency.NewAmount("9223372036854775807", "USD")
+	e, err := d.Div("0.5")
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+	if e.String() != "18446744073709551614 USD" {
+		t.Errorf("got %v, want 18446744073709551614 USD", e.String())
 	}
 }
 
@@ -491,6 +541,12 @@ func TestAmount_RoundTo(t *testing.T) {
 		{"12.345", 0, currency.RoundHalfDown, "12"},
 		{"12.345", 0, currency.RoundUp, "13"},
 		{"12.345", 0, currency.RoundDown, "12"},
+
+		// Amounts larger than math.MaxInt64.
+		{"12345678901234567890.0345", 3, currency.RoundHalfUp, "12345678901234567890.035"},
+		{"12345678901234567890.0345", 3, currency.RoundHalfDown, "12345678901234567890.034"},
+		{"12345678901234567890.0345", 3, currency.RoundUp, "12345678901234567890.035"},
+		{"12345678901234567890.0345", 3, currency.RoundDown, "12345678901234567890.034"},
 	}
 
 	for _, tt := range tests {
