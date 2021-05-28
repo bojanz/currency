@@ -30,33 +30,30 @@ const (
 
 // InvalidNumberError is returned when a numeric string can't be converted to a decimal.
 type InvalidNumberError struct {
-	Op     string
 	Number string
 }
 
 func (e InvalidNumberError) Error() string {
-	return fmt.Sprintf("currency/%v: invalid number %q", e.Op, e.Number)
+	return fmt.Sprintf("invalid number %q", e.Number)
 }
 
 // InvalidCurrencyCodeError is returned when a currency code is invalid or unrecognized.
 type InvalidCurrencyCodeError struct {
-	Op           string
 	CurrencyCode string
 }
 
 func (e InvalidCurrencyCodeError) Error() string {
-	return fmt.Sprintf("currency/%v: invalid currency code %q", e.Op, e.CurrencyCode)
+	return fmt.Sprintf("invalid currency code %q", e.CurrencyCode)
 }
 
 // MismatchError is returned when two amounts have mismatched currency codes.
 type MismatchError struct {
-	Op string
-	A  Amount
-	B  Amount
+	A Amount
+	B Amount
 }
 
 func (e MismatchError) Error() string {
-	return fmt.Sprintf("currency/%v: %q and %q have mismatched currency codes", e.Op, e.A, e.B)
+	return fmt.Sprintf("amounts %q and %q have mismatched currency codes", e.A, e.B)
 }
 
 // Amount stores a decimal number with its currency code.
@@ -69,10 +66,10 @@ type Amount struct {
 func NewAmount(n, currencyCode string) (Amount, error) {
 	number, _, err := apd.NewFromString(n)
 	if err != nil {
-		return Amount{}, InvalidNumberError{"NewAmount", n}
+		return Amount{}, InvalidNumberError{n}
 	}
 	if currencyCode == "" || !IsValid(currencyCode) {
-		return Amount{}, InvalidCurrencyCodeError{"NewAmount", currencyCode}
+		return Amount{}, InvalidCurrencyCodeError{currencyCode}
 	}
 
 	return Amount{number, currencyCode}, nil
@@ -81,11 +78,11 @@ func NewAmount(n, currencyCode string) (Amount, error) {
 // NewAmountFromBigInt creates a new Amount from a big.Int and a currency code.
 func NewAmountFromBigInt(n *big.Int, currencyCode string) (Amount, error) {
 	if n == nil {
-		return Amount{}, InvalidNumberError{"NewAmountFromBigInt", "nil"}
+		return Amount{}, InvalidNumberError{"nil"}
 	}
 	d, ok := GetDigits(currencyCode)
 	if !ok {
-		return Amount{}, InvalidCurrencyCodeError{"NewAmountFromBigInt", currencyCode}
+		return Amount{}, InvalidCurrencyCodeError{currencyCode}
 	}
 	number := apd.NewWithBigInt(n, -int32(d))
 
@@ -96,7 +93,7 @@ func NewAmountFromBigInt(n *big.Int, currencyCode string) (Amount, error) {
 func NewAmountFromInt64(n int64, currencyCode string) (Amount, error) {
 	d, ok := GetDigits(currencyCode)
 	if !ok {
-		return Amount{}, InvalidCurrencyCodeError{"NewAmountFromInt64", currencyCode}
+		return Amount{}, InvalidCurrencyCodeError{currencyCode}
 	}
 	number := apd.New(n, -int32(d))
 
@@ -137,11 +134,11 @@ func (a Amount) Int64() (int64, error) {
 // Convert converts a to a different currency.
 func (a Amount) Convert(currencyCode, rate string) (Amount, error) {
 	if currencyCode == "" || !IsValid(currencyCode) {
-		return Amount{}, InvalidCurrencyCodeError{"Amount.Convert", currencyCode}
+		return Amount{}, InvalidCurrencyCodeError{currencyCode}
 	}
 	result, _, err := apd.NewFromString(rate)
 	if err != nil {
-		return Amount{}, InvalidNumberError{"Amount.Convert", rate}
+		return Amount{}, InvalidNumberError{rate}
 	}
 	ctx := decimalContext(a.number, result)
 	ctx.Mul(result, a.number, result)
@@ -152,7 +149,7 @@ func (a Amount) Convert(currencyCode, rate string) (Amount, error) {
 // Add adds a and b together and returns the result.
 func (a Amount) Add(b Amount) (Amount, error) {
 	if a.currencyCode != b.currencyCode {
-		return Amount{}, MismatchError{"Amount.Add", a, b}
+		return Amount{}, MismatchError{a, b}
 	}
 	result := apd.New(0, 0)
 	ctx := decimalContext(a.number, b.number)
@@ -164,7 +161,7 @@ func (a Amount) Add(b Amount) (Amount, error) {
 // Sub subtracts b from a and returns the result.
 func (a Amount) Sub(b Amount) (Amount, error) {
 	if a.currencyCode != b.currencyCode {
-		return Amount{}, MismatchError{"Amount.Sub", a, b}
+		return Amount{}, MismatchError{a, b}
 	}
 	result := apd.New(0, 0)
 	ctx := decimalContext(a.number, b.number)
@@ -177,7 +174,7 @@ func (a Amount) Sub(b Amount) (Amount, error) {
 func (a Amount) Mul(n string) (Amount, error) {
 	result, _, err := apd.NewFromString(n)
 	if err != nil {
-		return Amount{}, InvalidNumberError{"Amount.Mul", n}
+		return Amount{}, InvalidNumberError{n}
 	}
 	ctx := decimalContext(a.number, result)
 	ctx.Mul(result, a.number, result)
@@ -189,7 +186,7 @@ func (a Amount) Mul(n string) (Amount, error) {
 func (a Amount) Div(n string) (Amount, error) {
 	result, _, err := apd.NewFromString(n)
 	if err != nil || result.IsZero() {
-		return Amount{}, InvalidNumberError{"Amount.Div", n}
+		return Amount{}, InvalidNumberError{n}
 	}
 	ctx := decimalContext(a.number, result)
 	ctx.Quo(result, a.number, result)
@@ -229,7 +226,7 @@ func (a Amount) RoundTo(digits uint8, mode RoundingMode) Amount {
 //
 func (a Amount) Cmp(b Amount) (int, error) {
 	if a.currencyCode != b.currencyCode {
-		return -1, MismatchError{"Amount.Cmp", a, b}
+		return -1, MismatchError{a, b}
 	}
 	return a.number.Cmp(b.number), nil
 }
@@ -272,16 +269,16 @@ func (a Amount) MarshalBinary() ([]byte, error) {
 // UnmarshalBinary implements the encoding.BinaryUnmarshaler interface.
 func (a *Amount) UnmarshalBinary(data []byte) error {
 	if len(data) < 3 {
-		return InvalidCurrencyCodeError{"Amount.UnmarshalBinary", string(data)}
+		return InvalidCurrencyCodeError{string(data)}
 	}
 	n := string(data[3:])
 	currencyCode := string(data[0:3])
 	number, _, err := apd.NewFromString(n)
 	if err != nil {
-		return InvalidNumberError{"Amount.UnmarshalBinary", n}
+		return InvalidNumberError{n}
 	}
 	if currencyCode == "" || !IsValid(currencyCode) {
-		return InvalidCurrencyCodeError{"Amount.UnmarshalBinary", currencyCode}
+		return InvalidCurrencyCodeError{currencyCode}
 	}
 	a.number = number
 	a.currencyCode = currencyCode
@@ -312,10 +309,10 @@ func (a *Amount) UnmarshalJSON(data []byte) error {
 	}
 	number, _, err := apd.NewFromString(aux.Number)
 	if err != nil {
-		return InvalidNumberError{"Amount.UnmarshalJSON", aux.Number}
+		return InvalidNumberError{aux.Number}
 	}
 	if aux.CurrencyCode == "" || !IsValid(aux.CurrencyCode) {
-		return InvalidCurrencyCodeError{"Amount.UnmarshalJSON", aux.CurrencyCode}
+		return InvalidCurrencyCodeError{aux.CurrencyCode}
 	}
 	a.number = number
 	a.currencyCode = aux.CurrencyCode
@@ -345,10 +342,10 @@ func (a *Amount) Scan(src interface{}) error {
 	currencyCode := values[1]
 	number, _, err := apd.NewFromString(n)
 	if err != nil {
-		return InvalidNumberError{"Amount.Scan", n}
+		return InvalidNumberError{n}
 	}
 	if currencyCode == "" || !IsValid(currencyCode) {
-		return InvalidCurrencyCodeError{"Amount.Scan", currencyCode}
+		return InvalidCurrencyCodeError{currencyCode}
 	}
 	a.number = number
 	a.currencyCode = currencyCode
@@ -359,7 +356,7 @@ func (a *Amount) Scan(src interface{}) error {
 // decimalContext returns the decimal context to use for a calculation.
 func decimalContext(decimals ...*apd.Decimal) *apd.Context {
 	// Choose between decimal64 (19 digits) and decimal128 (39 digits)
-	// based on operand size, for increased performance.
+	// based on operand size (> int32), for increased performance.
 	for _, d := range decimals {
 		if d.Coeff.BitLen() > 31 {
 			return apd.BaseContext.WithPrecision(39)
