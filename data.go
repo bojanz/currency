@@ -4,7 +4,7 @@
 package currency
 
 // CLDRVersion is the CLDR version from which the data is derived.
-const CLDRVersion = "39.0.0"
+const CLDRVersion = "40.0.0"
 
 type numberingSystem uint8
 
@@ -232,9 +232,8 @@ var currencySymbols = map[string][]symbolInfo{
 	},
 	"CAD": {
 		{"CA$", []string{"en"}},
-		{"$", []string{"en-CA"}},
+		{"$", []string{"en-CA", "fr-CA"}},
 		{"$CA", []string{"fa", "fr"}},
-		{"$\u00a0CA", []string{"fr-CA"}},
 		{"C$", []string{"nl"}},
 	},
 	"CDF": {
@@ -366,7 +365,7 @@ var currencySymbols = map[string][]symbolInfo{
 	},
 	"HRK": {
 		{"HRK", []string{"en"}},
-		{"kn", []string{"bs"}},
+		{"kn", []string{"bs", "hr"}},
 	},
 	"HTG": {
 		{"HTG", []string{"en"}},
@@ -412,7 +411,7 @@ var currencySymbols = map[string][]symbolInfo{
 	},
 	"JPY": {
 		{"¥", []string{"en", "en-AU"}},
-		{"JP¥", []string{"af", "am", "ar", "as", "az", "bn", "cs", "cy", "da", "el", "en-001", "eu", "gl", "gu", "hi", "hy", "id", "is", "kk", "km", "ko", "ky", "lo", "mn", "mr", "ms", "my", "ne", "nl", "pa", "ps", "pt", "si", "so", "sq", "sw", "te", "tk", "ur", "uz", "zh", "zu"}},
+		{"JP¥", []string{"af", "am", "ar", "as", "az", "bn", "cs", "cy", "da", "el", "en-001", "en-CA", "eu", "gl", "gu", "hi", "hy", "id", "is", "kk", "km", "ko", "ky", "lo", "mn", "mr", "ms", "my", "ne", "nl", "pa", "ps", "pt", "si", "so", "sq", "sw", "te", "tk", "ur", "uz", "zh", "zu"}},
 		{"￥", []string{"ja"}},
 	},
 	"KES": {
@@ -464,6 +463,11 @@ var currencySymbols = map[string][]symbolInfo{
 	"LRD": {
 		{"LRD", []string{"en"}},
 		{"$", []string{"en-LR"}},
+	},
+	"LSL": {
+		{"LSL", []string{"en"}},
+		{"ЛСЛ", []string{"kk"}},
+		{"ឡូទី", []string{"km"}},
 	},
 	"LYD": {
 		{"LYD", []string{"en"}},
@@ -540,7 +544,7 @@ var currencySymbols = map[string][]symbolInfo{
 	"NOK": {
 		{"NOK", []string{"en"}},
 		{"Nkr", []string{"sv"}},
-		{"kr", []string{"nb", "nn", "no"}},
+		{"kr", []string{"no"}},
 	},
 	"NPR": {
 		{"NPR", []string{"en"}},
@@ -710,7 +714,7 @@ var currencySymbols = map[string][]symbolInfo{
 		{"$", []string{"en", "en-IN", "es-419", "nl-BQ", "sw-KE"}},
 		{"$US", []string{"fr"}},
 		{"$\u00a0US", []string{"fr-CA"}},
-		{"US$", []string{"am", "ar", "as", "az", "bn", "cs", "cy", "da", "en-001", "es", "es-AR", "es-CL", "es-CO", "es-CU", "es-DO", "es-UY", "eu", "gu", "id", "ka", "ko", "lo", "mk", "my", "ne", "nl", "pa", "pt", "si", "so", "sq", "sr", "sr-Latn", "sv", "sw", "ta-SG", "th", "tk", "uz", "vi", "yue", "zh", "zh-Hant"}},
+		{"US$", []string{"am", "ar", "as", "az", "bn", "cs", "cy", "da", "en-001", "en-CA", "es", "es-AR", "es-CL", "es-CO", "es-CU", "es-DO", "es-UY", "eu", "gu", "id", "ka", "ko", "lo", "mk", "my", "ne", "nl", "pa", "pt", "si", "so", "sq", "sr", "sr-Latn", "sv", "sw", "ta-SG", "th", "tk", "uz", "vi", "yue", "zh", "zh-Hant"}},
 		{"щ.д.", []string{"bg"}},
 	},
 	"UYU": {
@@ -752,6 +756,7 @@ var currencySymbols = map[string][]symbolInfo{
 	},
 	"XOF": {
 		{"F\u202fCFA", []string{"en"}},
+		{"فرانک\u202fCFA", []string{"fa"}},
 		{"සිෆ්එ", []string{"si"}},
 	},
 	"XPF": {
@@ -776,6 +781,7 @@ var currencySymbols = map[string][]symbolInfo{
 var currencyFormats = map[string]currencyFormat{
 	"af":      {"¤0.00", 0, 1, 3, 3, ",", "\u00a0", "+", "-"},
 	"ar":      {"0.00\u00a0¤", 1, 1, 3, 3, "٫", "٬", "\u061c+", "\u061c-"},
+	"ar-AE":   {"¤\u00a00.00", 0, 1, 3, 3, ".", ",", "\u200e+", "\u200e-"},
 	"ar-DZ":   {"¤\u00a00.00", 0, 1, 3, 3, ",", ".", "\u200e+", "\u200e-"},
 	"ar-EH":   {"¤\u00a00.00", 0, 1, 3, 3, ".", ",", "\u200e+", "\u200e-"},
 	"ar-LY":   {"¤\u00a00.00", 0, 1, 3, 3, ",", ".", "\u200e+", "\u200e-"},
@@ -855,11 +861,10 @@ var currencyFormats = map[string]currencyFormat{
 	"ms-BN":   {"¤\u00a00.00", 0, 1, 3, 3, ",", ".", "+", "-"},
 	"ms-ID":   {"¤0.00", 0, 1, 3, 3, ",", ".", "+", "-"},
 	"my":      {"0.00\u00a0¤", 5, 1, 3, 3, ".", ",", "+", "-"},
-	"nb":      {"¤\u00a00.00", 0, 1, 3, 3, ",", "\u00a0", "+", "−"},
 	"ne":      {"¤\u00a00.00", 4, 1, 3, 2, ".", ",", "+", "-"},
 	"nl":      {"¤\u00a00.00;¤\u00a0-0.00", 0, 1, 3, 3, ",", ".", "+", "-"},
 	"nn":      {"0.00\u00a0¤", 0, 1, 3, 3, ",", "\u00a0", "+", "−"},
-	"no":      {"¤\u00a00.00", 0, 1, 3, 3, ",", "\u00a0", "+", "−"},
+	"no":      {"¤\u00a00.00;¤\u00a0-0.00", 0, 1, 3, 3, ",", "\u00a0", "+", "−"},
 	"pa":      {"¤\u00a00.00", 0, 1, 3, 2, ".", ",", "+", "-"},
 	"pl":      {"0.00\u00a0¤", 0, 2, 3, 3, ",", "\u00a0", "+", "-"},
 	"ps":      {"0.00\u00a0¤", 2, 1, 3, 3, "٫", "٬", "\u200e+\u200e", "\u200e-\u200e"},
@@ -891,12 +896,12 @@ var currencyFormats = map[string]currencyFormat{
 }
 
 var parentLocales = map[string]string{
-	"az-Arab": "en", "az-Cyrl": "en", "blt-Latn": "en",
-	"bs-Cyrl": "en", "en-150": "en-001", "en-AG": "en-001",
-	"en-AI": "en-001", "en-AT": "en-150", "en-AU": "en-001",
-	"en-BB": "en-001", "en-BE": "en-150", "en-BM": "en-001",
-	"en-BS": "en-001", "en-BW": "en-001", "en-BZ": "en-001",
-	"en-CA": "en-001", "en-CC": "en-001", "en-CH": "en-150",
+	"az-Arab": "en", "az-Cyrl": "en", "bal-Latn": "en",
+	"blt-Latn": "en", "bs-Cyrl": "en", "en-150": "en-001",
+	"en-AG": "en-001", "en-AI": "en-001", "en-AT": "en-150",
+	"en-AU": "en-001", "en-BB": "en-001", "en-BE": "en-150",
+	"en-BM": "en-001", "en-BS": "en-001", "en-BW": "en-001",
+	"en-BZ": "en-001", "en-CC": "en-001", "en-CH": "en-150",
 	"en-CK": "en-001", "en-CM": "en-001", "en-CX": "en-001",
 	"en-CY": "en-001", "en-DE": "en-150", "en-DG": "en-001",
 	"en-DK": "en-150", "en-DM": "en-001", "en-ER": "en-001",
@@ -913,34 +918,33 @@ var parentLocales = map[string]string{
 	"en-MU": "en-001", "en-MW": "en-001", "en-MY": "en-001",
 	"en-NA": "en-001", "en-NF": "en-001", "en-NG": "en-001",
 	"en-NL": "en-150", "en-NR": "en-001", "en-NU": "en-001",
-	"en-NZ": "en-001", "en-PG": "en-001", "en-PH": "en-001",
-	"en-PK": "en-001", "en-PN": "en-001", "en-PW": "en-001",
-	"en-RW": "en-001", "en-SB": "en-001", "en-SC": "en-001",
-	"en-SD": "en-001", "en-SE": "en-150", "en-SG": "en-001",
-	"en-SH": "en-001", "en-SI": "en-150", "en-SL": "en-001",
-	"en-SS": "en-001", "en-SX": "en-001", "en-SZ": "en-001",
-	"en-TC": "en-001", "en-TK": "en-001", "en-TO": "en-001",
-	"en-TT": "en-001", "en-TV": "en-001", "en-TZ": "en-001",
-	"en-UG": "en-001", "en-VC": "en-001", "en-VG": "en-001",
-	"en-VU": "en-001", "en-WS": "en-001", "en-ZA": "en-001",
-	"en-ZM": "en-001", "en-ZW": "en-001", "es-AR": "es-419",
-	"es-BO": "es-419", "es-BR": "es-419", "es-BZ": "es-419",
-	"es-CL": "es-419", "es-CO": "es-419", "es-CR": "es-419",
-	"es-CU": "es-419", "es-DO": "es-419", "es-EC": "es-419",
-	"es-GT": "es-419", "es-HN": "es-419", "es-MX": "es-419",
-	"es-NI": "es-419", "es-PA": "es-419", "es-PE": "es-419",
-	"es-PR": "es-419", "es-PY": "es-419", "es-SV": "es-419",
-	"es-US": "es-419", "es-UY": "es-419", "es-VE": "es-419",
-	"hi-Latn": "en", "iu-Latn": "en", "kk-Arab": "en",
-	"ks-Deva": "en", "ku-Arab": "en", "ky-Arab": "en",
-	"ky-Latn": "en", "mn-Mong": "en", "mni-Mtei": "en",
-	"ms-Arab": "en", "nb": "no", "nn": "no",
-	"pa-Arab": "en", "pt-AO": "pt-PT", "pt-CH": "pt-PT",
-	"pt-CV": "pt-PT", "pt-FR": "pt-PT", "pt-GQ": "pt-PT",
-	"pt-GW": "pt-PT", "pt-LU": "pt-PT", "pt-MO": "pt-PT",
-	"pt-MZ": "pt-PT", "pt-ST": "pt-PT", "pt-TL": "pt-PT",
-	"so-Arab": "en", "sr-Latn": "en", "sw-Arab": "en",
-	"tg-Arab": "en", "ug-Cyrl": "en", "uz-Arab": "en",
-	"uz-Cyrl": "en", "yue-Hans": "en", "zh-Hant": "en",
-	"zh-Hant-MO": "zh-Hant-HK",
+	"en-NZ": "en-001", "en-PG": "en-001", "en-PK": "en-001",
+	"en-PN": "en-001", "en-PW": "en-001", "en-RW": "en-001",
+	"en-SB": "en-001", "en-SC": "en-001", "en-SD": "en-001",
+	"en-SE": "en-150", "en-SG": "en-001", "en-SH": "en-001",
+	"en-SI": "en-150", "en-SL": "en-001", "en-SS": "en-001",
+	"en-SX": "en-001", "en-SZ": "en-001", "en-TC": "en-001",
+	"en-TK": "en-001", "en-TO": "en-001", "en-TT": "en-001",
+	"en-TV": "en-001", "en-TZ": "en-001", "en-UG": "en-001",
+	"en-VC": "en-001", "en-VG": "en-001", "en-VU": "en-001",
+	"en-WS": "en-001", "en-ZA": "en-001", "en-ZM": "en-001",
+	"en-ZW": "en-001", "es-AR": "es-419", "es-BO": "es-419",
+	"es-BR": "es-419", "es-BZ": "es-419", "es-CL": "es-419",
+	"es-CO": "es-419", "es-CR": "es-419", "es-CU": "es-419",
+	"es-DO": "es-419", "es-EC": "es-419", "es-GT": "es-419",
+	"es-HN": "es-419", "es-MX": "es-419", "es-NI": "es-419",
+	"es-PA": "es-419", "es-PE": "es-419", "es-PR": "es-419",
+	"es-PY": "es-419", "es-SV": "es-419", "es-US": "es-419",
+	"es-UY": "es-419", "es-VE": "es-419", "hi-Latn": "en",
+	"iu-Latn": "en", "kk-Arab": "en", "ks-Deva": "en",
+	"ku-Arab": "en", "ky-Arab": "en", "ky-Latn": "en",
+	"mn-Mong": "en", "mni-Mtei": "en", "ms-Arab": "en",
+	"nb": "no", "nn": "no", "pa-Arab": "en",
+	"pt-AO": "pt-PT", "pt-CH": "pt-PT", "pt-CV": "pt-PT",
+	"pt-FR": "pt-PT", "pt-GQ": "pt-PT", "pt-GW": "pt-PT",
+	"pt-LU": "pt-PT", "pt-MO": "pt-PT", "pt-MZ": "pt-PT",
+	"pt-ST": "pt-PT", "pt-TL": "pt-PT", "so-Arab": "en",
+	"sr-Latn": "en", "sw-Arab": "en", "tg-Arab": "en",
+	"ug-Cyrl": "en", "uz-Arab": "en", "uz-Cyrl": "en",
+	"yue-Hans": "en", "zh-Hant": "en", "zh-Hant-MO": "zh-Hant-HK",
 }

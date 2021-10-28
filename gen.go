@@ -1,6 +1,7 @@
 // Copyright (c) 2020 Bojan Zivanovic and contributors
 // SPDX-License-Identifier: MIT
 
+//go:build ignore
 // +build ignore
 
 package main
@@ -668,7 +669,7 @@ func readFormat(dir string, locale string) (currencyFormat, error) {
 // generateParentLocales generates parent locales from CLDR data.
 //
 // Ensures ignored locales are skipped.
-// Replaces "root" with "en", since this package treats them as equivalent.
+// Replaces "und" with "en", since this package treats them as equivalent.
 func generateParentLocales(dir string) (map[string]string, error) {
 	data, err := ioutil.ReadFile(dir + "/cldr-json/cldr-core/supplemental/parentLocales.json")
 	if err != nil {
@@ -687,8 +688,8 @@ func generateParentLocales(dir string) (map[string]string, error) {
 
 	parentLocales := make(map[string]string)
 	for locale, parent := range aux.Supplemental.ParentLocales.ParentLocale {
-		// Avoid exposing the concept of "root" to users.
-		if parent == "root" {
+		// Avoid exposing the concept of "und" to users.
+		if parent == "und" {
 			parent = "en"
 		}
 		if !shouldIgnoreLocale(locale) {
@@ -704,19 +705,19 @@ func generateParentLocales(dir string) (map[string]string, error) {
 
 func shouldIgnoreLocale(locale string) bool {
 	ignoredLocales := []string{
+		// English is our fallback, we don't need another.
+		"und",
 		// Esperanto, Interlingua, Volapuk are made up languages.
 		"eo", "ia", "vo",
-		// Church Slavic, Manx, Prussian are historical languages.
-		"cu", "gv", "prg",
+		// Belarus (Classical orthography), Church Slavic, Manx, Prussian are historical.
+		"be-tarask", "cu", "gv", "prg",
 		// Valencian differs from its parent only by a single character (è/é).
-		"ca-ES-VALENCIA",
+		"ca-ES-valencia",
 		// Africa secondary languages.
 		// Not present in "modern" data, just listed in parentLocales.
 		"bm", "byn", "dje", "dyo", "ff", "ha", "shi", "vai", "wo", "yo",
 		// Infrequently used locales.
 		"jv", "kn", "ml", "row", "sat", "sd",
-		// Special "grouping" locales.
-		"root", "en-US-POSIX",
 	}
 	localeParts := strings.Split(locale, "-")
 	ignore := false
