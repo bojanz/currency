@@ -1,6 +1,6 @@
 module github.com/bojanz/currency
 
-go 1.14
+go 1.15
 
 require (
 	github.com/cockroachdb/apd/v2 v2.0.2
