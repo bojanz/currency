@@ -78,6 +78,30 @@ func GetSymbol(currencyCode string, locale Locale) (symbol string, ok bool) {
 	return symbol, true
 }
 
+// getFormat returns the format for a locale.
+func getFormat(locale Locale) currencyFormat {
+	var format currencyFormat
+	// CLDR considers "en" and "en-US" to be equivalent.
+	// Fall back immediately for better performance
+	enUSLocale := Locale{Language: "en", Territory: "US"}
+	if locale == enUSLocale {
+		locale = Locale{Language: "en"}
+	}
+	for {
+		localeID := locale.String()
+		if cf, ok := currencyFormats[localeID]; ok {
+			format = cf
+			break
+		}
+		locale = locale.GetParent()
+		if locale.IsEmpty() {
+			break
+		}
+	}
+
+	return format
+}
+
 // contains returns whether the sorted slice a contains x.
 // The slice must be sorted in ascending order.
 func contains(a []string, x string) bool {

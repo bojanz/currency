@@ -10,26 +10,11 @@ import (
 )
 
 func TestFormatter_Locale(t *testing.T) {
-	tests := []struct {
-		localeID string
-		want     string
-	}{
-		{"de-CH", "de-CH"},
-		// Fallback due to lack of format data.
-		{"fr-FR", "fr"},
-		// Fallback due to package rules.
-		{"en-US", "en"},
-	}
-
-	for _, tt := range tests {
-		t.Run("", func(t *testing.T) {
-			locale := currency.NewLocale(tt.localeID)
-			formatter := currency.NewFormatter(locale)
-			got := formatter.Locale().String()
-			if got != tt.want {
-				t.Errorf("got %v, want %v", got, tt.want)
-			}
-		})
+	locale := currency.NewLocale("fr-FR")
+	formatter := currency.NewFormatter(locale)
+	got := formatter.Locale().String()
+	if got != "fr-FR" {
+		t.Errorf("got %v, want fr-FR", got)
 	}
 }
 
@@ -40,11 +25,13 @@ func TestFormatter_Format(t *testing.T) {
 		localeID     string
 		want         string
 	}{
-		{"1234.59", "USD", "en", "$1,234.59"},
+		{"1234.59", "USD", "en-US", "$1,234.59"},
+		{"1234.59", "USD", "en-CA", "US$1,234.59"},
 		{"1234.59", "USD", "de-CH", "$\u00a01’234.59"},
 		{"1234.59", "USD", "sr", "1.234,59\u00a0US$"},
 
-		{"-1234.59", "USD", "en", "-$1,234.59"},
+		{"-1234.59", "USD", "en-US", "-$1,234.59"},
+		{"-1234.59", "USD", "en-CA", "-US$1,234.59"},
 		{"-1234.59", "USD", "de-CH", "$-1’234.59"},
 		{"-1234.59", "USD", "sr", "-1.234,59\u00a0US$"},
 

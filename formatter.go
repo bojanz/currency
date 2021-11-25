@@ -64,32 +64,15 @@ type Formatter struct {
 
 // NewFormatter creates a new formatter for the given locale.
 func NewFormatter(locale Locale) *Formatter {
-	f := &Formatter{}
-	for {
-		// CLDR considers "en" and "en-US" to be equivalent.
-		// Fall back immediately for better performance
-		enUSLocale := Locale{Language: "en", Territory: "US"}
-		if locale == enUSLocale {
-			locale = Locale{Language: "en"}
-		}
-		localeID := locale.String()
-		format, ok := currencyFormats[localeID]
-		if ok {
-			f.format = format
-			break
-		}
-		locale = locale.GetParent()
-		if locale.IsEmpty() {
-			break
-		}
+	f := &Formatter{
+		locale:          locale,
+		format:          getFormat(locale),
+		MinDigits:       DefaultDigits,
+		MaxDigits:       6,
+		RoundingMode:    RoundHalfUp,
+		CurrencyDisplay: DisplaySymbol,
+		SymbolMap:       make(map[string]string),
 	}
-	f.locale = locale
-	f.MinDigits = DefaultDigits
-	f.MaxDigits = 6
-	f.RoundingMode = RoundHalfUp
-	f.CurrencyDisplay = DisplaySymbol
-	f.SymbolMap = make(map[string]string)
-
 	return f
 }
 
