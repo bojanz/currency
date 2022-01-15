@@ -38,7 +38,7 @@ becomes problematic once there are multiple currencies (difficult to sort in the
 DB), or there is a need for sub-minor-unit precision (due to merchant or tax
 requirements, etc). A real arbitrary-precision decimal type is required. Since
 Go doesn't have one natively, a userspace implementation is used, provided by
-the cockroachdb/apd package. The Amount struct provides an easy to use
+the [cockroachdb/apd](https://github.com/cockroachdb/apd) package. The Amount struct provides an easy to use
 abstraction on top of it, allowing the underlying implementation to be replaced
 in the future without a backwards compatibility break.
 

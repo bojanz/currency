@@ -11,7 +11,7 @@ import (
 	"math/big"
 	"strings"
 
-	"github.com/cockroachdb/apd/v2"
+	"github.com/cockroachdb/apd/v3"
 )
 
 // RoundingMode determines how the amount will be rounded.
@@ -84,7 +84,8 @@ func NewAmountFromBigInt(n *big.Int, currencyCode string) (Amount, error) {
 	if !ok {
 		return Amount{}, InvalidCurrencyCodeError{currencyCode}
 	}
-	number := apd.NewWithBigInt(n, -int32(d))
+	coeff := new(apd.BigInt).SetMathBigInt(n)
+	number := apd.NewWithBigInt(coeff, -int32(d))
 
 	return Amount{number, currencyCode}, nil
 }
@@ -120,7 +121,7 @@ func (a Amount) String() string {
 
 // BigInt returns a in minor units, as a big.Int.
 func (a Amount) BigInt() *big.Int {
-	return &a.Round().number.Coeff
+	return a.Round().number.Coeff.MathBigInt()
 }
 
 // Int64 returns a in minor units, as an int64.
@@ -204,7 +205,7 @@ func (a Amount) RoundTo(digits uint8, mode RoundingMode) Amount {
 	if digits == DefaultDigits {
 		digits, _ = GetDigits(a.currencyCode)
 	}
-	extModes := map[RoundingMode]string{
+	extModes := map[RoundingMode]apd.Rounder{
 		RoundHalfUp:   apd.RoundHalfUp,
 		RoundHalfDown: apd.RoundHalfDown,
 		RoundUp:       apd.RoundUp,
