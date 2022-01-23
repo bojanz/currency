@@ -84,6 +84,7 @@ CREATE TABLE products (
    updated_at TIMESTAMPTZ
 );
 ```
+Note that the number and currency_code columns can have any name, only their ordering matters.
 
 Example struct:
 ```go
@@ -102,3 +103,5 @@ p := Product{}
 row := tx.QueryRow(ctx, `SELECT id, name, price, created_at, updated_at FROM products WHERE id = $1`, id)
 err := row.Scan(&p.ID, &p.Name, &p.Price, &p.CreatedAt, &p.UpdatedAt)
 ```
+
+See our [database integration notes](https://github.com/bojanz/currency/wiki/Database-integration-notes) for other examples (MySQL/MariaDB, SQLite).
