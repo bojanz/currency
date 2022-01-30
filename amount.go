@@ -354,14 +354,19 @@ func (a *Amount) Scan(src interface{}) error {
 	return nil
 }
 
+var (
+	decimalContextPrecision19 = apd.BaseContext.WithPrecision(19)
+	decimalContextPrecision39 = apd.BaseContext.WithPrecision(39)
+)
+
 // decimalContext returns the decimal context to use for a calculation.
 func decimalContext(decimals ...*apd.Decimal) *apd.Context {
 	// Choose between decimal64 (19 digits) and decimal128 (39 digits)
 	// based on operand size (> int32), for increased performance.
 	for _, d := range decimals {
 		if d.Coeff.BitLen() > 31 {
-			return apd.BaseContext.WithPrecision(39)
+			return decimalContextPrecision39
 		}
 	}
-	return apd.BaseContext.WithPrecision(19)
+	return decimalContextPrecision19
 }
