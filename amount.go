@@ -193,6 +193,7 @@ func (a Amount) Div(n string) (Amount, error) {
 	}
 	ctx := decimalContext(&a.number, &result)
 	ctx.Quo(&result, &a.number, &result)
+	result.Reduce(&result)
 
 	return Amount{result, a.currencyCode}, nil
 }
