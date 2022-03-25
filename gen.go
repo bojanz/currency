@@ -277,6 +277,17 @@ func fetchCLDR(dir string) (string, error) {
 	return aux.Version, nil
 }
 
+type isoEntry struct {
+	Code    string `xml:"Ccy"`
+	Number  string `xml:"CcyNbr"`
+	Digits  string `xml:"CcyMnrUnts"`
+	Country string `xml:"CtryNm"`
+	Name    struct {
+		Value  string `xml:",chardata"`
+		IsFund bool   `xml:"IsFund,attr"`
+	} `xml:"CcyNm"`
+}
+
 // fetchISO fetches currency info from ISO.
 //
 // ISO data is needed because CLDR can't be used as a reliable source
@@ -290,16 +301,7 @@ func fetchISO() (map[string]*currencyInfo, error) {
 	}
 	aux := struct {
 		Table []struct {
-			Entry []struct {
-				Code    string `xml:"Ccy"`
-				Number  string `xml:"CcyNbr"`
-				Digits  string `xml:"CcyMnrUnts"`
-				Country string `xml:"CtryNm"`
-				Name    struct {
-					Value  string `xml:",chardata"`
-					IsFund bool   `xml:"IsFund,attr"`
-				} `xml:"CcyNm"`
-			} `xml:"CcyNtry"`
+			Entry []isoEntry `xml:"CcyNtry"`
 		} `xml:"CcyTbl"`
 	}{}
 	if err := xml.Unmarshal(data, &aux); err != nil {
@@ -308,21 +310,35 @@ func fetchISO() (map[string]*currencyInfo, error) {
 
 	currencies := make(map[string]*currencyInfo, 170)
 	for _, entry := range aux.Table[0].Entry {
-		if entry.Code == "" || entry.Name.IsFund {
+		if shouldSkip(entry) {
 			continue
 		}
-		if entry.Code == "XUA" || entry.Code == "XSU" || entry.Code == "XDR" {
-			continue
+
+		digits, err := strconv.Atoi(entry.Digits)
+		if err != nil {
+			return nil, fmt.Errorf("digits invalid: %w", err)
 		}
-		if strings.HasPrefix(entry.Country, "ZZ") {
-			// Special currency (Gold, Platinum, etc).
-			continue
-		}
-		digits := parseDigits(entry.Digits, 2)
-		currencies[entry.Code] = &currencyInfo{entry.Number, digits}
+		currencies[entry.Code] = &currencyInfo{entry.Number, uint8(digits)}
 	}
 
 	return currencies, nil
+}
+
+func shouldSkip(e isoEntry) bool {
+	if e.Code == "" {
+		fmt.Printf("Skipping '%s' (country: %s) - it has no code defined.\n", e.Name.Value, e.Country)
+		return true
+	}
+	if e.Digits == "N.A." {
+		fmt.Printf("Skipping '%s' - it has no digits defined.\n", e.Code)
+		return true
+	}
+	if e.Number == "" {
+		fmt.Printf("Skipping '%s' - it has no number defined.\n", e.Code)
+		return true
+	}
+
+	return false
 }
 
 func fetchURL(url string) ([]byte, error) {
