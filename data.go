@@ -415,7 +415,7 @@ var currencySymbols = map[string][]symbolInfo{
 	},
 	"JPY": {
 		{"¥", []string{"en", "en-AU"}},
-		{"JP¥", []string{"af", "am", "ar", "as", "az", "bn", "cs", "cy", "da", "el", "en-001", "en-CA", "en-MV", "eu", "gl", "gu", "hi", "hi-Latn", "hy", "id", "is", "kk", "km", "ko", "ky", "lo", "mn", "mr", "ms", "my", "ne", "nl", "pa", "ps", "pt", "si", "so", "sq", "sw", "te", "tk", "ur", "uz", "zh", "zu"}},
+		{"JP¥", []string{"af", "am", "ar", "as", "az", "bn", "cs", "cy", "da", "el", "en-001", "en-CA", "eu", "gl", "gu", "hi", "hy", "id", "is", "kk", "km", "ko", "ky", "lo", "mn", "mr", "ms", "my", "ne", "nl", "pa", "ps", "pt", "si", "so", "sq", "sw", "te", "tk", "ur", "uz", "zh", "zu"}},
 		{"￥", []string{"ja"}},
 	},
 	"KES": {
@@ -722,7 +722,7 @@ var currencySymbols = map[string][]symbolInfo{
 		{"$", []string{"en", "en-IN", "es-419", "nl-BQ", "sw-KE"}},
 		{"$US", []string{"fr"}},
 		{"$\u00a0US", []string{"fr-CA"}},
-		{"US$", []string{"am", "ar", "as", "az", "bn", "cs", "cy", "da", "en-001", "en-CA", "en-MV", "es", "es-AR", "es-CL", "es-CO", "es-CU", "es-DO", "es-UY", "eu", "gu", "id", "ka", "ko", "lo", "mk", "my", "ne", "nl", "pa", "pt", "si", "so", "sq", "sr", "sr-Latn", "sv", "sw", "ta-SG", "th", "tk", "uz", "vi", "yue", "zh", "zh-Hant"}},
+		{"US$", []string{"am", "ar", "as", "az", "bn", "cs", "cy", "da", "en-001", "en-CA", "es", "es-AR", "es-CL", "es-CO", "es-CU", "es-DO", "es-UY", "eu", "gu", "id", "ka", "ko", "lo", "mk", "my", "ne", "nl", "pa", "pt", "si", "so", "sq", "sr", "sr-Latn", "sv", "sw", "ta-SG", "th", "tk", "uz", "vi", "yue", "zh", "zh-Hant"}},
 		{"щ.д.", []string{"bg"}},
 	},
 	"UYU": {
@@ -850,7 +850,6 @@ var currencyFormats = map[string]currencyFormat{
 	"gu":      {"¤0.00", 0, 1, 3, 2, ".", ",", "+", "-"},
 	"he":      {"\u200f0.00\u00a0¤;\u200f-0.00\u00a0¤", 0, 1, 3, 3, ".", ",", "\u200e+", "\u200e-"},
 	"hi":      {"¤0.00", 0, 1, 3, 2, ".", ",", "+", "-"},
-	"hi-Latn": {"¤0.00", 0, 1, 3, 2, ".", ",", "+", "-"},
 	"hr":      {"0.00\u00a0¤", 0, 1, 3, 3, ",", ".", "+", "−"},
 	"hu":      {"0.00\u00a0¤", 0, 1, 3, 3, ",", "\u00a0", "+", "-"},
 	"hy":      {"0.00\u00a0¤", 0, 1, 3, 3, ",", "\u00a0", "+", "-"},

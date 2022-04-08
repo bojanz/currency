@@ -312,11 +312,8 @@ func fetchISO() (map[string]*currencyInfo, error) {
 			continue
 		}
 
-		digits, err := strconv.Atoi(entry.Digits)
-		if err != nil {
-			return nil, fmt.Errorf("digits invalid: %w", err)
-		}
-		currencies[entry.Code] = &currencyInfo{entry.Number, uint8(digits)}
+		digits := parseDigits(entry.Digits, 2)
+		currencies[entry.Code] = &currencyInfo{entry.Number, digits}
 	}
 
 	return currencies, nil
