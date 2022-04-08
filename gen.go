@@ -312,8 +312,8 @@ func fetchISO() (map[string]*currencyInfo, error) {
 			continue
 		}
 
-		// We use digits from ISO here with a fallback to 2, but we prefer to rely on CLDR data in that matter.
-		// In case they're available in CLDR, they will be replaced further down in replaceDigits function.
+		// We use ISO digits here with a fallback to 2, but prefer CLDR
+		// data when available. See replaceDigits() for the next step.
 		digits := parseDigits(entry.Digits, 2)
 		currencies[entry.Code] = &currencyInfo{entry.Number, digits}
 	}
@@ -339,10 +339,13 @@ func fetchURL(url string) ([]byte, error) {
 	return data, nil
 }
 
-// replaceDigits replaces each currency's digits with data from CLDR.
+// replaceDigits replaces currency digits with data from CLDR.
 //
 // CLDR data reflects real life usage more closely, specifying 0 digits
 // (instead of 2 in ISO data) for ~14 currencies, such as ALL and RSD.
+//
+// Note that CLDR does not have data for every currency, in which ase
+// the original ISO digits are kept.
 func replaceDigits(currencies map[string]*currencyInfo, dir string) error {
 	data, err := ioutil.ReadFile(dir + "/cldr-json/cldr-core/supplemental/currencyData.json")
 	if err != nil {
