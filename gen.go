@@ -308,16 +308,12 @@ func fetchISO() (map[string]*currencyInfo, error) {
 
 	currencies := make(map[string]*currencyInfo, 170)
 	for _, entry := range aux.Table[0].Entry {
-		if entry.Code == "" || entry.Name.IsFund {
+		if entry.Code == "" || entry.Number == "" || entry.Digits == "N.A." {
 			continue
 		}
-		if entry.Code == "XUA" || entry.Code == "XSU" || entry.Code == "XDR" {
-			continue
-		}
-		if strings.HasPrefix(entry.Country, "ZZ") {
-			// Special currency (Gold, Platinum, etc).
-			continue
-		}
+
+		// We use digits from ISO here with a fallback to 2, but we prefer to rely on CLDR data in that matter.
+		// In case they're available in CLDR, they will be replaced further down in replaceDigits function.
 		digits := parseDigits(entry.Digits, 2)
 		currencies[entry.Code] = &currencyInfo{entry.Number, digits}
 	}
