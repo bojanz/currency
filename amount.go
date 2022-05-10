@@ -215,7 +215,8 @@ func (a Amount) RoundTo(digits uint8, mode RoundingMode) Amount {
 		RoundDown:     apd.RoundDown,
 	}
 	result := apd.Decimal{}
-	ctx := decimalContext(&a.number)
+	// make a copy since the decimal context is a global object and shouldn't be modified concurrently
+	ctx := *decimalContext(&a.number)
 	ctx.Rounding = extModes[mode]
 	ctx.Quantize(&result, &a.number, -int32(digits))
 
@@ -363,6 +364,8 @@ var (
 )
 
 // decimalContext returns the decimal context to use for a calculation.
+// The returned context is a global object.
+// It can safely be used concurrently, but not modified concurrently.
 func decimalContext(decimals ...*apd.Decimal) *apd.Context {
 	// Choose between decimal64 (19 digits) and decimal128 (39 digits)
 	// based on operand size (> int32), for increased performance.

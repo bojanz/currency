@@ -6,6 +6,7 @@ package currency_test
 import (
 	"encoding/json"
 	"math/big"
+	"sync"
 	"testing"
 
 	"github.com/bojanz/currency"
@@ -806,4 +807,26 @@ func TestAmount_Scan(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestAmount_RoundTo_is_concurrency_safe(t *testing.T) {
+	const n = 50
+
+	var allReadyWg, allDone sync.WaitGroup
+	allReadyWg.Add(n)
+	allDone.Add(n)
+
+	for i := 0; i < n; i++ {
+		go func() {
+			defer allDone.Done()
+			amount, _ := currency.NewAmount("10.99", "EUR")
+
+			allReadyWg.Done()
+			allReadyWg.Wait()
+
+			amount.RoundTo(1, currency.RoundHalfUp)
+		}()
+	}
+
+	allDone.Wait()
 }
