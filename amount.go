@@ -208,16 +208,9 @@ func (a Amount) RoundTo(digits uint8, mode RoundingMode) Amount {
 	if digits == DefaultDigits {
 		digits, _ = GetDigits(a.currencyCode)
 	}
-	extModes := map[RoundingMode]apd.Rounder{
-		RoundHalfUp:   apd.RoundHalfUp,
-		RoundHalfDown: apd.RoundHalfDown,
-		RoundUp:       apd.RoundUp,
-		RoundDown:     apd.RoundDown,
-	}
+
 	result := apd.Decimal{}
-	// make a copy since the decimal context is a global object and shouldn't be modified concurrently
-	ctx := *decimalContext(&a.number)
-	ctx.Rounding = extModes[mode]
+	ctx := decimalContextWithRoundingMode(mode, &a.number)
 	ctx.Quantize(&result, &a.number, -int32(digits))
 
 	return Amount{result, a.currencyCode}
@@ -375,4 +368,22 @@ func decimalContext(decimals ...*apd.Decimal) *apd.Context {
 		}
 	}
 	return decimalContextPrecision19
+}
+
+// decimalContextWithRoundingMode returns the decimal context to use for a calculation with the given round mode.
+// It optimizes for the most common RoundHalfUp mode by returning a preallocated global context for it.
+func decimalContextWithRoundingMode(mode RoundingMode, decimals ...*apd.Decimal) *apd.Context {
+	if mode == RoundHalfUp {
+		return decimalContext(decimals...)
+	}
+
+	extModes := map[RoundingMode]apd.Rounder{
+		RoundHalfDown: apd.RoundHalfDown,
+		RoundUp:       apd.RoundUp,
+		RoundDown:     apd.RoundDown,
+	}
+	ctx := *decimalContext(decimals...)
+	ctx.Rounding = extModes[mode]
+
+	return &ctx
 }

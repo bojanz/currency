@@ -5,6 +5,7 @@ package currency_test
 
 import (
 	"encoding/json"
+	"fmt"
 	"math/big"
 	"sync"
 	"testing"
@@ -810,23 +811,38 @@ func TestAmount_Scan(t *testing.T) {
 }
 
 func TestAmount_RoundTo_is_concurrency_safe(t *testing.T) {
-	const n = 50
+	const n = 20
 
-	var allReadyWg, allDone sync.WaitGroup
-	allReadyWg.Add(n)
-	allDone.Add(n)
-
-	for i := 0; i < n; i++ {
-		go func() {
-			defer allDone.Done()
-			amount, _ := currency.NewAmount("10.99", "EUR")
-
-			allReadyWg.Done()
-			allReadyWg.Wait()
-
-			amount.RoundTo(1, currency.RoundHalfUp)
-		}()
+	roundingModes := []currency.RoundingMode{
+		currency.RoundHalfUp,
+		currency.RoundHalfDown,
+		currency.RoundUp,
+		currency.RoundDown,
 	}
 
-	allDone.Wait()
+	for i := range roundingModes {
+		roundingMode := roundingModes[i]
+
+		t.Run(fmt.Sprintf("rounding_mode_%d", roundingMode), func(t *testing.T) {
+			t.Parallel()
+
+			var allReadyWg, allDone sync.WaitGroup
+			allReadyWg.Add(n)
+			allDone.Add(n)
+
+			for i := 0; i < n; i++ {
+				go func() {
+					defer allDone.Done()
+					amount, _ := currency.NewAmount("10.99", "EUR")
+
+					allReadyWg.Done()
+					allReadyWg.Wait()
+
+					amount.RoundTo(1, roundingMode)
+				}()
+			}
+
+			allDone.Wait()
+		})
+	}
 }
