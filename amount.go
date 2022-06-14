@@ -149,6 +149,12 @@ func (a Amount) Convert(currencyCode, rate string) (Amount, error) {
 // Add adds a and b together and returns the result.
 func (a Amount) Add(b Amount) (Amount, error) {
 	if a.currencyCode != b.currencyCode {
+		if a.Equal(Amount{}) {
+			return b, nil
+		}
+		if b.Equal(Amount{}) {
+			return a, nil
+		}
 		return Amount{}, MismatchError{a, b}
 	}
 	result := apd.Decimal{}
@@ -161,6 +167,15 @@ func (a Amount) Add(b Amount) (Amount, error) {
 // Sub subtracts b from a and returns the result.
 func (a Amount) Sub(b Amount) (Amount, error) {
 	if a.currencyCode != b.currencyCode {
+		if a.Equal(Amount{}) {
+			// 0-b == -b
+			var result apd.Decimal
+			result.Neg(&b.number)
+			return Amount{result, b.currencyCode}, nil
+		}
+		if b.Equal(Amount{}) {
+			return a, nil
+		}
 		return Amount{}, MismatchError{a, b}
 	}
 	result := apd.Decimal{}
