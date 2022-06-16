@@ -130,9 +130,7 @@ func BenchmarkAmount_RoundTo(b *testing.B) {
 		currency.RoundDown,
 	}
 
-	for i := range roundingModes {
-		roundingMode := roundingModes[i]
-
+	for _, roundingMode := range roundingModes {
 		b.Run(fmt.Sprintf("rounding_mode_%d", roundingMode), func(b *testing.B) {
 			var z currency.Amount
 			for n := 0; n < b.N; n++ {
