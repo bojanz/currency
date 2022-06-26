@@ -5,7 +5,9 @@ package currency_test
 
 import (
 	"encoding/json"
+	"fmt"
 	"math/big"
+	"sync"
 	"testing"
 
 	"github.com/bojanz/currency"
@@ -804,6 +806,36 @@ func TestAmount_Scan(t *testing.T) {
 			if errStr != tt.wantError {
 				t.Errorf("error: got %v, want %v", errStr, tt.wantError)
 			}
+		})
+	}
+}
+
+func TestAmount_RoundToWithConcurrency(t *testing.T) {
+	const n = 2
+
+	roundingModes := []currency.RoundingMode{
+		currency.RoundHalfUp,
+		currency.RoundHalfDown,
+		currency.RoundUp,
+		currency.RoundDown,
+	}
+
+	for _, roundingMode := range roundingModes {
+		t.Run(fmt.Sprintf("rounding_mode_%d", roundingMode), func(t *testing.T) {
+			t.Parallel()
+
+			var allDone sync.WaitGroup
+			allDone.Add(n)
+
+			for i := 0; i < n; i++ {
+				go func() {
+					defer allDone.Done()
+					amount, _ := currency.NewAmount("10.99", "EUR")
+					amount.RoundTo(1, roundingMode)
+				}()
+			}
+
+			allDone.Wait()
 		})
 	}
 }

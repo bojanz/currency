@@ -1,6 +1,7 @@
 package currency_test
 
 import (
+	"fmt"
 	"math/big"
 	"testing"
 
@@ -117,4 +118,25 @@ func BenchmarkAmount_Cmp(b *testing.B) {
 		z, _ = x.Cmp(y)
 	}
 	cmpResult = z
+}
+
+func BenchmarkAmount_RoundTo(b *testing.B) {
+	x, _ := currency.NewAmount("34.9876", "USD")
+
+	roundingModes := []currency.RoundingMode{
+		currency.RoundHalfUp,
+		currency.RoundHalfDown,
+		currency.RoundUp,
+		currency.RoundDown,
+	}
+
+	for _, roundingMode := range roundingModes {
+		b.Run(fmt.Sprintf("rounding_mode_%d", roundingMode), func(b *testing.B) {
+			var z currency.Amount
+			for n := 0; n < b.N; n++ {
+				z = x.RoundTo(2, roundingMode)
+			}
+			result = z
+		})
+	}
 }
