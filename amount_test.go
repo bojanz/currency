@@ -827,6 +827,8 @@ func TestAmount_Scan(t *testing.T) {
 		{"(3.45,USD)", "3.45", "USD", ""},
 		{"(3.45,)", "0", "", `invalid currency code ""`},
 		{"(,USD)", "0", "", `invalid number ""`},
+		{"(0,)", "0", "", ""},
+		{"(0,   )", "0", "", ""},
 	}
 
 	for _, tt := range tests {
