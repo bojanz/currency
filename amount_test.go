@@ -275,6 +275,7 @@ func TestAmount_Add(t *testing.T) {
 	a, _ := currency.NewAmount("20.99", "USD")
 	b, _ := currency.NewAmount("3.50", "USD")
 	x, _ := currency.NewAmount("99.99", "EUR")
+	var z currency.Amount
 
 	_, err := a.Add(x)
 	if e, ok := err.(currency.MismatchError); ok {
@@ -316,12 +317,30 @@ func TestAmount_Add(t *testing.T) {
 	if e.String() != "9223372036854775827.99 USD" {
 		t.Errorf("got %v, want 9223372036854775827.99 USD", e.String())
 	}
+
+	// Test that addition with the zero value works and yields the other operand.
+	f, err := a.Add(z)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+	if !f.Equal(a) {
+		t.Errorf("%v + zero = %v, want %v", a, f, a)
+	}
+
+	g, err := z.Add(a)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+	if !g.Equal(a) {
+		t.Errorf("%v + zero = %v, want %v", a, g, a)
+	}
 }
 
 func TestAmount_Sub(t *testing.T) {
 	a, _ := currency.NewAmount("20.99", "USD")
 	b, _ := currency.NewAmount("3.50", "USD")
 	x, _ := currency.NewAmount("99.99", "EUR")
+	var z currency.Amount
 
 	_, err := a.Sub(x)
 	if e, ok := err.(currency.MismatchError); ok {
@@ -362,6 +381,27 @@ func TestAmount_Sub(t *testing.T) {
 	}
 	if e.String() != "922337203685477598778.01 USD" {
 		t.Errorf("got %v, want 922337203685477598778.01 USD", e.String())
+	}
+
+	// Test that subtraction with the zero value works.
+	f, err := a.Sub(z)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+	if !f.Equal(a) {
+		t.Errorf("%v - zero = %v, want %v", a, f, a)
+	}
+
+	g, err := z.Sub(a)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+	negA, err := a.Mul("-1")
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+	if !g.Equal(negA) {
+		t.Errorf("zero - %v = %v, want %v", a, g, negA)
 	}
 }
 

@@ -5,6 +5,7 @@ package currency_test
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/bojanz/currency"
 )
@@ -57,6 +58,30 @@ func ExampleAmount_Add() {
 	totalAmount, _ := firstAmount.Add(secondAmount)
 	fmt.Println(totalAmount)
 	// Output: 24.49 USD
+}
+
+func ExampleAmount_sum() {
+	var amounts []currency.Amount
+	for i := 0; i <= 4; i++ {
+		amount, err := currency.NewAmount(strconv.Itoa(i), "AUD")
+		if err != nil {
+			panic(err)
+		}
+		amounts = append(amounts, amount)
+	}
+
+	// It is OK to add any currency.Amount to the zero value.
+	var sum currency.Amount
+	for _, a := range amounts {
+		var err error
+		sum, err = sum.Add(a)
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	fmt.Println(sum) // 0 + 1 + 2 + 3 + 4 = 10
+	// Output: 10 AUD
 }
 
 func ExampleAmount_Sub() {
