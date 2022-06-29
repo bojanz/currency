@@ -109,20 +109,8 @@ func BenchmarkAmount_Round(b *testing.B) {
 	result = z
 }
 
-func BenchmarkAmount_Cmp(b *testing.B) {
-	x, _ := currency.NewAmount("34.99", "USD")
-	y, _ := currency.NewAmount("12.99", "USD")
-
-	var z int
-	for n := 0; n < b.N; n++ {
-		z, _ = x.Cmp(y)
-	}
-	cmpResult = z
-}
-
 func BenchmarkAmount_RoundTo(b *testing.B) {
 	x, _ := currency.NewAmount("34.9876", "USD")
-
 	roundingModes := []currency.RoundingMode{
 		currency.RoundHalfUp,
 		currency.RoundHalfDown,
@@ -139,4 +127,15 @@ func BenchmarkAmount_RoundTo(b *testing.B) {
 			result = z
 		})
 	}
+}
+
+func BenchmarkAmount_Cmp(b *testing.B) {
+	x, _ := currency.NewAmount("34.99", "USD")
+	y, _ := currency.NewAmount("12.99", "USD")
+
+	var z int
+	for n := 0; n < b.N; n++ {
+		z, _ = x.Cmp(y)
+	}
+	cmpResult = z
 }
