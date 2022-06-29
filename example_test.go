@@ -60,24 +60,12 @@ func ExampleAmount_Add() {
 	// Output: 24.49 USD
 }
 
-func ExampleAmount_sum() {
-	var amounts []currency.Amount
-	for i := 0; i <= 4; i++ {
-		amount, err := currency.NewAmount(strconv.Itoa(i), "AUD")
-		if err != nil {
-			panic(err)
-		}
-		amounts = append(amounts, amount)
-	}
-
-	// It is OK to add any currency.Amount to the zero value.
+func ExampleAmount_Add_sum() {
+	// Any currency.Amount can be added to the zero value.
 	var sum currency.Amount
-	for _, a := range amounts {
-		var err error
-		sum, err = sum.Add(a)
-		if err != nil {
-			panic(err)
-		}
+	for i := 0; i <= 4; i++ {
+		a, _ := currency.NewAmount(strconv.Itoa(i), "AUD")
+		sum, _ = sum.Add(a)
 	}
 
 	fmt.Println(sum) // 0 + 1 + 2 + 3 + 4 = 10
@@ -90,6 +78,18 @@ func ExampleAmount_Sub() {
 	amount, _ := baseAmount.Sub(discountAmount)
 	fmt.Println(amount)
 	// Output: 15.99 USD
+}
+
+func ExampleAmount_Sub_diff() {
+	// Any currency.Amount can be subtracted from the zero value.
+	var diff currency.Amount
+	for i := 0; i <= 4; i++ {
+		a, _ := currency.NewAmount(strconv.Itoa(i), "AUD")
+		diff, _ = diff.Sub(a)
+	}
+
+	fmt.Println(diff) // 0 - 1 - 2 - 3 - 4 = -10
+	// Output: -10 AUD
 }
 
 func ExampleAmount_Mul() {
