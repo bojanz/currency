@@ -358,11 +358,10 @@ func (a *Amount) Scan(src interface{}) error {
 		return InvalidNumberError{n}
 	}
 	// Allow the zero value (number=0, currencyCode is empty).
-	// If the DB uses a fixed width type for currencyCode,
-	// as recommended in the readme, currencyCode might be "" or "   ".
+	// An empty currencyCode consists of 3 spaces when stored in a char(3).
 	if (currencyCode == "" || currencyCode == "   ") && number.IsZero() {
 		a.number = number
-		a.currencyCode = "" // convert "   " into ""
+		a.currencyCode = ""
 		return nil
 	}
 	if currencyCode == "" || !IsValid(currencyCode) {

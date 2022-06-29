@@ -73,7 +73,7 @@ Example schema:
 ```
 CREATE TYPE price AS (
    number NUMERIC,
-   currency_code CHAR(3)
+   currency_code TEXT
 );
 
 CREATE TABLE products (
