@@ -3,7 +3,11 @@
 
 package currency
 
-import "strings"
+import (
+	"strings"
+	"unicode"
+	"unicode/utf8"
+)
 
 // Locale represents a Unicode locale identifier.
 type Locale struct {
@@ -25,7 +29,9 @@ func NewLocale(id string) Locale {
 		}
 		partLen := len(part)
 		if partLen == 4 {
-			locale.Script = strings.Title(part)
+			// Uppercase the first letter in a UTF8-safe manner.
+			r, size := utf8.DecodeRuneInString(part)
+			locale.Script = string(unicode.ToTitle(r)) + part[size:]
 			continue
 		}
 		if partLen == 2 || partLen == 3 {
