@@ -78,11 +78,11 @@ func (l Locale) IsEmpty() bool {
 // GetParent returns the parent locale for l.
 //
 //	Order:
-// 	1. Language - Script - Territory (e.g. "sr-Cyrl-RS")
-// 	2. Language - Script (e.g. "sr-Cyrl")
-// 	3. Language (e.g. "sr")
-// 	4. English ("en")
-// 	5. Empty locale ("")
+//	1. Language - Script - Territory (e.g. "sr-Cyrl-RS")
+//	2. Language - Script (e.g. "sr-Cyrl")
+//	3. Language (e.g. "sr")
+//	4. English ("en")
+//	5. Empty locale ("")
 //
 // Note that according to CLDR rules, certain locales have special parents.
 // For example, the parent for "es-AR" is "es-419", and for "sr-Latn" it is "en".

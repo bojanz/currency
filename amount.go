@@ -233,10 +233,9 @@ func (a Amount) RoundTo(digits uint8, mode RoundingMode) Amount {
 
 // Cmp compares a and b and returns:
 //
-//   -1 if a <  b
-//    0 if a == b
-//   +1 if a >  b
-//
+//	-1 if a <  b
+//	0 if a == b
+//	+1 if a >  b
 func (a Amount) Cmp(b Amount) (int, error) {
 	if a.currencyCode != b.currencyCode {
 		return -1, MismatchError{a, b}
