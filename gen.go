@@ -284,7 +284,7 @@ func fetchCLDR(dir string) (string, error) {
 // Furthermore, CLDR includes both active and inactive currencies, while ISO
 // includes only active ones, matching the needs of this package.
 func fetchISO() (map[string]*currencyInfo, error) {
-	data, err := fetchURL("https://www.currency-iso.org/dam/downloads/lists/list_one.xml")
+	data, err := fetchURL("https://www.six-group.com/dam/download/financial-information/data-center/iso-currrency/lists/list-one.xml")
 	if err != nil {
 		return nil, fmt.Errorf("fetchISO: %w", err)
 	}
