@@ -716,7 +716,7 @@ func shouldIgnoreLocale(locale string) bool {
 		// Not present in "modern" data, just listed in parentLocales.
 		"bm", "byn", "dje", "dyo", "ff", "ha", "shi", "vai", "wo", "yo",
 		// Infrequently used locales.
-		"jv", "kn", "ml", "row", "sat", "sd",
+		"jv", "kn", "ml", "row", "sat", "sd", "to",
 	}
 	localeParts := strings.Split(locale, "-")
 	ignore := false

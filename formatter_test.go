@@ -44,7 +44,7 @@ func TestFormatter_Format(t *testing.T) {
 		{"1234.00", "CHF", "sr", "1.234,00\u00a0CHF"},
 
 		// Arabic digits.
-		{"12345678.90", "USD", "ar", "١٢٬٣٤٥٬٦٧٨٫٩٠\u00a0US$"},
+		{"12345678.90", "USD", "ar", "\u200f١٢٬٣٤٥٬٦٧٨٫٩٠\u00a0US$"},
 		// Arabic extended (Persian) digits.
 		{"12345678.90", "USD", "fa", "\u200e$۱۲٬۳۴۵٬۶۷۸٫۹۰"},
 		// Bengali digits.
@@ -95,11 +95,6 @@ func TestFormatter_Grouping(t *testing.T) {
 		{"1234.99", "USD", "hi", false, "$1,234.99"},
 		{"1234567.99", "USD", "hi", false, "$12,34,567.99"},
 		{"12345678.99", "USD", "hi", false, "$1,23,45,678.99"},
-
-		// The "bg" locale doesn't support grouping.
-		{"123.99", "EUR", "bg", false, "123,99\u00a0€"},
-		{"1234.99", "EUR", "bg", false, "1234,99\u00a0€"},
-		{"1234567.99", "EUR", "bg", false, "1234567,99\u00a0€"},
 	}
 
 	for _, tt := range tests {
