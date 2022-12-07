@@ -26,6 +26,10 @@ const (
 	RoundUp
 	// RoundDown rounds towards 0, truncating extra digits.
 	RoundDown
+	// RoundHalfEven rounds up if the digits are > 0.5. If the digits are equal
+	// to 0.5, it rounds up if the previous digit is odd, always producing an
+	// even digit.
+	RoundHalfEven
 )
 
 // InvalidNumberError is returned when a numeric string can't be converted to a decimal.
@@ -401,6 +405,7 @@ func roundingContext(decimal *apd.Decimal, mode RoundingMode) *apd.Context {
 		RoundHalfDown: apd.RoundHalfDown,
 		RoundUp:       apd.RoundUp,
 		RoundDown:     apd.RoundDown,
+		RoundHalfEven: apd.RoundHalfEven,
 	}
 	ctx := *decimalContext(decimal)
 	ctx.Rounding = extModes[mode]
