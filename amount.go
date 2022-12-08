@@ -26,6 +26,9 @@ const (
 	RoundUp
 	// RoundDown rounds towards 0, truncating extra digits.
 	RoundDown
+	// RoundHalfEven rounds up if the next digit is > 5. If the next digit is equal
+	// to 5, it rounds to the nearest even decimal. Also called bankers' rounding.
+	RoundHalfEven
 )
 
 // InvalidNumberError is returned when a numeric string can't be converted to a decimal.
@@ -401,6 +404,7 @@ func roundingContext(decimal *apd.Decimal, mode RoundingMode) *apd.Context {
 		RoundHalfDown: apd.RoundHalfDown,
 		RoundUp:       apd.RoundUp,
 		RoundDown:     apd.RoundDown,
+		RoundHalfEven: apd.RoundHalfEven,
 	}
 	ctx := *decimalContext(decimal)
 	ctx.Rounding = extModes[mode]
