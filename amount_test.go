@@ -542,6 +542,8 @@ func TestAmount_RoundTo(t *testing.T) {
 		{"-12.345", 2, currency.RoundHalfDown, "-12.34"},
 		{"-12.345", 2, currency.RoundUp, "-12.35"},
 		{"-12.345", 2, currency.RoundDown, "-12.34"},
+		{"-12.345", 2, currency.RoundHalfEven, "-12.34"},
+		{"-12.335", 2, currency.RoundHalfEven, "-12.34"},
 
 		// More digits that the amount has.
 		{"12.345", 4, currency.RoundHalfUp, "12.3450"},

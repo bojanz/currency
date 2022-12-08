@@ -26,9 +26,8 @@ const (
 	RoundUp
 	// RoundDown rounds towards 0, truncating extra digits.
 	RoundDown
-	// RoundHalfEven rounds up if the digits are > 0.5. If the digits are equal
-	// to 0.5, it rounds up if the previous digit is odd, always producing an
-	// even digit.
+	// RoundHalfEven rounds up if the next digit is > 5. If the next digit is equal
+	// to 5, it rounds to the nearest even decimal. Also called bankers' rounding.
 	RoundHalfEven
 )
 
