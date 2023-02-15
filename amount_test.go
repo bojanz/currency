@@ -826,6 +826,18 @@ func TestAmount_UnmarshalJSON(t *testing.T) {
 		t.Errorf("got %T, want currency.InvalidNumberError", err)
 	}
 
+	d = []byte(`{"number":3.45,"currency":"USD"}`)
+	err = json.Unmarshal(d, unmarshalled)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+	if unmarshalled.Number() != "3.45" {
+		t.Errorf("got %v, want 3.45", unmarshalled.Number())
+	}
+	if unmarshalled.CurrencyCode() != "USD" {
+		t.Errorf("got %v, want USD", unmarshalled.CurrencyCode())
+	}
+
 	d = []byte(`{"number":"3.45","currency":"usd"}`)
 	err = json.Unmarshal(d, unmarshalled)
 	if e, ok := err.(currency.InvalidCurrencyCodeError); ok {
