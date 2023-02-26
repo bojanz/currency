@@ -315,16 +315,22 @@ func (a Amount) MarshalJSON() ([]byte, error) {
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (a *Amount) UnmarshalJSON(data []byte) error {
 	aux := struct {
-		Number       string `json:"number"`
-		CurrencyCode string `json:"currency"`
+		Number       json.RawMessage `json:"number"`
+		CurrencyCode string          `json:"currency"`
 	}{}
 	err := json.Unmarshal(data, &aux)
 	if err != nil {
 		return err
 	}
+
+	var auxNumber string
+	if err = json.Unmarshal(aux.Number, &auxNumber); err != nil {
+		auxNumber = string(aux.Number)
+	}
+
 	number := apd.Decimal{}
-	if _, _, err := number.SetString(aux.Number); err != nil {
-		return InvalidNumberError{aux.Number}
+	if _, _, err := number.SetString(auxNumber); err != nil {
+		return InvalidNumberError{auxNumber}
 	}
 	if aux.CurrencyCode == "" || !IsValid(aux.CurrencyCode) {
 		return InvalidCurrencyCodeError{aux.CurrencyCode}
