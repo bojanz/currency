@@ -593,6 +593,8 @@ func TestAmount_RoundToWithConcurrency(t *testing.T) {
 	}
 
 	for _, roundingMode := range roundingModes {
+		roundingMode := roundingMode
+
 		t.Run(fmt.Sprintf("rounding_mode_%d", roundingMode), func(t *testing.T) {
 			t.Parallel()
 
