@@ -511,6 +511,10 @@ func readSymbols(currencies map[string]*currencyInfo, dir string, locale string)
 	for currencyCode, data := range aux.Main[locale].Numbers.Currencies {
 		if _, ok := currencies[currencyCode]; ok {
 			symbols[currencyCode] = data["symbol"]
+			// CLDR omits the symbol when it matches the currency code.
+			if symbols[currencyCode] == "" {
+				symbols[currencyCode] = currencyCode
+			}
 		}
 	}
 
