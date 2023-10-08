@@ -90,6 +90,10 @@ var currencyFormats = map[string]currencyFormat{
 	{{ export .Formats 1 "\t" }}
 }
 
+var countryCurrencies = map[string]string{
+	{{ export .CountryCurrencies 5 "\t" }}
+}
+
 var parentLocales = map[string]string{
 	{{ export .ParentLocales 3 "\t" }}
 }
@@ -191,6 +195,11 @@ func main() {
 		os.RemoveAll(assetDir)
 		log.Fatal(err)
 	}
+	countryCurrencies, err := generateCountryCurrencies(assetDir)
+	if err != nil {
+		os.RemoveAll(assetDir)
+		log.Fatal(err)
+	}
 	parentLocales, err := generateParentLocales(assetDir)
 	if err != nil {
 		os.RemoveAll(assetDir)
@@ -230,21 +239,23 @@ func main() {
 		log.Fatal(err)
 	}
 	t.Execute(f, struct {
-		CLDRVersion     string
-		G10Currencies   []string
-		OtherCurrencies []string
-		CurrencyInfo    map[string]*currencyInfo
-		SymbolInfo      map[string]symbolInfoSlice
-		Formats         map[string]currencyFormat
-		ParentLocales   map[string]string
+		CLDRVersion       string
+		G10Currencies     []string
+		OtherCurrencies   []string
+		CurrencyInfo      map[string]*currencyInfo
+		SymbolInfo        map[string]symbolInfoSlice
+		Formats           map[string]currencyFormat
+		CountryCurrencies map[string]string
+		ParentLocales     map[string]string
 	}{
-		CLDRVersion:     CLDRVersion,
-		G10Currencies:   g10Currencies,
-		OtherCurrencies: otherCurrencies,
-		CurrencyInfo:    currencies,
-		SymbolInfo:      symbols,
-		Formats:         formats,
-		ParentLocales:   parentLocales,
+		CLDRVersion:       CLDRVersion,
+		G10Currencies:     g10Currencies,
+		OtherCurrencies:   otherCurrencies,
+		CurrencyInfo:      currencies,
+		SymbolInfo:        symbols,
+		Formats:           formats,
+		CountryCurrencies: countryCurrencies,
+		ParentLocales:     parentLocales,
 	})
 
 	log.Println("Done.")
@@ -370,6 +381,52 @@ func replaceDigits(currencies map[string]*currencyInfo, dir string) error {
 	}
 
 	return nil
+}
+
+// generateCountryCurrencies generates the map of country codes to currency codes.
+func generateCountryCurrencies(dir string) (map[string]string, error) {
+	data, err := os.ReadFile(dir + "/cldr-json/cldr-core/supplemental/currencyData.json")
+	if err != nil {
+		return nil, fmt.Errorf("generateCountryCurrencies: %w", err)
+	}
+
+	aux := struct {
+		Supplemental struct {
+			CurrencyData struct {
+				Region map[string][]map[string]struct {
+					To     string `json:"_to"`
+					Tender string `json:"_tender"`
+				}
+			}
+		}
+	}{}
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return nil, fmt.Errorf("generateCountryCurrencies: %w", err)
+	}
+
+	countryCurrencies := make(map[string]string)
+	for countryCode, currencies := range aux.Supplemental.CurrencyData.Region {
+		if contains([]string{"EA", "EU", "ZZ"}, countryCode) {
+			// EA, EU and ZZ are not countries.
+			continue
+		}
+
+		lastCurrencyCode := ""
+		for _, currencyUsage := range currencies {
+			for currencyCode, usageInfo := range currencyUsage {
+				// If there's no "to" date, then this currency is still in use.
+				if usageInfo.To == "" && usageInfo.Tender != "false" {
+					lastCurrencyCode = currencyCode
+				}
+			}
+		}
+
+		if lastCurrencyCode != "" && lastCurrencyCode != "XXX" {
+			countryCurrencies[countryCode] = lastCurrencyCode
+		}
+	}
+
+	return countryCurrencies, nil
 }
 
 // generateSymbols generates currency symbols for all locales.

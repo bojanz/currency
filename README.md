@@ -10,8 +10,9 @@ Backstory: https://bojanz.github.io/price-currency-handling-go/
 
 1. All currency codes, their numeric codes and fraction digits.
 2. Currency symbols and formats for all locales.
-3. Amount struct, with value semantics (Fowler's Money pattern)
-4. Formatter, for formatting amounts and parsing formatted amounts.
+3. Country mapping (country code => currency code).
+4. Amount struct, with value semantics (Fowler's Money pattern)
+5. Formatter, for formatting amounts and parsing formatted amounts.
 
 ```go
     amount, _ := currency.NewAmount("275.98", "EUR")

@@ -201,6 +201,21 @@ func ExampleFormatter_Parse() {
 	// 1234.59 EUR
 }
 
+func ExampleForCountryCode() {
+	currencyCode, ok := currency.ForCountryCode("US")
+	fmt.Println(currencyCode, ok)
+
+	currencyCode, ok = currency.ForCountryCode("FR")
+	fmt.Println(currencyCode, ok)
+
+	// Non-existent country code.
+	_, ok = currency.ForCountryCode("XX")
+	fmt.Println(ok)
+	// Output: USD true
+	// EUR true
+	// false
+}
+
 func ExampleGetNumericCode() {
 	numericCode, ok := currency.GetNumericCode("USD")
 	fmt.Println(numericCode, ok)

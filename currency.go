@@ -9,6 +9,13 @@ import "sort"
 // DefaultDigits is a placeholder for each currency's number of fraction digits.
 const DefaultDigits uint8 = 255
 
+// ForCountryCode returns the currency code for a country code.
+func ForCountryCode(countryCode string) (currencyCode string, ok bool) {
+	currencyCode, ok = countryCurrencies[countryCode]
+
+	return currencyCode, ok
+}
+
 // GetCurrencyCodes returns all known currency codes.
 func GetCurrencyCodes() []string {
 	return currencyCodes

@@ -9,6 +9,30 @@ import (
 	"github.com/bojanz/currency"
 )
 
+func TestForCountryCode(t *testing.T) {
+	tests := []struct {
+		countryCode      string
+		wantCurrencyCode string
+		wantOK           bool
+	}{
+		{"FR", "EUR", true},
+		{"RS", "RSD", true},
+		{"XX", "", false},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			gotCurrencyCode, gotOK := currency.ForCountryCode(tt.countryCode)
+			if gotOK != tt.wantOK {
+				t.Errorf("got %v, want %v", gotOK, tt.wantOK)
+			}
+			if gotCurrencyCode != tt.wantCurrencyCode {
+				t.Errorf("got %q, want %q", gotCurrencyCode, tt.wantCurrencyCode)
+			}
+		})
+	}
+}
+
 func TestGetCurrencyCodes(t *testing.T) {
 	currencyCodes := currency.GetCurrencyCodes()
 	var got [10]string
