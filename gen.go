@@ -10,7 +10,7 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -263,7 +263,7 @@ func fetchCLDR(dir string) (string, error) {
 		return "", err
 	}
 
-	data, err := ioutil.ReadFile(dir + "/cldr-json/cldr-core/package.json")
+	data, err := os.ReadFile(dir + "/cldr-json/cldr-core/package.json")
 	if err != nil {
 		return "", fmt.Errorf("fetchCLDR: %w", err)
 	}
@@ -331,7 +331,7 @@ func fetchURL(url string) ([]byte, error) {
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("fetchURL: Get %q: %v", url, resp.Status)
 	}
-	data, err := ioutil.ReadAll(resp.Body)
+	data, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("fetchURL: Get %q: %w", url, err)
 	}
@@ -347,7 +347,7 @@ func fetchURL(url string) ([]byte, error) {
 // Note that CLDR does not have data for every currency, in which ase
 // the original ISO digits are kept.
 func replaceDigits(currencies map[string]*currencyInfo, dir string) error {
-	data, err := ioutil.ReadFile(dir + "/cldr-json/cldr-core/supplemental/currencyData.json")
+	data, err := os.ReadFile(dir + "/cldr-json/cldr-core/supplemental/currencyData.json")
 	if err != nil {
 		return fmt.Errorf("replaceDigits: %w", err)
 	}
@@ -377,7 +377,7 @@ func replaceDigits(currencies map[string]*currencyInfo, dir string) error {
 // Symbols are grouped by locale, and deduplicated by parent.
 func generateSymbols(currencies map[string]*currencyInfo, dir string) (map[string]symbolInfoSlice, error) {
 	symbols := make(map[string]map[string][]string)
-	files, err := ioutil.ReadDir(dir + "/cldr-json/cldr-numbers-modern/main")
+	files, err := os.ReadDir(dir + "/cldr-json/cldr-numbers-modern/main")
 	if err != nil {
 		return nil, fmt.Errorf("generateSymbols: %w", err)
 	}
@@ -490,7 +490,7 @@ func generateSymbols(currencies map[string]*currencyInfo, dir string) (map[strin
 // Discards symbols belonging to inactive currencies.
 func readSymbols(currencies map[string]*currencyInfo, dir string, locale string) (map[string]string, error) {
 	filename := fmt.Sprintf("%v/cldr-json/cldr-numbers-modern/main/%v/currencies.json", dir, locale)
-	data, err := ioutil.ReadFile(filename)
+	data, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, fmt.Errorf("readSymbols: %w", err)
 	}
@@ -526,7 +526,7 @@ func readSymbols(currencies map[string]*currencyInfo, dir string, locale string)
 // Formats are deduplicated by parent.
 func generateFormats(dir string) (map[string]currencyFormat, error) {
 	formats := make(map[string]currencyFormat)
-	files, err := ioutil.ReadDir(dir + "/cldr-json/cldr-numbers-modern/main")
+	files, err := os.ReadDir(dir + "/cldr-json/cldr-numbers-modern/main")
 	if err != nil {
 		return nil, fmt.Errorf("generateFormats: %w", err)
 	}
@@ -561,7 +561,7 @@ func generateFormats(dir string) (map[string]currencyFormat, error) {
 // readFormat reads the given locale's currency format from CLDR data.
 func readFormat(dir string, locale string) (currencyFormat, error) {
 	filename := fmt.Sprintf("%v/cldr-json/cldr-numbers-modern/main/%v/numbers.json", dir, locale)
-	data, err := ioutil.ReadFile(filename)
+	data, err := os.ReadFile(filename)
 	if err != nil {
 		return currencyFormat{}, fmt.Errorf("readFormat: %w", err)
 	}
@@ -674,7 +674,7 @@ func readFormat(dir string, locale string) (currencyFormat, error) {
 // Ensures ignored locales are skipped.
 // Replaces "und" with "en", since this package treats them as equivalent.
 func generateParentLocales(dir string) (map[string]string, error) {
-	data, err := ioutil.ReadFile(dir + "/cldr-json/cldr-core/supplemental/parentLocales.json")
+	data, err := os.ReadFile(dir + "/cldr-json/cldr-core/supplemental/parentLocales.json")
 	if err != nil {
 		return nil, fmt.Errorf("generateParentLocales: %w", err)
 	}
