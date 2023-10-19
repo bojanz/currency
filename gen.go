@@ -58,7 +58,8 @@ type symbolInfo struct {
 }
 
 type currencyFormat struct {
-	pattern               string
+	standardPattern       string
+	accountingPattern     string
 	numberingSystem       numberingSystem
 	minGroupingDigits     uint8
 	primaryGroupingSize   uint8
@@ -143,7 +144,8 @@ const (
 )
 
 type currencyFormat struct {
-	pattern               string
+	standardPattern       string
+	accountingPattern     string
 	numberingSystem       numberingSystem
 	minGroupingDigits     uint8
 	primaryGroupingSize   uint8
@@ -155,7 +157,7 @@ type currencyFormat struct {
 }
 
 func (f currencyFormat) GoString() string {
-	return fmt.Sprintf("{%q, %d, %d, %d, %d, %q, %q, %q, %q}", f.pattern, f.numberingSystem, f.minGroupingDigits, f.primaryGroupingSize, f.secondaryGroupingSize, f.decimalSeparator, f.groupingSeparator, f.plusSign, f.minusSign)
+	return fmt.Sprintf("{%q, %q, %d, %d, %d, %d, %q, %q, %q, %q}", f.standardPattern, f.accountingPattern, f.numberingSystem, f.minGroupingDigits, f.primaryGroupingSize, f.secondaryGroupingSize, f.decimalSeparator, f.groupingSeparator, f.plusSign, f.minusSign)
 }
 
 func main() {
@@ -624,7 +626,8 @@ func readFormat(dir string, locale string) (currencyFormat, error) {
 	}
 
 	type cldrPattern struct {
-		Standard string
+		Standard   string
+		Accounting string
 	}
 	type cldrData struct {
 		Numbers struct {
@@ -652,40 +655,47 @@ func readFormat(dir string, locale string) (currencyFormat, error) {
 	}
 
 	var numSystem numberingSystem
-	var pattern string
+	var standardPattern string
+	var accountingPattern string
 	var symbols map[string]string
 	extFormat := aux.Main[locale].Numbers
 	switch extFormat.DefaultNumberingSystem {
 	case "latn":
 		numSystem = numLatn
-		pattern = extFormat.PatternLatn.Standard
+		standardPattern = extFormat.PatternLatn.Standard
+		accountingPattern = extFormat.PatternLatn.Accounting
 		symbols = extFormat.SymbolsLatn
 	case "arab":
 		numSystem = numArab
-		pattern = extFormat.PatternArab.Standard
+		standardPattern = extFormat.PatternArab.Standard
+		accountingPattern = extFormat.PatternArab.Accounting
 		symbols = extFormat.SymbolsArab
 	case "arabext":
 		numSystem = numArabExt
-		pattern = extFormat.PatternArabExt.Standard
+		standardPattern = extFormat.PatternArabExt.Standard
+		accountingPattern = extFormat.PatternArabExt.Accounting
 		symbols = extFormat.SymbolsArabExt
 	case "beng":
 		numSystem = numBeng
-		pattern = extFormat.PatternBeng.Standard
+		standardPattern = extFormat.PatternBeng.Standard
+		accountingPattern = extFormat.PatternBeng.Accounting
 		symbols = extFormat.SymbolsBeng
 	case "deva":
 		numSystem = numDeva
-		pattern = extFormat.PatternDeva.Standard
+		standardPattern = extFormat.PatternDeva.Standard
+		accountingPattern = extFormat.PatternDeva.Accounting
 		symbols = extFormat.SymbolsDeva
 	case "mymr":
 		numSystem = numMymr
-		pattern = extFormat.PatternMymr.Standard
+		standardPattern = extFormat.PatternMymr.Standard
+		accountingPattern = extFormat.PatternMymr.Accounting
 		symbols = extFormat.SymbolsMymr
 	default:
 		return currencyFormat{}, fmt.Errorf("readFormat: unknown numbering system %q in locale %q", extFormat.DefaultNumberingSystem, locale)
 	}
 	primaryGroupingSize := 0
 	secondaryGroupingSize := 0
-	patternParts := strings.Split(pattern, ";")
+	patternParts := strings.Split(standardPattern, ";")
 	if strings.Contains(patternParts[0], ",") {
 		r, _ := regexp.Compile("#+0")
 		primaryGroup := r.FindString(patternParts[0])
@@ -696,10 +706,14 @@ func readFormat(dir string, locale string) (currencyFormat, error) {
 			// This pattern has a distinct secondary group size.
 			secondaryGroupingSize = len(numberGroups[1])
 		}
-		// Strip the grouping info from the pattern, now that it is
-		// available separately.
-		pattern = strings.ReplaceAll(pattern, "#,##,##", "")
-		pattern = strings.ReplaceAll(pattern, "#,##", "")
+	}
+	// Strip the grouping info from the patterns, now that it is available separately.
+	standardPattern = processPattern(standardPattern)
+	accountingPattern = processPattern(accountingPattern)
+	// To save memory, the accounting pattern is stored
+	// only if it's different from the standard pattern.
+	if accountingPattern == standardPattern {
+		accountingPattern = ""
 	}
 	decimalSeparator := symbols["decimal"]
 	groupingSeparator := symbols["group"]
@@ -713,7 +727,8 @@ func readFormat(dir string, locale string) (currencyFormat, error) {
 	}
 
 	format := currencyFormat{}
-	format.pattern = pattern
+	format.standardPattern = standardPattern
+	format.accountingPattern = accountingPattern
 	format.numberingSystem = numSystem
 	format.minGroupingDigits = parseDigits(extFormat.MinimumGroupingDigits, 1)
 	format.primaryGroupingSize = uint8(primaryGroupingSize)
@@ -724,6 +739,15 @@ func readFormat(dir string, locale string) (currencyFormat, error) {
 	format.minusSign = symbols["minusSign"]
 
 	return format, nil
+}
+
+// processPattern processes the pattern.
+func processPattern(pattern string) string {
+	// Strip the grouping info.
+	pattern = strings.ReplaceAll(pattern, "#,##,##", "")
+	pattern = strings.ReplaceAll(pattern, "#,##", "")
+
+	return pattern
 }
 
 // generateParentLocales generates parent locales from CLDR data.

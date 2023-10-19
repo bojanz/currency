@@ -34,6 +34,11 @@ var localDigits = map[numberingSystem]string{
 type Formatter struct {
 	locale Locale
 	format currencyFormat
+	// AccountingStyle formats the amount using the accounting style.
+	// In many locales negative amounts are formatted using parenthesis instead of a minus sign.
+	// For example, "-3.00 USD" in the "en" locale is formatted as "($3.00)" instead of "-$3.00".
+	// Defaults to false.
+	AccountingStyle bool
 	// AddPlusSign inserts the plus sign in front of positive amounts.
 	// Defaults to false.
 	AddPlusSign bool
@@ -142,6 +147,9 @@ func (f *Formatter) Parse(s, currencyCode string) (Amount, error) {
 			replacements = append(replacements, v, strconv.Itoa(i))
 		}
 	}
+	if f.AccountingStyle {
+		replacements = append(replacements, "(", "-", ")", "")
+	}
 	r := strings.NewReplacer(replacements...)
 	n := r.Replace(s)
 
@@ -150,19 +158,32 @@ func (f *Formatter) Parse(s, currencyCode string) (Amount, error) {
 
 // getPattern returns a positive or negative pattern for a currency amount.
 func (f *Formatter) getPattern(amount Amount) string {
-	patterns := strings.Split(f.format.pattern, ";")
-	if amount.IsNegative() {
+	var patterns []string
+	if f.usesAccountingPattern() {
+		patterns = strings.Split(f.format.accountingPattern, ";")
+	} else {
+		patterns = strings.Split(f.format.standardPattern, ";")
+	}
+
+	switch {
+	case amount.IsNegative():
 		if len(patterns) == 1 {
 			return "-" + patterns[0]
 		}
 		return patterns[1]
-	} else if f.AddPlusSign {
-		if len(patterns) == 1 {
+	case f.AddPlusSign:
+		if len(patterns) == 1 || f.usesAccountingPattern() {
 			return "+" + patterns[0]
 		}
 		return strings.Replace(patterns[1], "-", "+", 1)
+	default:
+		return patterns[0]
 	}
-	return patterns[0]
+}
+
+// usesAccountingPattern returns whether the formatter needs to use the accounting pattern.
+func (f *Formatter) usesAccountingPattern() bool {
+	return f.AccountingStyle && f.format.accountingPattern != ""
 }
 
 // formatNumber formats the number for display.
