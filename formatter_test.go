@@ -68,6 +68,38 @@ func TestFormatter_Format(t *testing.T) {
 	}
 }
 
+func TestFormatter_PlusSign(t *testing.T) {
+	tests := []struct {
+		number       string
+		currencyCode string
+		localeID     string
+		AddPlusSign  bool
+		want         string
+	}{
+		{"123.99", "USD", "en", false, "$123.99"},
+		{"123.99", "USD", "en", true, "+$123.99"},
+
+		{"123.99", "USD", "de-CH", false, "$\u00a0123.99"},
+		{"123.99", "USD", "de-CH", true, "$+123.99"},
+
+		{"123.99", "USD", "fr-FR", false, "123,99\u00a0$US"},
+		{"123.99", "USD", "fr-FR", true, "+123,99\u00a0$US"},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			amount, _ := currency.NewAmount(tt.number, tt.currencyCode)
+			locale := currency.NewLocale(tt.localeID)
+			formatter := currency.NewFormatter(locale)
+			formatter.AddPlusSign = tt.AddPlusSign
+			got := formatter.Format(amount)
+			if got != tt.want {
+				t.Errorf("got %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestFormatter_Grouping(t *testing.T) {
 	tests := []struct {
 		number       string
@@ -103,38 +135,6 @@ func TestFormatter_Grouping(t *testing.T) {
 			locale := currency.NewLocale(tt.localeID)
 			formatter := currency.NewFormatter(locale)
 			formatter.NoGrouping = tt.NoGrouping
-			got := formatter.Format(amount)
-			if got != tt.want {
-				t.Errorf("got %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestFormatter_PlusSign(t *testing.T) {
-	tests := []struct {
-		number       string
-		currencyCode string
-		localeID     string
-		AddPlusSign  bool
-		want         string
-	}{
-		{"123.99", "USD", "en", false, "$123.99"},
-		{"123.99", "USD", "en", true, "+$123.99"},
-
-		{"123.99", "USD", "de-CH", false, "$\u00a0123.99"},
-		{"123.99", "USD", "de-CH", true, "$+123.99"},
-
-		{"123.99", "USD", "fr-FR", false, "123,99\u00a0$US"},
-		{"123.99", "USD", "fr-FR", true, "+123,99\u00a0$US"},
-	}
-
-	for _, tt := range tests {
-		t.Run("", func(t *testing.T) {
-			amount, _ := currency.NewAmount(tt.number, tt.currencyCode)
-			locale := currency.NewLocale(tt.localeID)
-			formatter := currency.NewFormatter(locale)
-			formatter.AddPlusSign = tt.AddPlusSign
 			got := formatter.Format(amount)
 			if got != tt.want {
 				t.Errorf("got %v, want %v", got, tt.want)

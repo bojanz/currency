@@ -34,12 +34,12 @@ var localDigits = map[numberingSystem]string{
 type Formatter struct {
 	locale Locale
 	format currencyFormat
-	// NoGrouping turns off grouping of major digits.
-	// Defaults to false.
-	NoGrouping bool
 	// AddPlusSign inserts the plus sign in front of positive amounts.
 	// Defaults to false.
 	AddPlusSign bool
+	// NoGrouping turns off grouping of major digits.
+	// Defaults to false.
+	NoGrouping bool
 	// MinDigits specifies the minimum number of fraction digits.
 	// All zeroes past the minimum will be removed (0 => no trailing zeroes).
 	// Defaults to currency.DefaultDigits (e.g. 2 for USD, 0 for RSD).
@@ -49,12 +49,10 @@ type Formatter struct {
 	// Defaults to 6, so that most amounts are shown as-is (without rounding).
 	MaxDigits uint8
 	// RoundingMode specifies how the formatted amount will be rounded.
-	// One of the currency.Round* constants.
 	// Defaults to currency.RoundHalfUp.
 	RoundingMode RoundingMode
-	// CurrencyDisplay specifies how the currency will be displayed.
-	// One of the currency.Display* constants.
-	// Defaults to curency.DisplaySymbol.
+	// CurrencyDisplay specifies how the currency will be displayed (symbol/code/none).
+	// Defaults to currency.DisplaySymbol.
 	CurrencyDisplay Display
 	// SymbolMap specifies custom symbols for individual currency codes.
 	// For example, "USD": "$" means that the $ symbol will be used even if
