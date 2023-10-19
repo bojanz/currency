@@ -283,6 +283,12 @@ func TestFormatter_CurrencyDisplay(t *testing.T) {
 		{"1234.59", "USD", "sr-Latn", currency.DisplaySymbol, "1.234,59\u00a0US$"},
 		{"1234.59", "USD", "sr-Latn", currency.DisplayCode, "1.234,59\u00a0USD"},
 		{"1234.59", "USD", "sr-Latn", currency.DisplayNone, "1.234,59"},
+
+		// Confirm that any extra spacing around the currency is stripped
+		// even when the negative amount is formatted with the accounting style.
+		{"-1234.59", "USD", "en", currency.DisplayNone, "(1,234.59)"},
+		{"-1234.59", "USD", "en-NL", currency.DisplayNone, "(1.234,59)"},
+		{"-1234.59", "USD", "sr-Latn", currency.DisplayNone, "(1.234,59)"},
 	}
 
 	for _, tt := range tests {
@@ -290,6 +296,7 @@ func TestFormatter_CurrencyDisplay(t *testing.T) {
 			amount, _ := currency.NewAmount(tt.number, tt.currencyCode)
 			locale := currency.NewLocale(tt.localeID)
 			formatter := currency.NewFormatter(locale)
+			formatter.AccountingStyle = true
 			formatter.CurrencyDisplay = tt.currencyDisplay
 			got := formatter.Format(amount)
 			if got != tt.want {

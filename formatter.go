@@ -111,19 +111,19 @@ func (f *Formatter) Format(amount Amount) string {
 
 	replacements := []string{
 		"0.00", formattedNumber,
-		"¤", formattedCurrency,
 		"+", f.format.plusSign,
 		"-", f.format.minusSign,
 	}
-	r := strings.NewReplacer(replacements...)
-	formattedAmount := r.Replace(pattern)
 	if formattedCurrency == "" {
 		// Many patterns have a non-breaking space between
 		// the number and currency, not needed in this case.
-		formattedAmount = strings.TrimSpace(formattedAmount)
+		replacements = append(replacements, "\u00a0¤", "", "¤\u00a0", "", "¤", "")
+	} else {
+		replacements = append(replacements, "¤", formattedCurrency)
 	}
+	r := strings.NewReplacer(replacements...)
 
-	return formattedAmount
+	return r.Replace(pattern)
 }
 
 // Parse parses a formatted amount.
