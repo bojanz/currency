@@ -35,7 +35,6 @@ type Formatter struct {
 	locale Locale
 	format currencyFormat
 	// AccountingStyle formats the amount using the accounting style.
-	// In many locales negative amounts are formatted using parenthesis instead of a minus sign.
 	// For example, "-3.00 USD" in the "en" locale is formatted as "($3.00)" instead of "-$3.00".
 	// Defaults to false.
 	AccountingStyle bool
