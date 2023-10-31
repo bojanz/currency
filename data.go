@@ -4,7 +4,7 @@
 package currency
 
 // CLDRVersion is the CLDR version from which the data is derived.
-const CLDRVersion = "44.0.0-BETA2"
+const CLDRVersion = "44.0.0"
 
 type numberingSystem uint8
 
@@ -378,7 +378,7 @@ var currencySymbols = map[string][]symbolInfo{
 	},
 	"IDR": {
 		{"IDR", []string{"en"}},
-		{"Rp", []string{"id", "ms-ID"}},
+		{"Rp", []string{"en-ID", "id", "ms-ID"}},
 	},
 	"ILS": {
 		{"₪", []string{"en"}},
@@ -413,7 +413,7 @@ var currencySymbols = map[string][]symbolInfo{
 	},
 	"JPY": {
 		{"¥", []string{"en", "en-AU"}},
-		{"JP¥", []string{"af", "am", "ar", "as", "az", "bn", "cs", "cy", "da", "el", "el-polyton", "en-001", "en-CA", "eu", "gd", "gl", "gu", "hi", "hy", "id", "is", "kk", "km", "ko", "kok", "ky", "lo", "mn", "mr", "ms", "my", "ne", "nl", "pa", "ps", "pt", "si", "so", "sq", "sw", "te", "tk", "ur", "uz", "yue-Hans", "zh", "zu"}},
+		{"JP¥", []string{"af", "am", "ar", "as", "az", "bn", "chr", "cs", "cy", "da", "el", "el-polyton", "en-001", "en-CA", "eu", "gd", "gl", "gu", "hi", "hy", "id", "is", "kk", "km", "ko", "kok", "ky", "lo", "mn", "mr", "ms", "my", "ne", "nl", "pa", "ps", "pt", "si", "so", "sq", "sw", "te", "tk", "ur", "uz", "yue-Hans", "zh", "zu"}},
 		{"￥", []string{"ja"}},
 	},
 	"KES": {
@@ -587,7 +587,7 @@ var currencySymbols = map[string][]symbolInfo{
 	},
 	"PLN": {
 		{"PLN", []string{"en"}},
-		{"zł", []string{"pl"}},
+		{"zł", []string{"dsb", "hsb", "pl"}},
 	},
 	"PYG": {
 		{"PYG", []string{"en"}},
@@ -679,7 +679,7 @@ var currencySymbols = map[string][]symbolInfo{
 	},
 	"THB": {
 		{"THB", []string{"en", "es-419"}},
-		{"฿", []string{"af", "am", "ar", "az", "bn", "bs", "ca", "cy", "da", "de", "el", "el-polyton", "es", "et", "eu", "fa", "fil", "ga", "gd", "gl", "gu", "he", "hi", "hy", "id", "it", "kk", "km", "ky", "lo", "lv", "mn", "mr", "my", "ne", "nl", "pa", "pt", "ru", "si", "sq", "sw", "ta", "te", "th", "tr", "ur", "vi", "zu"}},
+		{"฿", []string{"af", "am", "ar", "az", "bn", "bs", "ca", "cy", "da", "de", "dsb", "el", "el-polyton", "es", "et", "eu", "fa", "fil", "ga", "gd", "gl", "gu", "he", "hi", "hsb", "hy", "id", "it", "kk", "km", "ky", "lo", "lv", "mn", "mr", "my", "ne", "nl", "pa", "pt", "ru", "si", "sq", "sw", "ta", "te", "th", "tr", "ur", "vi", "zu"}},
 	},
 	"TMT": {
 		{"TMT", []string{"en"}},
@@ -811,6 +811,7 @@ var currencyFormats = map[string]currencyFormat{
 	"de-AT":      {"¤\u00a00.00", 0, 1, 3, 3, ",", ".", "+", "-"},
 	"de-CH":      {"¤\u00a00.00;¤-0.00", 0, 1, 3, 3, ".", "’", "+", "-"},
 	"de-LI":      {"¤\u00a00.00", 0, 1, 3, 3, ".", "’", "+", "-"},
+	"dsb":        {"0.00\u00a0¤", 0, 1, 3, 3, ",", ".", "+", "-"},
 	"el":         {"0.00\u00a0¤", 0, 1, 3, 3, ",", ".", "+", "-"},
 	"el-polyton": {"0.00\u00a0¤", 0, 1, 3, 3, ",", ".", "+", "-"},
 	"en":         {"¤0.00", 0, 1, 3, 3, ".", ",", "+", "-"},
@@ -821,6 +822,7 @@ var currencyFormats = map[string]currencyFormat{
 	"en-DE":      {"0.00\u00a0¤", 0, 1, 3, 3, ",", ".", "+", "-"},
 	"en-DK":      {"0.00\u00a0¤", 0, 1, 3, 3, ",", ".", "+", "-"},
 	"en-FI":      {"0.00\u00a0¤", 0, 1, 3, 3, ",", "\u00a0", "+", "-"},
+	"en-ID":      {"¤0.00", 0, 1, 3, 3, ",", ".", "+", "-"},
 	"en-IN":      {"¤0.00", 0, 1, 3, 2, ".", ",", "+", "-"},
 	"en-MV":      {"¤\u00a00.00", 0, 1, 3, 3, ".", ",", "+", "-"},
 	"en-NL":      {"¤\u00a00.00;¤\u00a0-0.00", 0, 1, 3, 3, ",", ".", "+", "-"},
@@ -854,6 +856,7 @@ var currencyFormats = map[string]currencyFormat{
 	"he":         {"\u200f0.00\u00a0\u200f¤;\u200f-0.00\u00a0\u200f¤", 0, 1, 3, 3, ".", ",", "\u200e+", "\u200e-"},
 	"hi":         {"¤0.00", 0, 1, 3, 2, ".", ",", "+", "-"},
 	"hr":         {"0.00\u00a0¤", 0, 1, 3, 3, ",", ".", "+", "−"},
+	"hsb":        {"0.00\u00a0¤", 0, 1, 3, 3, ",", ".", "+", "-"},
 	"hu":         {"0.00\u00a0¤", 0, 2, 3, 3, ",", "\u00a0", "+", "-"},
 	"hy":         {"0.00\u00a0¤", 0, 1, 3, 3, ",", "\u00a0", "+", "-"},
 	"id":         {"¤0.00", 0, 1, 3, 3, ",", ".", "+", "-"},
