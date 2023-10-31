@@ -68,6 +68,40 @@ func TestFormatter_Format(t *testing.T) {
 	}
 }
 
+func TestFormatter_AccountingStyle(t *testing.T) {
+	tests := []struct {
+		number       string
+		currencyCode string
+		localeID     string
+		AddPlusSign  bool
+		want         string
+	}{
+		// Locale with an accounting pattern.
+		{"1234.59", "USD", "en", false, "$1,234.59"},
+		{"-1234.59", "USD", "en", false, "($1,234.59)"},
+		{"1234.59", "USD", "en", true, "+$1,234.59"},
+
+		// Locale without an accounting pattern.
+		{"1234.59", "EUR", "es", false, "1234,59 €"},
+		{"-1234.59", "EUR", "es", false, "-1234,59 €"},
+		{"1234.59", "EUR", "es", true, "+1234,59 €"},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			amount, _ := currency.NewAmount(tt.number, tt.currencyCode)
+			locale := currency.NewLocale(tt.localeID)
+			formatter := currency.NewFormatter(locale)
+			formatter.AccountingStyle = true
+			formatter.AddPlusSign = tt.AddPlusSign
+			got := formatter.Format(amount)
+			if got != tt.want {
+				t.Errorf("got %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestFormatter_PlusSign(t *testing.T) {
 	tests := []struct {
 		number       string
@@ -249,6 +283,12 @@ func TestFormatter_CurrencyDisplay(t *testing.T) {
 		{"1234.59", "USD", "sr-Latn", currency.DisplaySymbol, "1.234,59\u00a0US$"},
 		{"1234.59", "USD", "sr-Latn", currency.DisplayCode, "1.234,59\u00a0USD"},
 		{"1234.59", "USD", "sr-Latn", currency.DisplayNone, "1.234,59"},
+
+		// Confirm that any extra spacing around the currency is stripped
+		// even when the negative amount is formatted with the accounting style.
+		{"-1234.59", "USD", "en", currency.DisplayNone, "(1,234.59)"},
+		{"-1234.59", "USD", "en-NL", currency.DisplayNone, "(1.234,59)"},
+		{"-1234.59", "USD", "sr-Latn", currency.DisplayNone, "(1.234,59)"},
 	}
 
 	for _, tt := range tests {
@@ -256,6 +296,7 @@ func TestFormatter_CurrencyDisplay(t *testing.T) {
 			amount, _ := currency.NewAmount(tt.number, tt.currencyCode)
 			locale := currency.NewLocale(tt.localeID)
 			formatter := currency.NewFormatter(locale)
+			formatter.AccountingStyle = true
 			formatter.CurrencyDisplay = tt.currencyDisplay
 			got := formatter.Format(amount)
 			if got != tt.want {
@@ -302,6 +343,7 @@ func TestFormatter_Parse(t *testing.T) {
 		{"-USD\u00a01,234.59", "USD", "en", "-1234.59"},
 		{"-1,234.59", "USD", "en", "-1234.59"},
 		{"-1234.59", "USD", "en", "-1234.59"},
+		{"(1234.59)", "USD", "en", "-1234.59"},
 
 		{"€\u00a01.234,00", "EUR", "de-AT", "1234.00"},
 		{"EUR\u00a01.234,00", "EUR", "de-AT", "1234.00"},
@@ -324,6 +366,8 @@ func TestFormatter_Parse(t *testing.T) {
 		t.Run("", func(t *testing.T) {
 			locale := currency.NewLocale(tt.localeID)
 			formatter := currency.NewFormatter(locale)
+			// Allow parsing negative amounts formatted using parenthesis.
+			formatter.AccountingStyle = true
 			got, err := formatter.Parse(tt.s, tt.currencyCode)
 			if err != nil {
 				t.Errorf("unexpected error: %v", err)
