@@ -4,9 +4,7 @@
 // Package currency handles currency amounts, provides currency information and formatting.
 package currency
 
-import (
-	"slices"
-)
+import "slices"
 
 // DefaultDigits is a placeholder for each currency's number of fraction digits.
 const DefaultDigits uint8 = 255
