@@ -381,3 +381,12 @@ func TestFormatter_Parse(t *testing.T) {
 		})
 	}
 }
+
+func TestEmptyLocale(t *testing.T) {
+	locale := currency.NewLocale("")
+	formatter := currency.NewFormatter(locale)
+	got := formatter.Locale().String()
+	if got != "" {
+		t.Errorf("got %v, want fr-FR", got)
+	}
+}
