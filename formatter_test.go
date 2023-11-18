@@ -387,6 +387,6 @@ func TestEmptyLocale(t *testing.T) {
 	formatter := currency.NewFormatter(locale)
 	got := formatter.Locale().String()
 	if got != "" {
-		t.Errorf("got %v, want fr-FR", got)
+		t.Errorf("got %v, want empty locale", got)
 	}
 }
