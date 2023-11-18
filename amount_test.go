@@ -865,6 +865,14 @@ func TestAmount_UnmarshalJSON(t *testing.T) {
 	if unmarshalled.CurrencyCode() != "USD" {
 		t.Errorf("got %v, want USD", unmarshalled.CurrencyCode())
 	}
+
+	d = []byte(`{'break_please'}`)
+	amount := &currency.Amount{}
+	err = amount.UnmarshalJSON(d)
+	if err == nil {
+		t.Errorf("error expected")
+	}
+
 }
 
 func TestAmount_Value(t *testing.T) {
