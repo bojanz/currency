@@ -60,7 +60,7 @@ func GetSymbol(currencyCode string, locale Locale) (symbol string, ok bool) {
 	}
 	enLocale := Locale{Language: "en"}
 	enUSLocale := Locale{Language: "en", Territory: "US"}
-	if locale == enLocale || locale == enUSLocale {
+	if locale == enLocale || locale == enUSLocale || locale.IsEmpty() {
 		// The "en"/"en-US" symbol is always first.
 		return symbols[0].symbol, true
 	}
@@ -87,13 +87,14 @@ func GetSymbol(currencyCode string, locale Locale) (symbol string, ok bool) {
 
 // getFormat returns the format for a locale.
 func getFormat(locale Locale) currencyFormat {
-	var format currencyFormat
 	// CLDR considers "en" and "en-US" to be equivalent.
 	// Fall back immediately for better performance
 	enUSLocale := Locale{Language: "en", Territory: "US"}
-	if locale == enUSLocale {
-		locale = Locale{Language: "en"}
+	if locale == enUSLocale || locale.IsEmpty() {
+		return currencyFormats["en"]
 	}
+
+	var format currencyFormat
 	for {
 		localeID := locale.String()
 		if cf, ok := currencyFormats[localeID]; ok {

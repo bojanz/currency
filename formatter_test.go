@@ -43,6 +43,10 @@ func TestFormatter_Format(t *testing.T) {
 		{"1234.00", "CHF", "de-CH", "CHF\u00a01’234.00"},
 		{"1234.00", "CHF", "sr", "1.234,00\u00a0CHF"},
 
+		// An empty locale should be equivalent to "en".
+		{"1234.59", "USD", "", "$1,234.59"},
+		{"-1234.59", "USD", "", "-$1,234.59"},
+
 		// Arabic digits.
 		{"12345678.90", "USD", "ar", "\u200f١٢٬٣٤٥٬٦٧٨٫٩٠\u00a0US$"},
 		// Arabic extended (Persian) digits.

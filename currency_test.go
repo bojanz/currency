@@ -120,7 +120,8 @@ func TestGetSymbol(t *testing.T) {
 		{"USD", currency.NewLocale("en-AU"), "US$", true},
 		{"USD", currency.NewLocale("es"), "US$", true},
 		{"USD", currency.NewLocale("es-ES"), "US$", true},
-		{"USD", currency.NewLocale(""), "", true},
+		// An empty locale should use "en" data.
+		{"USD", currency.NewLocale(""), "$", true},
 	}
 
 	for _, tt := range tests {
