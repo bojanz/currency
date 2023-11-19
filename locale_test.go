@@ -21,6 +21,8 @@ func TestNewLocale(t *testing.T) {
 		{"sr-Cyrl", currency.Locale{Language: "sr", Script: "Cyrl"}},
 		{"sr-Latn-RS", currency.Locale{Language: "sr", Script: "Latn", Territory: "RS"}},
 		{"yue-Hans", currency.Locale{Language: "yue", Script: "Hans"}},
+		// ID with extra spacing.
+		{"  yue-Hans ", currency.Locale{Language: "yue", Script: "Hans"}},
 		// ID with the wrong case, ordering, delimeter.
 		{"SR_rs_LATN", currency.Locale{Language: "sr", Script: "Latn", Territory: "RS"}},
 		// ID with a variant. Variants are unsupported and ignored.

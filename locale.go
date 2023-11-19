@@ -19,7 +19,7 @@ type Locale struct {
 // NewLocale creates a new Locale from its string representation.
 func NewLocale(id string) Locale {
 	// Normalize the ID ("SR_rs_LATN" => "sr-Latn-RS").
-	id = strings.ToLower(id)
+	id = strings.ToLower(strings.TrimSpace(id))
 	id = strings.ReplaceAll(id, "_", "-")
 	locale := Locale{}
 	for i, part := range strings.Split(id, "-") {
