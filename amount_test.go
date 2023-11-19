@@ -90,6 +90,7 @@ func TestNewAmountFromBigInt(t *testing.T) {
 		wantNumber   string
 	}{
 		{big.NewInt(2099), "USD", "20.99"},
+		{big.NewInt(-2099), "USD", "-20.99"},
 		{big.NewInt(5000), "USD", "50.00"},
 		{big.NewInt(50), "JPY", "50"},
 		{hugeInt, "USD", "9223372036854775987.99"},
@@ -163,6 +164,9 @@ func TestAmount_BigInt(t *testing.T) {
 		// Number with no decimals.
 		{"50", "USD", big.NewInt(5000)},
 		{"50", "JPY", big.NewInt(50)},
+		// Negative number.
+		{"-12.3564", "USD", big.NewInt(-1236)},
+		{"-50", "JPY", big.NewInt(-50)},
 	}
 
 	for _, tt := range tests {

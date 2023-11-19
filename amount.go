@@ -122,8 +122,14 @@ func (a Amount) String() string {
 
 // BigInt returns a in minor units, as a big.Int.
 func (a Amount) BigInt() *big.Int {
-	r := a.Round()
-	return r.number.Coeff.MathBigInt()
+	a = a.Round()
+	n := a.number.Coeff.MathBigInt()
+	if a.IsNegative() {
+		// The coefficient is always positive, apd stores the sign separately.
+		n = n.Neg(n)
+	}
+
+	return n
 }
 
 // Int64 returns a in minor units, as an int64.
@@ -131,6 +137,7 @@ func (a Amount) BigInt() *big.Int {
 func (a Amount) Int64() (int64, error) {
 	n := a.Round().number
 	n.Exponent = 0
+
 	return n.Int64()
 }
 
