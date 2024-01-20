@@ -930,3 +930,11 @@ func TestAmount_Scan(t *testing.T) {
 		})
 	}
 }
+
+func TestAmount_ScanNonString(t *testing.T) {
+	var a currency.Amount
+	err := a.Scan(123)
+	if err == nil {
+		t.Errorf("error expected")
+	}
+}
