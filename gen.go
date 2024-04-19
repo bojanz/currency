@@ -396,6 +396,7 @@ func generateCountryCurrencies(dir string) (map[string]string, error) {
 		Supplemental struct {
 			CurrencyData struct {
 				Region map[string][]map[string]struct {
+					From   string `json:"_from"`
 					To     string `json:"_to"`
 					Tender string `json:"_tender"`
 				}
@@ -414,11 +415,16 @@ func generateCountryCurrencies(dir string) (map[string]string, error) {
 		}
 
 		lastCurrencyCode := ""
+		lastFrom := ""
 		for _, currencyUsage := range currencies {
 			for currencyCode, usageInfo := range currencyUsage {
-				// If there's no "to" date, then this currency is still in use.
-				if usageInfo.To == "" && usageInfo.Tender != "false" {
+				if usageInfo.To != "" || usageInfo.Tender == "false" {
+					// Currency no longer in use, skip.
+					continue
+				}
+				if lastFrom == "" || usageInfo.From > lastFrom {
 					lastCurrencyCode = currencyCode
+					lastFrom = usageInfo.From
 				}
 			}
 		}
