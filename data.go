@@ -4,7 +4,7 @@
 package currency
 
 // CLDRVersion is the CLDR version from which the data is derived.
-const CLDRVersion = "44.0.0"
+const CLDRVersion = "45.0.0"
 
 type numberingSystem uint8
 
@@ -58,10 +58,10 @@ var currencyCodes = []string{
 	"MVR", "MWK", "MXN", "MXV", "MYR", "MZN", "NAD", "NGN", "NIO", "NPR",
 	"OMR", "PAB", "PEN", "PGK", "PHP", "PKR", "PLN", "PYG", "QAR", "RON",
 	"RSD", "RUB", "RWF", "SAR", "SBD", "SCR", "SDG", "SGD", "SHP", "SLE",
-	"SLL", "SOS", "SRD", "SSP", "STN", "SVC", "SYP", "SZL", "THB", "TJS",
-	"TMT", "TND", "TOP", "TRY", "TTD", "TWD", "TZS", "UAH", "UGX", "USN",
-	"UYI", "UYU", "UYW", "UZS", "VED", "VES", "VND", "VUV", "WST", "XAF",
-	"XCD", "XOF", "XPF", "YER", "ZAR", "ZMW", "ZWL",
+	"SOS", "SRD", "SSP", "STN", "SVC", "SYP", "SZL", "THB", "TJS", "TMT",
+	"TND", "TOP", "TRY", "TTD", "TWD", "TZS", "UAH", "UGX", "USN", "UYI",
+	"UYU", "UYW", "UZS", "VED", "VES", "VND", "VUV", "WST", "XAF", "XCD",
+	"XOF", "XPF", "YER", "ZAR", "ZMW", "ZWL",
 }
 
 var currencies = map[string]currencyInfo{
@@ -108,19 +108,19 @@ var currencies = map[string]currencyInfo{
 	"RWF": {"646", 0}, "SAR": {"682", 2}, "SBD": {"090", 2},
 	"SCR": {"690", 2}, "SDG": {"938", 2}, "SEK": {"752", 2},
 	"SGD": {"702", 2}, "SHP": {"654", 2}, "SLE": {"925", 2},
-	"SLL": {"694", 0}, "SOS": {"706", 0}, "SRD": {"968", 2},
-	"SSP": {"728", 2}, "STN": {"930", 2}, "SVC": {"222", 2},
-	"SYP": {"760", 0}, "SZL": {"748", 2}, "THB": {"764", 2},
-	"TJS": {"972", 2}, "TMT": {"934", 2}, "TND": {"788", 3},
-	"TOP": {"776", 2}, "TRY": {"949", 2}, "TTD": {"780", 2},
-	"TWD": {"901", 2}, "TZS": {"834", 2}, "UAH": {"980", 2},
-	"UGX": {"800", 0}, "USD": {"840", 2}, "USN": {"997", 2},
-	"UYI": {"940", 0}, "UYU": {"858", 2}, "UYW": {"927", 4},
-	"UZS": {"860", 2}, "VED": {"926", 2}, "VES": {"928", 2},
-	"VND": {"704", 0}, "VUV": {"548", 0}, "WST": {"882", 2},
-	"XAF": {"950", 0}, "XCD": {"951", 2}, "XOF": {"952", 0},
-	"XPF": {"953", 0}, "YER": {"886", 0}, "ZAR": {"710", 2},
-	"ZMW": {"967", 2}, "ZWL": {"932", 2},
+	"SOS": {"706", 0}, "SRD": {"968", 2}, "SSP": {"728", 2},
+	"STN": {"930", 2}, "SVC": {"222", 2}, "SYP": {"760", 0},
+	"SZL": {"748", 2}, "THB": {"764", 2}, "TJS": {"972", 2},
+	"TMT": {"934", 2}, "TND": {"788", 3}, "TOP": {"776", 2},
+	"TRY": {"949", 2}, "TTD": {"780", 2}, "TWD": {"901", 2},
+	"TZS": {"834", 2}, "UAH": {"980", 2}, "UGX": {"800", 0},
+	"USD": {"840", 2}, "USN": {"997", 2}, "UYI": {"940", 0},
+	"UYU": {"858", 2}, "UYW": {"927", 4}, "UZS": {"860", 2},
+	"VED": {"926", 2}, "VES": {"928", 2}, "VND": {"704", 0},
+	"VUV": {"548", 0}, "WST": {"882", 2}, "XAF": {"950", 0},
+	"XCD": {"951", 2}, "XOF": {"952", 0}, "XPF": {"953", 0},
+	"YER": {"886", 0}, "ZAR": {"710", 2}, "ZMW": {"967", 2},
+	"ZWL": {"932", 2},
 }
 
 var currencySymbols = map[string][]symbolInfo{
@@ -921,11 +921,11 @@ var countryCurrencies = map[string]string{
 	"AZ": "AZN", "BA": "BAM", "BB": "BBD", "BD": "BDT", "BE": "EUR",
 	"BF": "XOF", "BG": "BGN", "BH": "BHD", "BI": "BIF", "BJ": "XOF",
 	"BL": "EUR", "BM": "BMD", "BN": "BND", "BO": "BOB", "BQ": "USD",
-	"BR": "BRL", "BS": "BSD", "BT": "BTN", "BV": "NOK", "BW": "BWP",
+	"BR": "BRL", "BS": "BSD", "BT": "INR", "BV": "NOK", "BW": "BWP",
 	"BY": "BYN", "BZ": "BZD", "CA": "CAD", "CC": "AUD", "CD": "CDF",
 	"CF": "XAF", "CG": "XAF", "CH": "CHF", "CI": "XOF", "CK": "NZD",
 	"CL": "CLP", "CM": "XAF", "CN": "CNY", "CO": "COP", "CR": "CRC",
-	"CU": "CUP", "CV": "CVE", "CW": "ANG", "CX": "AUD", "CY": "EUR",
+	"CU": "CUP", "CV": "CVE", "CW": "XCG", "CX": "AUD", "CY": "EUR",
 	"CZ": "CZK", "DE": "EUR", "DG": "USD", "DJ": "DJF", "DK": "DKK",
 	"DM": "XCD", "DO": "DOP", "DZ": "DZD", "EC": "USD", "EE": "EUR",
 	"EG": "EGP", "EH": "MAD", "ER": "ERN", "ES": "EUR", "ET": "ETB",
@@ -941,13 +941,13 @@ var countryCurrencies = map[string]string{
 	"JP": "JPY", "KE": "KES", "KG": "KGS", "KH": "KHR", "KI": "AUD",
 	"KM": "KMF", "KN": "XCD", "KP": "KPW", "KR": "KRW", "KW": "KWD",
 	"KY": "KYD", "KZ": "KZT", "LA": "LAK", "LB": "LBP", "LC": "XCD",
-	"LI": "CHF", "LK": "LKR", "LR": "LRD", "LS": "LSL", "LT": "EUR",
+	"LI": "CHF", "LK": "LKR", "LR": "LRD", "LS": "ZAR", "LT": "EUR",
 	"LU": "EUR", "LV": "EUR", "LY": "LYD", "MA": "MAD", "MC": "EUR",
 	"MD": "MDL", "ME": "EUR", "MF": "EUR", "MG": "MGA", "MH": "USD",
 	"MK": "MKD", "ML": "XOF", "MM": "MMK", "MN": "MNT", "MO": "MOP",
 	"MP": "USD", "MQ": "EUR", "MR": "MRU", "MS": "XCD", "MT": "EUR",
 	"MU": "MUR", "MV": "MVR", "MW": "MWK", "MX": "MXN", "MY": "MYR",
-	"MZ": "MZN", "NA": "NAD", "NC": "XPF", "NE": "XOF", "NF": "AUD",
+	"MZ": "MZN", "NA": "ZAR", "NC": "XPF", "NE": "XOF", "NF": "AUD",
 	"NG": "NGN", "NI": "NIO", "NL": "EUR", "NO": "NOK", "NP": "NPR",
 	"NR": "AUD", "NU": "NZD", "NZ": "NZD", "OM": "OMR", "PA": "USD",
 	"PE": "PEN", "PF": "XPF", "PG": "PGK", "PH": "PHP", "PK": "PKR",
@@ -957,7 +957,7 @@ var countryCurrencies = map[string]string{
 	"SB": "SBD", "SC": "SCR", "SD": "SDG", "SE": "SEK", "SG": "SGD",
 	"SH": "SHP", "SI": "EUR", "SJ": "NOK", "SK": "EUR", "SL": "SLE",
 	"SM": "EUR", "SN": "XOF", "SO": "SOS", "SR": "SRD", "SS": "SSP",
-	"ST": "STN", "SV": "USD", "SX": "ANG", "SY": "SYP", "SZ": "SZL",
+	"ST": "STN", "SV": "USD", "SX": "XCG", "SY": "SYP", "SZ": "SZL",
 	"TA": "GBP", "TC": "USD", "TD": "XAF", "TF": "EUR", "TG": "XOF",
 	"TH": "THB", "TJ": "TJS", "TK": "NZD", "TL": "USD", "TM": "TMT",
 	"TN": "TND", "TO": "TOP", "TR": "TRY", "TT": "TTD", "TV": "AUD",
