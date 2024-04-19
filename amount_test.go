@@ -930,3 +930,17 @@ func TestAmount_Scan(t *testing.T) {
 		})
 	}
 }
+
+func TestAmount_ScanNonString(t *testing.T) {
+	var a currency.Amount
+	err := a.Scan(123)
+
+	wantError := "value is not a string: 123"
+	errStr := ""
+	if err != nil {
+		errStr = err.Error()
+	}
+	if errStr != wantError {
+		t.Errorf("error: got %v, want %v", errStr, wantError)
+	}
+}

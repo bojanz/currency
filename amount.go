@@ -360,7 +360,10 @@ func (a Amount) Value() (driver.Value, error) {
 // Allows scanning amounts from a PostgreSQL composite type.
 func (a *Amount) Scan(src interface{}) error {
 	// Wire format: "(9.99,USD)".
-	input := src.(string)
+	input, ok := src.(string)
+	if !ok {
+		return fmt.Errorf("value is not a string: %v", src)
+	}
 	if len(input) == 0 {
 		return nil
 	}
