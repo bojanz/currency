@@ -7,7 +7,7 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v4
         with:
-          go-version: 1.21.x
+          go-version: 1.23.x
 
       - name: Install tools
         run: |
@@ -17,12 +17,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-build-${{ hashFiles('**/go.sum') }}
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
-            ${{ runner.os }}-build-
+            ${{ runner.os }}-go-
 
       - name: Verify code formatting
         run: |
@@ -36,7 +38,7 @@ jobs:
   test:
     strategy:
       matrix:
-        go: ['1.19', '1.20', '1.21']
+        go: ['1.21', '1.22', '1.23']
     name: test @ Go ${{ matrix.go }}
     runs-on: ubuntu-latest
     steps:
@@ -48,12 +50,14 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - uses: actions/cache@v3
+    - uses: actions/cache@v4
       with:
-        path: ~/go/pkg/mod
-        key: ${{ runner.os }}-build-${{ hashFiles('**/go.sum') }}
+        path: |
+          ~/.cache/go-build
+          ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
         restore-keys: |
-          ${{ runner.os }}-build-
+          ${{ runner.os }}-go-
 
     - name: Test
       run: go test -v -race -coverprofile=profile.cov ./...
