@@ -269,7 +269,7 @@ func main() {
 // to parse. See https://github.com/unicode-org/cldr-json for details.
 func fetchCLDR(dir string) (string, error) {
 	repo := "https://github.com/unicode-org/cldr-json.git"
-	cmd := exec.Command("git", "clone", repo, "--depth", "1", dir)
+	cmd := exec.Command("git", "clone", repo, "--depth", "1", "--branch=45.0.0", dir)
 	cmd.Stderr = os.Stderr
 	_, err := cmd.Output()
 	if err != nil {

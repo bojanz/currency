@@ -61,7 +61,7 @@ var currencyCodes = []string{
 	"SOS", "SRD", "SSP", "STN", "SVC", "SYP", "SZL", "THB", "TJS", "TMT",
 	"TND", "TOP", "TRY", "TTD", "TWD", "TZS", "UAH", "UGX", "USN", "UYI",
 	"UYU", "UYW", "UZS", "VED", "VES", "VND", "VUV", "WST", "XAF", "XCD",
-	"XOF", "XPF", "YER", "ZAR", "ZMW", "ZWL",
+	"XOF", "XPF", "YER", "ZAR", "ZMW", "ZWG",
 }
 
 var currencies = map[string]currencyInfo{
@@ -120,7 +120,7 @@ var currencies = map[string]currencyInfo{
 	"VUV": {"548", 0}, "WST": {"882", 2}, "XAF": {"950", 0},
 	"XCD": {"951", 2}, "XOF": {"952", 0}, "XPF": {"953", 0},
 	"YER": {"886", 0}, "ZAR": {"710", 2}, "ZMW": {"967", 2},
-	"ZWL": {"932", 2},
+	"ZWG": {"924", 2},
 }
 
 var currencySymbols = map[string][]symbolInfo{
