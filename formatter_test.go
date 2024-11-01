@@ -48,7 +48,7 @@ func TestFormatter_Format(t *testing.T) {
 		{"-1234.59", "USD", "", "-$1,234.59"},
 
 		// Arabic digits.
-		{"12345678.90", "USD", "ar", "\u200f١٢٬٣٤٥٬٦٧٨٫٩٠\u00a0US$"},
+		{"12345678.90", "USD", "ar-EG", "\u200f١٢٬٣٤٥٬٦٧٨٫٩٠\u00a0US$"},
 		// Arabic extended (Persian) digits.
 		{"12345678.90", "USD", "fa", "\u200e$۱۲٬۳۴۵٬۶۷۸٫۹۰"},
 		// Bengali digits.
@@ -355,7 +355,7 @@ func TestFormatter_Parse(t *testing.T) {
 		{"1234,00", "EUR", "de-AT", "1234.00"},
 
 		// Arabic digits.
-		{"١٢٬٣٤٥٬٦٧٨٫٩٠\u00a0US$", "USD", "ar", "12345678.90"},
+		{"١٢٬٣٤٥٬٦٧٨٫٩٠\u00a0US$", "USD", "ar-EG", "12345678.90"},
 		// Arabic extended (Persian) digits.
 		{"\u200e$۱۲٬۳۴۵٬۶۷۸٫۹۰", "USD", "fa", "12345678.90"},
 		// Bengali digits.

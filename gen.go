@@ -17,6 +17,7 @@ import (
 	"os/exec"
 	"reflect"
 	"regexp"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -207,7 +208,7 @@ func main() {
 		os.RemoveAll(assetDir)
 		log.Fatal(err)
 	}
-	parentLocales, err := generateParentLocales(assetDir)
+	parentLocales, err := generateParentLocales(locales, assetDir)
 	if err != nil {
 		os.RemoveAll(assetDir)
 		log.Fatal(err)
@@ -274,7 +275,7 @@ func main() {
 // to parse. See https://github.com/unicode-org/cldr-json for details.
 func fetchCLDR(dir string) (string, error) {
 	repo := "https://github.com/unicode-org/cldr-json.git"
-	cmd := exec.Command("git", "clone", repo, "--depth", "1", "--branch=45.0.0", dir)
+	cmd := exec.Command("git", "clone", repo, "--depth", "1", dir)
 	cmd.Stderr = os.Stderr
 	_, err := cmd.Output()
 	if err != nil {
@@ -772,7 +773,7 @@ func processPattern(pattern string) string {
 //
 // Ensures ignored locales are skipped.
 // Replaces "und" with "en", since this package treats them as equivalent.
-func generateParentLocales(dir string) (map[string]string, error) {
+func generateParentLocales(locales []string, dir string) (map[string]string, error) {
 	data, err := os.ReadFile(dir + "/cldr-json/cldr-core/supplemental/parentLocales.json")
 	if err != nil {
 		return nil, fmt.Errorf("generateParentLocales: %w", err)
@@ -794,7 +795,7 @@ func generateParentLocales(dir string) (map[string]string, error) {
 		if parent == "und" {
 			parent = "en"
 		}
-		if !shouldIgnoreLocale(locale) {
+		if slices.Contains(locales, locale) && !shouldIgnoreLocale(locale) {
 			parentLocales[locale] = parent
 		}
 	}
@@ -815,11 +816,8 @@ func shouldIgnoreLocale(locale string) bool {
 		"be-tarask", "cu", "gv", "prg",
 		// Valencian differs from its parent only by a single character (è/é).
 		"ca-ES-valencia",
-		// Africa secondary languages.
-		// Not present in "modern" data, just listed in parentLocales.
-		"bm", "byn", "dje", "dyo", "ff", "ha", "shi", "vai", "wo", "yo",
 		// Infrequently used locales.
-		"jv", "kn", "ml", "row", "sat", "sd", "to",
+		"jv", "kn", "ha", "ml", "sd", "yo",
 	}
 	localeParts := strings.Split(locale, "-")
 	ignore := false
