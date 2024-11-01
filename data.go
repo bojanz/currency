@@ -338,7 +338,7 @@ var currencySymbols = map[string][]symbolInfo{
 	},
 	"GHS": {
 		{"GHS", []string{"en"}},
-		{"GH₵", []string{"en-GH"}},
+		{"GH₵", []string{"en-GH", "ha-GH"}},
 	},
 	"GIP": {
 		{"GIP", []string{"en", "fr-CA"}},
@@ -380,7 +380,7 @@ var currencySymbols = map[string][]symbolInfo{
 	},
 	"IDR": {
 		{"IDR", []string{"en"}},
-		{"Rp", []string{"en-ID", "id", "ms-ID"}},
+		{"Rp", []string{"en-ID", "id", "jv", "ms-ID"}},
 	},
 	"ILS": {
 		{"₪", []string{"en"}},
@@ -415,7 +415,7 @@ var currencySymbols = map[string][]symbolInfo{
 	},
 	"JPY": {
 		{"¥", []string{"en", "en-AU"}},
-		{"JP¥", []string{"af", "am", "ar", "as", "az", "bn", "chr", "cs", "cy", "da", "el", "el-polyton", "en-001", "en-CA", "eu", "gd", "gl", "gu", "hi", "hy", "id", "is", "kk", "km", "ko", "kok", "ky", "lo", "mn", "mr", "ms", "my", "ne", "nl", "pa", "pcm", "ps", "pt", "si", "so", "sq", "sw", "te", "tk", "ur", "uz", "yue-Hans", "zh", "zu"}},
+		{"JP¥", []string{"af", "am", "ar", "as", "az", "bn", "chr", "cs", "cy", "da", "el", "el-polyton", "en-001", "en-CA", "eu", "gd", "gl", "gu", "hi", "hy", "id", "is", "jv", "kk", "km", "kn", "ko", "kok", "ky", "lo", "mn", "mr", "ms", "my", "ne", "nl", "pa", "pcm", "ps", "pt", "sd", "si", "so", "sq", "sw", "te", "tk", "ur", "uz", "yo", "yue-Hans", "zh", "zu"}},
 		{"￥", []string{"ja"}},
 	},
 	"KES": {
@@ -543,7 +543,7 @@ var currencySymbols = map[string][]symbolInfo{
 	},
 	"NGN": {
 		{"NGN", []string{"en"}},
-		{"₦", []string{"en-NG", "ig", "pcm"}},
+		{"₦", []string{"en-NG", "ha", "ig", "pcm", "yo"}},
 	},
 	"NIO": {
 		{"NIO", []string{"en"}},
@@ -585,7 +585,7 @@ var currencySymbols = map[string][]symbolInfo{
 	},
 	"PKR": {
 		{"PKR", []string{"en", "ur-IN"}},
-		{"Rs", []string{"en-PK", "ps-PK", "ur"}},
+		{"Rs", []string{"en-PK", "ps-PK", "sd", "ur"}},
 	},
 	"PLN": {
 		{"PLN", []string{"en"}},
@@ -609,7 +609,7 @@ var currencySymbols = map[string][]symbolInfo{
 	},
 	"RUB": {
 		{"RUB", []string{"en"}},
-		{"₽", []string{"be", "kk", "ru"}},
+		{"₽", []string{"be", "kk", "ru", "yo"}},
 	},
 	"RWF": {
 		{"RWF", []string{"en"}},
@@ -681,7 +681,7 @@ var currencySymbols = map[string][]symbolInfo{
 	},
 	"THB": {
 		{"THB", []string{"en", "es-419"}},
-		{"฿", []string{"af", "am", "ar", "az", "bn", "bs", "ca", "cy", "da", "de", "dsb", "el", "el-polyton", "es", "et", "eu", "fa", "fil", "ga", "gd", "gl", "gu", "he", "hi", "hsb", "hy", "id", "it", "kk", "km", "ky", "lo", "lv", "mn", "mr", "my", "ne", "nl", "pa", "pt", "ru", "si", "sq", "sw", "ta", "te", "th", "tr", "ur", "vi", "zu"}},
+		{"฿", []string{"af", "am", "ar", "az", "bn", "bs", "ca", "cy", "da", "de", "dsb", "el", "el-polyton", "es", "et", "eu", "fa", "fil", "ga", "gd", "gl", "gu", "he", "hi", "hsb", "hy", "id", "it", "kk", "km", "kn", "ky", "lo", "lv", "ml", "mn", "mr", "my", "ne", "nl", "pa", "pt", "ru", "si", "sq", "sw", "ta", "te", "th", "tr", "ur", "vi", "zu"}},
 	},
 	"TMT": {
 		{"TMT", []string{"en"}},
@@ -726,7 +726,7 @@ var currencySymbols = map[string][]symbolInfo{
 		{"$", []string{"bn-IN", "en", "en-IN", "es-419", "nl-BQ", "sw-KE"}},
 		{"$US", []string{"fr"}},
 		{"$\u00a0US", []string{"fr-CA"}},
-		{"US$", []string{"am", "ar", "as", "az", "bn", "cs", "cy", "da", "en-001", "en-CA", "es", "es-AR", "es-CL", "es-CO", "es-CU", "es-DO", "es-UY", "eu", "gu", "id", "ka", "ko", "kok", "lo", "mk", "my", "ne", "nl", "pa", "pcm", "pt", "si", "so", "sq", "sr", "sr-Latn", "sv", "sw", "ta-SG", "th", "ti", "tk", "uz", "vi", "yue", "yue-Hans", "zh", "zh-Hant"}},
+		{"US$", []string{"am", "ar", "as", "az", "bn", "cs", "cy", "da", "en-001", "en-CA", "es", "es-AR", "es-CL", "es-CO", "es-CU", "es-DO", "es-UY", "eu", "gu", "id", "jv", "ka", "ko", "kok", "lo", "mk", "my", "ne", "nl", "pa", "pcm", "pt", "sd", "si", "so", "sq", "sr", "sr-Latn", "sv", "sw", "ta-SG", "th", "ti", "tk", "uz", "vi", "yue", "yue-Hans", "zh", "zh-Hant"}},
 		{"щ.д.", []string{"bg"}},
 	},
 	"UYU": {
@@ -876,6 +876,7 @@ var currencyFormats = map[string]currencyFormat{
 	"fr-MA":      {"0.00\u00a0¤", "0.00\u00a0¤;(0.00\u00a0¤)", 0, 1, 3, 3, ",", ".", "+", "-"},
 	"gl":         {"0.00\u00a0¤", "", 0, 1, 3, 3, ",", ".", "+", "-"},
 	"gu":         {"¤0.00", "¤0.00;(¤0.00)", 0, 1, 3, 2, ".", ",", "+", "-"},
+	"ha":         {"¤\u00a00.00", "", 0, 1, 3, 3, ".", ",", "+", "-"},
 	"he":         {"\u200f0.00\u00a0\u200f¤;\u200f-0.00\u00a0\u200f¤", "", 0, 1, 3, 3, ".", ",", "\u200e+", "\u200e-"},
 	"hi":         {"¤0.00", "", 0, 1, 3, 2, ".", ",", "+", "-"},
 	"hi-Latn":    {"¤0.00", "", 0, 1, 3, 2, ".", ",", "+", "-"},
@@ -887,6 +888,7 @@ var currencyFormats = map[string]currencyFormat{
 	"is":         {"0.00\u00a0¤", "", 0, 1, 3, 3, ",", ".", "+", "-"},
 	"it":         {"0.00\u00a0¤", "", 0, 2, 3, 3, ",", ".", "+", "-"},
 	"it-CH":      {"¤\u00a00.00;¤-0.00", "", 0, 2, 3, 3, ".", "’", "+", "-"},
+	"jv":         {"¤\u00a00.00", "", 0, 1, 3, 3, ",", ".", "+", "-"},
 	"ka":         {"0.00\u00a0¤", "", 0, 2, 3, 3, ",", "\u00a0", "+", "-"},
 	"kk":         {"0.00\u00a0¤", "", 0, 1, 3, 3, ",", "\u00a0", "+", "-"},
 	"km":         {"0.00¤", "0.00¤;(0.00¤)", 0, 1, 3, 3, ".", ",", "+", "-"},
@@ -914,6 +916,7 @@ var currencyFormats = map[string]currencyFormat{
 	"ro":         {"0.00\u00a0¤", "0.00\u00a0¤;(0.00\u00a0¤)", 0, 1, 3, 3, ",", ".", "+", "-"},
 	"ru":         {"0.00\u00a0¤", "", 0, 1, 3, 3, ",", "\u00a0", "+", "-"},
 	"ru-UA":      {"0.00\u00a0¤", "", 0, 2, 3, 3, ",", "\u00a0", "+", "-"},
+	"sd":         {"0.00\u00a0¤", "", 1, 1, 3, 3, ".", "٬", "\u061c+", "\u061c-"},
 	"sk":         {"0.00\u00a0¤", "0.00\u00a0¤;(0.00\u00a0¤)", 0, 1, 3, 3, ",", "\u00a0", "+", "-"},
 	"sl":         {"0.00\u00a0¤", "0.00\u00a0¤;(0.00\u00a0¤)", 0, 2, 3, 3, ",", ".", "+", "−"},
 	"sq":         {"0.00\u00a0¤", "0.00\u00a0¤;(0.00\u00a0¤)", 0, 2, 3, 3, ",", "\u00a0", "+", "-"},

@@ -816,8 +816,6 @@ func shouldIgnoreLocale(locale string) bool {
 		"be-tarask", "cu", "gv", "prg",
 		// Valencian differs from its parent only by a single character (è/é).
 		"ca-ES-valencia",
-		// Infrequently used locales.
-		"jv", "kn", "ha", "ml", "sd", "yo",
 	}
 	localeParts := strings.Split(locale, "-")
 	ignore := false
