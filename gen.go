@@ -187,12 +187,17 @@ func main() {
 		os.RemoveAll(assetDir)
 		log.Fatal(err)
 	}
-	symbols, err := generateSymbols(currencies, assetDir)
+	locales, err := collectLocales(assetDir)
 	if err != nil {
 		os.RemoveAll(assetDir)
 		log.Fatal(err)
 	}
-	formats, err := generateFormats(assetDir)
+	symbols, err := generateSymbols(currencies, locales, assetDir)
+	if err != nil {
+		os.RemoveAll(assetDir)
+		log.Fatal(err)
+	}
+	formats, err := generateFormats(locales, assetDir)
 	if err != nil {
 		os.RemoveAll(assetDir)
 		log.Fatal(err)
@@ -352,6 +357,29 @@ func fetchURL(url string) ([]byte, error) {
 	return data, nil
 }
 
+// collectLocales collects CLDR locales with "modern" coverage.
+func collectLocales(dir string) ([]string, error) {
+	data, err := os.ReadFile(dir + "/cldr-json/cldr-core/coverageLevels.json")
+	if err != nil {
+		return nil, fmt.Errorf("collectLocales: %w", err)
+	}
+	aux := struct {
+		EffectiveCoverageLevels map[string]string
+	}{}
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return nil, fmt.Errorf("collectLocales: %w", err)
+	}
+
+	locales := make([]string, 0, len(aux.EffectiveCoverageLevels))
+	for locale, level := range aux.EffectiveCoverageLevels {
+		if !shouldIgnoreLocale(locale) && level == "modern" {
+			locales = append(locales, locale)
+		}
+	}
+
+	return locales, nil
+}
+
 // replaceDigits replaces currency digits with data from CLDR.
 //
 // CLDR data reflects real life usage more closely, specifying 0 digits
@@ -440,17 +468,9 @@ func generateCountryCurrencies(dir string) (map[string]string, error) {
 // generateSymbols generates currency symbols for all locales.
 //
 // Symbols are grouped by locale, and deduplicated by parent.
-func generateSymbols(currencies map[string]*currencyInfo, dir string) (map[string]symbolInfoSlice, error) {
+func generateSymbols(currencies map[string]*currencyInfo, locales []string, dir string) (map[string]symbolInfoSlice, error) {
 	symbols := make(map[string]map[string][]string)
-	files, err := os.ReadDir(dir + "/cldr-json/cldr-numbers-modern/main")
-	if err != nil {
-		return nil, fmt.Errorf("generateSymbols: %w", err)
-	}
-	for _, file := range files {
-		locale := file.Name()
-		if shouldIgnoreLocale(locale) {
-			continue
-		}
+	for _, locale := range locales {
 		localSymbols, err := readSymbols(currencies, dir, locale)
 		if err != nil {
 			return nil, fmt.Errorf("generateSymbols: %w", err)
@@ -554,7 +574,7 @@ func generateSymbols(currencies map[string]*currencyInfo, dir string) (map[strin
 //
 // Discards symbols belonging to inactive currencies.
 func readSymbols(currencies map[string]*currencyInfo, dir string, locale string) (map[string]string, error) {
-	filename := fmt.Sprintf("%v/cldr-json/cldr-numbers-modern/main/%v/currencies.json", dir, locale)
+	filename := fmt.Sprintf("%v/cldr-json/cldr-numbers-full/main/%v/currencies.json", dir, locale)
 	data, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, fmt.Errorf("readSymbols: %w", err)
@@ -589,17 +609,9 @@ func readSymbols(currencies map[string]*currencyInfo, dir string, locale string)
 // generateFormats generates currency formats from CLDR data.
 //
 // Formats are deduplicated by parent.
-func generateFormats(dir string) (map[string]currencyFormat, error) {
+func generateFormats(locales []string, dir string) (map[string]currencyFormat, error) {
 	formats := make(map[string]currencyFormat)
-	files, err := os.ReadDir(dir + "/cldr-json/cldr-numbers-modern/main")
-	if err != nil {
-		return nil, fmt.Errorf("generateFormats: %w", err)
-	}
-	for _, file := range files {
-		locale := file.Name()
-		if shouldIgnoreLocale(locale) {
-			continue
-		}
+	for _, locale := range locales {
 		format, err := readFormat(dir, locale)
 		if err != nil {
 			return nil, fmt.Errorf("generateFormats: %w", err)
@@ -625,7 +637,7 @@ func generateFormats(dir string) (map[string]currencyFormat, error) {
 
 // readFormat reads the given locale's currency format from CLDR data.
 func readFormat(dir string, locale string) (currencyFormat, error) {
-	filename := fmt.Sprintf("%v/cldr-json/cldr-numbers-modern/main/%v/numbers.json", dir, locale)
+	filename := fmt.Sprintf("%v/cldr-json/cldr-numbers-full/main/%v/numbers.json", dir, locale)
 	data, err := os.ReadFile(filename)
 	if err != nil {
 		return currencyFormat{}, fmt.Errorf("readFormat: %w", err)
