@@ -183,11 +183,6 @@ func main() {
 	}
 
 	log.Println("Processing...")
-	err = replaceDigits(currencies, assetDir)
-	if err != nil {
-		os.RemoveAll(assetDir)
-		log.Fatal(err)
-	}
 	locales, err := collectLocales(assetDir)
 	if err != nil {
 		os.RemoveAll(assetDir)
@@ -331,8 +326,6 @@ func fetchISO() (map[string]*currencyInfo, error) {
 			continue
 		}
 
-		// We use ISO digits here with a fallback to 2, but prefer CLDR
-		// data when available. See replaceDigits() for the next step.
 		digits := parseDigits(entry.Digits, 2)
 		currencies[entry.Code] = &currencyInfo{entry.Number, digits}
 	}
@@ -379,39 +372,6 @@ func collectLocales(dir string) ([]string, error) {
 	}
 
 	return locales, nil
-}
-
-// replaceDigits replaces currency digits with data from CLDR.
-//
-// CLDR data reflects real life usage more closely, specifying 0 digits
-// (instead of 2 in ISO data) for ~14 currencies, such as ALL and RSD.
-//
-// Note that CLDR does not have data for every currency, in which ase
-// the original ISO digits are kept.
-func replaceDigits(currencies map[string]*currencyInfo, dir string) error {
-	data, err := os.ReadFile(dir + "/cldr-json/cldr-core/supplemental/currencyData.json")
-	if err != nil {
-		return fmt.Errorf("replaceDigits: %w", err)
-	}
-	aux := struct {
-		Supplemental struct {
-			CurrencyData struct {
-				Fractions map[string]map[string]string
-			}
-		}
-	}{}
-	if err := json.Unmarshal(data, &aux); err != nil {
-		return fmt.Errorf("replaceDigits: %w", err)
-	}
-
-	for currencyCode := range currencies {
-		fractions, ok := aux.Supplemental.CurrencyData.Fractions[currencyCode]
-		if ok {
-			currencies[currencyCode].digits = parseDigits(fractions["_digits"], 2)
-		}
-	}
-
-	return nil
 }
 
 // generateCountryCurrencies generates the map of country codes to currency codes.
