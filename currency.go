@@ -4,7 +4,10 @@
 // Package currency handles currency amounts, provides currency information and formatting.
 package currency
 
-import "sort"
+import (
+	"slices"
+	"sort"
+)
 
 // DefaultDigits is a placeholder for each currency's number of fraction digits.
 const DefaultDigits uint8 = 255
@@ -113,20 +116,9 @@ func getFormat(locale Locale) currencyFormat {
 // contains returns whether the sorted slice a contains x.
 // The slice must be sorted in ascending order.
 func contains(a []string, x string) bool {
-	n := len(a)
-	if n < 10 {
-		// Linear search is faster with a small number of elements.
-		for _, v := range a {
-			if v == x {
-				return true
-			}
-		}
-	} else {
-		// Binary search is faster with a large number of elements.
+	if n := len(a); n > 7 {
 		i := sort.SearchStrings(a, x)
-		if i < n && a[i] == x {
-			return true
-		}
+		return i < n && a[i] == x
 	}
-	return false
+	return slices.Contains(a, x)
 }

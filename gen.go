@@ -220,7 +220,7 @@ func main() {
 	}
 	var otherCurrencies []string
 	for _, currencyCode := range currencyCodes {
-		if !contains(g10Currencies, currencyCode) {
+		if !slices.Contains(g10Currencies, currencyCode) {
 			otherCurrencies = append(otherCurrencies, currencyCode)
 		}
 	}
@@ -398,7 +398,7 @@ func generateCountryCurrencies(dir string) (map[string]string, error) {
 
 	countryCurrencies := make(map[string]string)
 	for countryCode, currencies := range aux.Supplemental.CurrencyData.Region {
-		if contains([]string{"EA", "EU", "ZZ"}, countryCode) {
+		if slices.Contains([]string{"EA", "EU", "ZZ"}, countryCode) {
 			// EA, EU and ZZ are not countries.
 			continue
 		}
@@ -462,7 +462,7 @@ func generateSymbols(currencies map[string]*currencyInfo, locales []string, dir 
 		// of USD, GBP, EUR, just like the "en" locale does.
 		// This noticeably decreases the size of generated data.
 		for symbol, locales := range localSymbols {
-			if contains(locales, "en") && currencyCode != symbol {
+			if slices.Contains(locales, "en") && currencyCode != symbol {
 				symbols[currencyCode][symbol] = append(symbols[currencyCode][symbol], localSymbols[currencyCode]...)
 				delete(symbols[currencyCode], currencyCode)
 				break
@@ -491,13 +491,13 @@ func generateSymbols(currencies map[string]*currencyInfo, locales []string, dir 
 			for _, localeID := range locales {
 				locale := currency.NewLocale(localeID)
 				parent := locale.GetParent()
-				if contains(locales, parent.String()) {
+				if slices.Contains(locales, parent.String()) {
 					deleteLocales = append(deleteLocales, localeID)
 				}
 			}
 			symbols[currencyCode][symbol] = []string{}
 			for _, localeID := range locales {
-				if !contains(deleteLocales, localeID) {
+				if !slices.Contains(deleteLocales, localeID) {
 					symbols[currencyCode][symbol] = append(symbols[currencyCode][symbol], localeID)
 				}
 			}
@@ -510,7 +510,7 @@ func generateSymbols(currencies map[string]*currencyInfo, locales []string, dir 
 	for currencyCode, localSymbols := range symbols {
 		// Always put the "en" symbol first, then the other sorted symbols.
 		for symbol, locales := range localSymbols {
-			if contains(locales, "en") {
+			if slices.Contains(locales, "en") {
 				currencySymbols[currencyCode] = append(currencySymbols[currencyCode], &symbolInfo{symbol, locales})
 				break
 			}
@@ -522,7 +522,7 @@ func generateSymbols(currencies map[string]*currencyInfo, locales []string, dir 
 		sort.Strings(symbolKeys)
 		for _, symbol := range symbolKeys {
 			locales := symbols[currencyCode][symbol]
-			if !contains(locales, "en") {
+			if !slices.Contains(locales, "en") {
 				currencySymbols[currencyCode] = append(currencySymbols[currencyCode], &symbolInfo{symbol, locales})
 			}
 		}
@@ -787,15 +787,6 @@ func shouldIgnoreLocale(locale string) bool {
 	}
 
 	return ignore
-}
-
-func contains(a []string, x string) bool {
-	for _, v := range a {
-		if v == x {
-			return true
-		}
-	}
-	return false
 }
 
 func parseDigits(n string, fallback uint8) uint8 {
