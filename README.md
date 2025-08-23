@@ -13,6 +13,7 @@ Backstory: https://bojanz.github.io/price-currency-handling-go/
 3. Country mapping (country code => currency code).
 4. Amount struct, with value semantics (Fowler's Money pattern)
 5. Formatter, for formatting amounts and parsing formatted amounts.
+6. Ability to register custom currencies, or override existing ones.
 
 ```go
     amount, _ := currency.NewAmount("275.98", "EUR")

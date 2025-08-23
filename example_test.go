@@ -249,3 +249,39 @@ func ExampleGetSymbol() {
 	// Output: $ true
 	// XXX false
 }
+
+func ExampleRegister() {
+	locale := currency.NewLocale("fr")
+
+	// Add a custom currency.
+	currency.Register("BTC", currency.Definition{
+		NumericCode:   "1000",
+		Digits:        8,
+		DefaultSymbol: "₿",
+	})
+	valid := currency.IsValid("BTC")
+	fmt.Println(valid)
+
+	// Override an existing currency, keeping the built-in symbols.
+	currency.Register("AUD", currency.Definition{
+		NumericCode: "036",
+		Digits:      3,
+	})
+	digits, _ := currency.GetDigits("AUD")
+	symbol, _ := currency.GetSymbol("AUD", locale)
+	fmt.Println(digits, symbol)
+
+	// Override an existing currency and its symbols.
+	currency.Register("AUD", currency.Definition{
+		NumericCode:   "036",
+		Digits:        3,
+		DefaultSymbol: "$$",
+	})
+	digits, _ = currency.GetDigits("AUD")
+	symbol, _ = currency.GetSymbol("AUD", locale)
+	fmt.Println(digits, symbol)
+
+	// Output: true
+	// 3 $AU
+	// 3 $$
+}

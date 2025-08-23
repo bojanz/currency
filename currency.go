@@ -122,3 +122,40 @@ func contains(a []string, x string) bool {
 	}
 	return slices.Contains(a, x)
 }
+
+// Definition contains information for registering a currency.
+type Definition struct {
+	// NumericCode is a three-digit code such as "999".
+	NumericCode string
+
+	// Digits is the number of fraction digits.
+	Digits uint8
+
+	// DefaultSymbol is the default symbol, used for all locales.
+	//
+	// When overriding an existing currency, keep DefaultSymbol
+	// empty to retain the built-in locale-specific symbols.
+	DefaultSymbol string
+}
+
+// Register adds a currency to the internal registry.
+//
+// This can be a non-ISO currency such as BTC, or an existing
+// currency for which we want to override the predefined data.
+func Register(currencyCode string, d Definition) {
+	if currencyCode == "" {
+		return
+	}
+
+	currencies[currencyCode] = currencyInfo{
+		numericCode: d.NumericCode,
+		digits:      d.Digits,
+	}
+	currencyCodes = append(currencyCodes, currencyCode)
+
+	if d.DefaultSymbol != "" {
+		currencySymbols[currencyCode] = []symbolInfo{
+			{symbol: d.DefaultSymbol, locales: []string{"en"}},
+		}
+	}
+}

@@ -136,3 +136,104 @@ func TestGetSymbol(t *testing.T) {
 		})
 	}
 }
+
+func Test_Register_NoCurrencyCode(t *testing.T) {
+	currency.Register("", currency.Definition{
+		NumericCode: "123",
+	})
+
+	numericCode, ok := currency.GetNumericCode("")
+	if ok {
+		t.Errorf("got %v, want false", ok)
+	}
+	if numericCode != "000" {
+		t.Errorf("got %v, want 000", numericCode)
+	}
+}
+
+func Test_Register_New(t *testing.T) {
+	currency.Register("BTC", currency.Definition{
+		NumericCode:   "1000",
+		Digits:        8,
+		DefaultSymbol: "₿",
+	})
+
+	if !currency.IsValid("BTC") {
+		t.Errorf("got false, want true")
+	}
+	numericCode, ok := currency.GetNumericCode("BTC")
+	if !ok {
+		t.Errorf("got %v, want true", ok)
+	}
+	if numericCode != "1000" {
+		t.Errorf("got %v, want 1000", numericCode)
+	}
+
+	d, ok := currency.GetDigits("BTC")
+	if !ok {
+		t.Errorf("got %v, want true", ok)
+	}
+	if d != 8 {
+		t.Errorf("got %v, want 8", d)
+	}
+
+	symbol, _ := currency.GetSymbol("BTC", currency.NewLocale("en"))
+	if symbol != "₿" {
+		t.Errorf("got %v, want ₿", symbol)
+	}
+	symbol, _ = currency.GetSymbol("BTC", currency.NewLocale("es-ES"))
+	if symbol != "₿" {
+		t.Errorf("got %v, want ₿", symbol)
+	}
+}
+
+func Test_Register_OverrideExisting(t *testing.T) {
+	currency.Register("CAD", currency.Definition{
+		NumericCode: "125",
+		Digits:      3,
+	})
+
+	if !currency.IsValid("CAD") {
+		t.Errorf("got false, want true")
+	}
+	numericCode, ok := currency.GetNumericCode("CAD")
+	if !ok {
+		t.Errorf("got %v, want true", ok)
+	}
+	if numericCode != "125" {
+		t.Errorf("got %v, want 125", numericCode)
+	}
+
+	d, ok := currency.GetDigits("CAD")
+	if !ok {
+		t.Errorf("got %v, want true", ok)
+	}
+	if d != 3 {
+		t.Errorf("got %v, want 3", d)
+	}
+
+	symbol, _ := currency.GetSymbol("CAD", currency.NewLocale("en"))
+	if symbol != "CA$" {
+		t.Errorf("got %v, want CA$", symbol)
+	}
+	symbol, _ = currency.GetSymbol("CAD", currency.NewLocale("fr"))
+	if symbol != "$CA" {
+		t.Errorf("got %v, want $CA", symbol)
+	}
+
+	// Override the symbols.
+	currency.Register("CAD", currency.Definition{
+		NumericCode:   "125",
+		Digits:        3,
+		DefaultSymbol: "$$",
+	})
+
+	symbol, _ = currency.GetSymbol("CAD", currency.NewLocale("en"))
+	if symbol != "$$" {
+		t.Errorf("got %v, want $$", symbol)
+	}
+	symbol, _ = currency.GetSymbol("CAD", currency.NewLocale("fr"))
+	if symbol != "$$" {
+		t.Errorf("got %v, want $$", symbol)
+	}
+}
