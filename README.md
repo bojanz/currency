@@ -2,7 +2,7 @@
 
 Handles currency amounts, provides currency information and formatting.
 
-Powered by CLDR v47, in just ~40kb of data.
+Powered by CLDR v48, in just ~40kb of data.
 
 Backstory: https://bojanz.github.io/price-currency-handling-go/
 
