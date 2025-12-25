@@ -7,7 +7,7 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v4
         with:
-          go-version: 1.23.x
+          go-version: 1.25.x
 
       - name: Install tools
         run: |
@@ -15,9 +15,9 @@ jobs:
           go install honnef.co/go/tools/cmd/staticcheck@latest
 
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: |
             ~/.cache/go-build
@@ -38,7 +38,7 @@ jobs:
   test:
     strategy:
       matrix:
-        go: ['1.21', '1.22', '1.23']
+        go: ['1.25', '1.24', '1.23']
     name: test @ Go ${{ matrix.go }}
     runs-on: ubuntu-latest
     steps:
