@@ -358,7 +358,7 @@ func (a Amount) Value() (driver.Value, error) {
 // Scan implements the database/sql.Scanner interface.
 //
 // Allows scanning amounts from a PostgreSQL composite type.
-func (a *Amount) Scan(src interface{}) error {
+func (a *Amount) Scan(src any) error {
 	// Wire format: "(9.99,USD)".
 	input, ok := src.(string)
 	if !ok {
