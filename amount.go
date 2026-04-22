@@ -14,6 +14,8 @@ import (
 	"github.com/cockroachdb/apd/v3"
 )
 
+var zeroDecimal = apd.New(0, 0)
+
 // RoundingMode determines how the amount will be rounded.
 type RoundingMode uint8
 
@@ -263,20 +265,17 @@ func (a Amount) Equal(b Amount) bool {
 
 // IsPositive returns whether a is positive.
 func (a Amount) IsPositive() bool {
-	zero := apd.New(0, 0)
-	return a.number.Cmp(zero) == 1
+	return a.number.Cmp(zeroDecimal) == 1
 }
 
 // IsNegative returns whether a is negative.
 func (a Amount) IsNegative() bool {
-	zero := apd.New(0, 0)
-	return a.number.Cmp(zero) == -1
+	return a.number.Cmp(zeroDecimal) == -1
 }
 
 // IsZero returns whether a is zero.
 func (a Amount) IsZero() bool {
-	zero := apd.New(0, 0)
-	return a.number.Cmp(zero) == 0
+	return a.number.Cmp(zeroDecimal) == 0
 }
 
 // MarshalBinary implements the encoding.BinaryMarshaler interface.
