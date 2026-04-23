@@ -10,6 +10,7 @@ import (
 
 var result currency.Amount
 var cmpResult int
+var boolResult bool
 
 func BenchmarkNewAmount(b *testing.B) {
 	var z currency.Amount
@@ -138,4 +139,34 @@ func BenchmarkAmount_Cmp(b *testing.B) {
 		z, _ = x.Cmp(y)
 	}
 	cmpResult = z
+}
+
+func BenchmarkAmount_IsPositive(b *testing.B) {
+	x, _ := currency.NewAmount("34.99", "USD")
+
+	var v bool
+	for n := 0; n < b.N; n++ {
+		v = x.IsPositive()
+	}
+	boolResult = v
+}
+
+func BenchmarkAmount_IsNegative(b *testing.B) {
+	x, _ := currency.NewAmount("-12.00", "USD")
+
+	var v bool
+	for n := 0; n < b.N; n++ {
+		v = x.IsNegative()
+	}
+	boolResult = v
+}
+
+func BenchmarkAmount_IsZero(b *testing.B) {
+	x, _ := currency.NewAmount("0.00", "USD")
+
+	var v bool
+	for n := 0; n < b.N; n++ {
+		v = x.IsZero()
+	}
+	boolResult = v
 }

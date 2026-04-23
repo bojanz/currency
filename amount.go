@@ -263,20 +263,17 @@ func (a Amount) Equal(b Amount) bool {
 
 // IsPositive returns whether a is positive.
 func (a Amount) IsPositive() bool {
-	zero := apd.New(0, 0)
-	return a.number.Cmp(zero) == 1
+	return a.number.Sign() == 1
 }
 
 // IsNegative returns whether a is negative.
 func (a Amount) IsNegative() bool {
-	zero := apd.New(0, 0)
-	return a.number.Cmp(zero) == -1
+	return a.number.Sign() == -1
 }
 
 // IsZero returns whether a is zero.
 func (a Amount) IsZero() bool {
-	zero := apd.New(0, 0)
-	return a.number.Cmp(zero) == 0
+	return a.number.IsZero()
 }
 
 // MarshalBinary implements the encoding.BinaryMarshaler interface.
@@ -394,6 +391,13 @@ func (a *Amount) Scan(src any) error {
 var (
 	decimalContextPrecision19 = apd.BaseContext.WithPrecision(19)
 	decimalContextPrecision39 = apd.BaseContext.WithPrecision(39)
+
+	roundersByMode = map[RoundingMode]apd.Rounder{
+		RoundHalfDown: apd.RoundHalfDown,
+		RoundUp:       apd.RoundUp,
+		RoundDown:     apd.RoundDown,
+		RoundHalfEven: apd.RoundHalfEven,
+	}
 )
 
 // decimalContext returns the decimal context to use for a calculation.
@@ -416,14 +420,8 @@ func roundingContext(decimal *apd.Decimal, mode RoundingMode) *apd.Context {
 		return decimalContext(decimal)
 	}
 
-	extModes := map[RoundingMode]apd.Rounder{
-		RoundHalfDown: apd.RoundHalfDown,
-		RoundUp:       apd.RoundUp,
-		RoundDown:     apd.RoundDown,
-		RoundHalfEven: apd.RoundHalfEven,
-	}
 	ctx := *decimalContext(decimal)
-	ctx.Rounding = extModes[mode]
+	ctx.Rounding = roundersByMode[mode]
 
 	return &ctx
 }
