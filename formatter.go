@@ -85,9 +85,21 @@ func (f *Formatter) Locale() Locale {
 
 // Format formats a currency amount.
 func (f *Formatter) Format(amount Amount) string {
+	// Round to the display precision up front, so the sign and pattern match
+	// the digits that are actually shown. Otherwise an amount that rounds to
+	// zero (e.g. "-0.001" with two fraction digits) would still be treated as
+	// negative, producing a spurious minus sign ("-$0.00" instead of "$0.00").
+	maxDigits := f.MaxDigits
+	if maxDigits == DefaultDigits {
+		maxDigits, _ = GetDigits(amount.CurrencyCode())
+	}
+	amount = amount.RoundTo(maxDigits, f.RoundingMode)
 	pattern := f.getPattern(amount)
-	if amount.IsNegative() {
-		// The minus sign will be provided by the pattern.
+	if amount.number.Negative {
+		// Drop the negative sign from the number itself; the minus sign (for a
+		// genuinely negative amount) is provided by the pattern. This also
+		// strips the leftover sign from a negative value that rounded to zero,
+		// which would otherwise leak a "-" into the formatted digits.
 		amount, _ = amount.Mul("-1")
 	}
 	formattedNumber := f.formatNumber(amount)
