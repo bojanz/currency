@@ -4,10 +4,7 @@
 // Package currency handles currency amounts, provides currency information and formatting.
 package currency
 
-import (
-	"slices"
-	"sort"
-)
+import "strings"
 
 // DefaultDigits is a placeholder for each currency's number of fraction digits.
 const DefaultDigits uint8 = 255
@@ -71,7 +68,7 @@ func GetSymbol(currencyCode string, locale Locale) (symbol string, ok bool) {
 	for {
 		localeID := locale.String()
 		for _, s := range symbols {
-			if contains(s.locales, localeID) {
+			if containsLocale(s.locales, localeID) {
 				symbol = s.symbol
 				break
 			}
@@ -113,14 +110,25 @@ func getFormat(locale Locale) currencyFormat {
 	return format
 }
 
-// contains returns whether the sorted slice a contains x.
-// The slice must be sorted in ascending order.
-func contains(a []string, x string) bool {
-	if n := len(a); n > 7 {
-		i := sort.SearchStrings(a, x)
-		return i < n && a[i] == x
+// containsLocale returns whether the space-separated list contains localeID.
+//
+// An empty localeID is never contained.
+func containsLocale(list, localeID string) bool {
+	if localeID == "" {
+		return false
 	}
-	return slices.Contains(a, x)
+	for i := 0; ; {
+		j := strings.Index(list[i:], localeID)
+		if j < 0 {
+			return false
+		}
+		// Confirm the match spans a whole entry, so that "en" doesn't match "en-AU".
+		start, end := i+j, i+j+len(localeID)
+		if (start == 0 || list[start-1] == ' ') && (end == len(list) || list[end] == ' ') {
+			return true
+		}
+		i = start + 1
+	}
 }
 
 // Definition contains information for registering a currency.
@@ -155,7 +163,7 @@ func Register(currencyCode string, d Definition) {
 
 	if d.DefaultSymbol != "" {
 		currencySymbols[currencyCode] = []symbolInfo{
-			{symbol: d.DefaultSymbol, locales: []string{"en"}},
+			{symbol: d.DefaultSymbol, locales: "en"},
 		}
 	}
 }

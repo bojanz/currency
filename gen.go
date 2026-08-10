@@ -54,7 +54,7 @@ type currencyInfo struct {
 
 type symbolInfo struct {
 	symbol  string
-	locales []string
+	locales string
 }
 
 type currencyFormat struct {
@@ -115,7 +115,7 @@ type symbolInfo struct {
 }
 
 func (s symbolInfo) GoString() string {
-	return fmt.Sprintf("{%q, %#v}", s.symbol, s.locales)
+	return fmt.Sprintf("{%q, %q}", s.symbol, strings.Join(s.locales, " "))
 }
 
 type symbolInfoSlice []*symbolInfo
