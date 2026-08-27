@@ -17,7 +17,6 @@ import (
 	"reflect"
 	"regexp"
 	"slices"
-	"sort"
 	"strconv"
 	"strings"
 	"text/template"
@@ -212,7 +211,7 @@ func main() {
 	for currencyCode := range currencies {
 		currencyCodes = append(currencyCodes, currencyCode)
 	}
-	sort.Strings(currencyCodes)
+	slices.Sort(currencyCodes)
 
 	g10Currencies := []string{
 		"AUD", "CAD", "CHF", "EUR", "GBP", "JPY", "NOK", "NZD", "SEK", "USD",
@@ -500,7 +499,7 @@ func generateSymbols(currencies map[string]*currencyInfo, locales []string, dir 
 					symbols[currencyCode][symbol] = append(symbols[currencyCode][symbol], localeID)
 				}
 			}
-			sort.Strings(symbols[currencyCode][symbol])
+			slices.Sort(symbols[currencyCode][symbol])
 		}
 	}
 
@@ -518,7 +517,7 @@ func generateSymbols(currencies map[string]*currencyInfo, locales []string, dir 
 		for symbol := range localSymbols {
 			symbolKeys = append(symbolKeys, symbol)
 		}
-		sort.Strings(symbolKeys)
+		slices.Sort(symbolKeys)
 		for _, symbol := range symbolKeys {
 			locales := symbols[currencyCode][symbol]
 			if !slices.Contains(locales, "en") {
@@ -814,11 +813,9 @@ func exportMap(v reflect.Value, width int, indent string) string {
 	for _, k := range v.MapKeys() {
 		key := k.Interface().(string)
 		keys = append(keys, key)
-		if len(key) > maxKeyLen {
-			maxKeyLen = len(key)
-		}
+		maxKeyLen = max(maxKeyLen, len(key))
 	}
-	sort.Strings(keys)
+	slices.Sort(keys)
 
 	b := strings.Builder{}
 	i := 0
@@ -846,7 +843,7 @@ func exportMap(v reflect.Value, width int, indent string) string {
 
 func exportSlice(v reflect.Value, width int, indent string) string {
 	b := strings.Builder{}
-	for i := 0; i < v.Len(); i++ {
+	for i := range v.Len() {
 		fmt.Fprintf(&b, `%#v,`, v.Index(i).Interface())
 		if i+1 != v.Len() {
 			if (i+1)%width == 0 {

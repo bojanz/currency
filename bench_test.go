@@ -8,106 +8,82 @@ import (
 	"github.com/bojanz/currency"
 )
 
-var result currency.Amount
-var cmpResult int
-var boolResult bool
-
 func BenchmarkNewAmount(b *testing.B) {
-	var z currency.Amount
-	for n := 0; n < b.N; n++ {
-		z, _ = currency.NewAmount("99.99", "EUR")
+	for b.Loop() {
+		currency.NewAmount("99.99", "EUR")
 	}
-	result = z
 }
 
 func BenchmarkNewAmountFromBigInt(b *testing.B) {
 	x := big.NewInt(9999)
 
-	var z currency.Amount
-	for n := 0; n < b.N; n++ {
-		z, _ = currency.NewAmountFromBigInt(x, "EUR")
+	for b.Loop() {
+		currency.NewAmountFromBigInt(x, "EUR")
 	}
-	result = z
 }
 
 func BenchmarkNewAmountFromInt64(b *testing.B) {
-	var z currency.Amount
-	for n := 0; n < b.N; n++ {
-		z, _ = currency.NewAmountFromInt64(9999, "EUR")
+	for b.Loop() {
+		currency.NewAmountFromInt64(9999, "EUR")
 	}
-	result = z
 }
 
 func BenchmarkAmount_Add(b *testing.B) {
 	x, _ := currency.NewAmount("34.99", "USD")
 	y, _ := currency.NewAmount("12.99", "USD")
 
-	var z currency.Amount
-	for n := 0; n < b.N; n++ {
-		z, _ = x.Add(y)
+	for b.Loop() {
+		x.Add(y)
 	}
-	result = z
 }
 
 func BenchmarkAmount_Sub(b *testing.B) {
 	x, _ := currency.NewAmount("34.99", "USD")
 	y, _ := currency.NewAmount("12.99", "USD")
 
-	var z currency.Amount
-	for n := 0; n < b.N; n++ {
-		z, _ = x.Sub(y)
+	for b.Loop() {
+		x.Sub(y)
 	}
-	result = z
 }
 
 func BenchmarkAmount_Mul(b *testing.B) {
 	x, _ := currency.NewAmount("34.99", "USD")
 
-	var z currency.Amount
-	for n := 0; n < b.N; n++ {
-		z, _ = x.Mul("2")
+	for b.Loop() {
+		x.Mul("2")
 	}
-	result = z
 }
 
 func BenchmarkAmount_MulDec(b *testing.B) {
 	x, _ := currency.NewAmount("34.99", "USD")
 
-	var z currency.Amount
-	for n := 0; n < b.N; n++ {
-		z, _ = x.Mul("2.5")
+	for b.Loop() {
+		x.Mul("2.5")
 	}
-	result = z
 }
 
 func BenchmarkAmount_Div(b *testing.B) {
 	x, _ := currency.NewAmount("34.99", "USD")
 
-	var z currency.Amount
-	for n := 0; n < b.N; n++ {
-		z, _ = x.Div("2")
+	for b.Loop() {
+		x.Div("2")
 	}
-	result = z
 }
 
 func BenchmarkAmount_DivDec(b *testing.B) {
 	x, _ := currency.NewAmount("34.99", "USD")
 
-	var z currency.Amount
-	for n := 0; n < b.N; n++ {
-		z, _ = x.Div("2.5")
+	for b.Loop() {
+		x.Div("2.5")
 	}
-	result = z
 }
 
 func BenchmarkAmount_Round(b *testing.B) {
 	x, _ := currency.NewAmount("34.9876", "USD")
 
-	var z currency.Amount
-	for n := 0; n < b.N; n++ {
-		z = x.Round()
+	for b.Loop() {
+		x.Round()
 	}
-	result = z
 }
 
 func BenchmarkAmount_RoundTo(b *testing.B) {
@@ -121,11 +97,9 @@ func BenchmarkAmount_RoundTo(b *testing.B) {
 
 	for _, roundingMode := range roundingModes {
 		b.Run(fmt.Sprintf("rounding_mode_%d", roundingMode), func(b *testing.B) {
-			var z currency.Amount
-			for n := 0; n < b.N; n++ {
-				z = x.RoundTo(2, roundingMode)
+			for b.Loop() {
+				x.RoundTo(2, roundingMode)
 			}
-			result = z
 		})
 	}
 }
@@ -134,39 +108,31 @@ func BenchmarkAmount_Cmp(b *testing.B) {
 	x, _ := currency.NewAmount("34.99", "USD")
 	y, _ := currency.NewAmount("12.99", "USD")
 
-	var z int
-	for n := 0; n < b.N; n++ {
-		z, _ = x.Cmp(y)
+	for b.Loop() {
+		x.Cmp(y)
 	}
-	cmpResult = z
 }
 
 func BenchmarkAmount_IsPositive(b *testing.B) {
 	x, _ := currency.NewAmount("34.99", "USD")
 
-	var v bool
-	for n := 0; n < b.N; n++ {
-		v = x.IsPositive()
+	for b.Loop() {
+		x.IsPositive()
 	}
-	boolResult = v
 }
 
 func BenchmarkAmount_IsNegative(b *testing.B) {
 	x, _ := currency.NewAmount("-12.00", "USD")
 
-	var v bool
-	for n := 0; n < b.N; n++ {
-		v = x.IsNegative()
+	for b.Loop() {
+		x.IsNegative()
 	}
-	boolResult = v
 }
 
 func BenchmarkAmount_IsZero(b *testing.B) {
 	x, _ := currency.NewAmount("0.00", "USD")
 
-	var v bool
-	for n := 0; n < b.N; n++ {
-		v = x.IsZero()
+	for b.Loop() {
+		x.IsZero()
 	}
-	boolResult = v
 }

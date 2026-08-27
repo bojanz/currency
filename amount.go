@@ -365,9 +365,7 @@ func (a *Amount) Scan(src any) error {
 		return nil
 	}
 	input = strings.Trim(input, "()")
-	values := strings.Split(input, ",")
-	n := values[0]
-	currencyCode := values[1]
+	n, currencyCode, _ := strings.Cut(input, ",")
 	number := apd.Decimal{}
 	if _, _, err := number.SetString(n); err != nil {
 		return InvalidNumberError{n}

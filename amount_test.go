@@ -597,15 +597,13 @@ func TestAmount_RoundToWithConcurrency(t *testing.T) {
 	}
 
 	for _, roundingMode := range roundingModes {
-		roundingMode := roundingMode
-
 		t.Run(fmt.Sprintf("rounding_mode_%d", roundingMode), func(t *testing.T) {
 			t.Parallel()
 
 			var allDone sync.WaitGroup
 			allDone.Add(n)
 
-			for i := 0; i < n; i++ {
+			for range n {
 				go func() {
 					defer allDone.Done()
 					amount, _ := currency.NewAmount("10.99", "EUR")

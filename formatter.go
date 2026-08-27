@@ -4,6 +4,7 @@
 package currency
 
 import (
+	"slices"
 	"strconv"
 	"strings"
 	"unicode"
@@ -196,12 +197,8 @@ func (f *Formatter) formatNumber(amount Amount) string {
 		maxDigits, _ = GetDigits(amount.CurrencyCode())
 	}
 	amount = amount.RoundTo(maxDigits, f.RoundingMode)
-	numberParts := strings.Split(amount.Number(), ".")
-	majorDigits := f.groupMajorDigits(numberParts[0])
-	minorDigits := ""
-	if len(numberParts) == 2 {
-		minorDigits = numberParts[1]
-	}
+	majorDigits, minorDigits, _ := strings.Cut(amount.Number(), ".")
+	majorDigits = f.groupMajorDigits(majorDigits)
 	if minDigits < maxDigits {
 		// Strip any trailing zeroes.
 		minorDigits = strings.TrimRight(minorDigits, "0")
@@ -259,16 +256,11 @@ func (f *Formatter) groupMajorDigits(majorDigits string) string {
 	var groups []string
 	groups = append(groups, majorDigits[numDigits-primarySize:numDigits])
 	for i := numDigits - primarySize; i > 0; i = i - secondarySize {
-		low := i - secondarySize
-		if low < 0 {
-			low = 0
-		}
+		low := max(i-secondarySize, 0)
 		groups = append(groups, majorDigits[low:i])
 	}
 	// Reverse the groups and reconstruct the digits.
-	for i, j := 0, len(groups)-1; i < j; i, j = i+1, j-1 {
-		groups[i], groups[j] = groups[j], groups[i]
-	}
+	slices.Reverse(groups)
 	majorDigits = strings.Join(groups, f.format.groupingSeparator)
 
 	return majorDigits
