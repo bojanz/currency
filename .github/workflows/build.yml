@@ -7,7 +7,7 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v6
         with:
-          go-version: 1.25.x
+          go-version: 1.27.x
 
       - name: Install tools
         run: |
@@ -38,7 +38,7 @@ jobs:
   test:
     strategy:
       matrix:
-        go: ['1.26', '1.25', '1.24']
+        go: ['1.27', '1.26', '1.25']
     name: test @ Go ${{ matrix.go }}
     runs-on: ubuntu-latest
     steps:
