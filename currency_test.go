@@ -236,4 +236,14 @@ func Test_Register_OverrideExisting(t *testing.T) {
 	if symbol != "$$" {
 		t.Errorf("got %v, want $$", symbol)
 	}
+
+	n := 0
+	for _, currencyCode := range currency.GetCurrencyCodes() {
+		if currencyCode == "CAD" {
+			n++
+		}
+	}
+	if n != 1 {
+		t.Errorf("got %v occurrences of CAD in GetCurrencyCodes(), want 1", n)
+	}
 }
