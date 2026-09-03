@@ -18,6 +18,7 @@ Backstory: https://bojanz.github.io/price-currency-handling-go/
 ```go
     amount, _ := currency.NewAmount("275.98", "EUR")
     total, _ := amount.Mul("4")
+    installments, _ := total.Split(3) // 367.98, 367.97, 367.97
 
     locale := currency.NewLocale("fr")
     formatter := currency.NewFormatter(locale)

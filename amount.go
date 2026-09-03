@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/big"
+	"slices"
 	"strings"
 
 	"github.com/cockroachdb/apd/v3"
@@ -221,6 +222,75 @@ func (a Amount) Div(n string) (Amount, error) {
 	result.Reduce(&result)
 
 	return Amount{result, a.currencyCode}, nil
+}
+
+// Split divides a into n parts that are as equal as possible.
+// It is a shortcut for Allocate with n equal ratios.
+func (a Amount) Split(n int) ([]Amount, error) {
+	if n < 1 {
+		return nil, fmt.Errorf("split count must be positive, got %d", n)
+	}
+	return a.Allocate(slices.Repeat([]int{1}, n)...)
+}
+
+// Allocate divides a into parts proportional to the given ratios.
+//
+// Ratios must be non-negative, and at least one must be positive.
+// Any remainder is distributed one smallest unit at a time, in order,
+// among parts with a non-zero ratio, ensuring that the parts add up to a.
+func (a Amount) Allocate(ratios ...int) ([]Amount, error) {
+	// Using apd.BigInt cause unreasonably large ratios could overflow an int.
+	var total, ratioValue apd.BigInt
+	for _, r := range ratios {
+		if r < 0 {
+			return nil, fmt.Errorf("ratio must not be negative, got %d", r)
+		}
+		ratioValue.SetInt64(int64(r))
+		total.Add(&total, &ratioValue)
+	}
+	if total.Sign() == 0 {
+		return nil, fmt.Errorf("ratios must sum to a positive number, got %v", ratios)
+	}
+
+	digits, _ := GetDigits(a.currencyCode)
+	exponent := min(-int32(digits), a.number.Exponent)
+	coeff := new(apd.BigInt).Set(&a.number.Coeff)
+	// Convert the amount to whole smallest units (for example, 100 USD becomes 10000 cents).
+	shift := int64(a.number.Exponent) - int64(exponent)
+	if shift > 0 {
+		var power apd.BigInt
+		power.Exp(apd.NewBigInt(10), apd.NewBigInt(shift), nil)
+		coeff.Mul(coeff, &power)
+	}
+	remainder := new(apd.BigInt).Set(coeff)
+	parts := make([]Amount, len(ratios))
+	for i, r := range ratios {
+		part := &parts[i].number.Coeff
+		part.SetInt64(int64(r))
+		part.Mul(part, coeff)
+		part.Quo(part, &total)
+		remainder.Sub(remainder, part)
+		parts[i].number.Exponent = exponent
+		parts[i].currencyCode = a.currencyCode
+	}
+	one := apd.NewBigInt(1)
+	// Give each leftover smallest unit to the next part with a non-zero ratio.
+	for i, r := range ratios {
+		if remainder.Sign() == 0 {
+			break
+		}
+		if r != 0 {
+			parts[i].number.Coeff.Add(&parts[i].number.Coeff, one)
+			remainder.Sub(remainder, one)
+		}
+	}
+	if a.number.Negative {
+		for i := range parts {
+			parts[i].number.Neg(&parts[i].number)
+		}
+	}
+
+	return parts, nil
 }
 
 // Round is a shortcut for RoundTo(currency.DefaultDigits, currency.RoundHalfUp).

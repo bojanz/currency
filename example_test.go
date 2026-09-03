@@ -108,6 +108,28 @@ func ExampleAmount_Div() {
 	// Output: 33.33 USD
 }
 
+func ExampleAmount_Split() {
+	amount, _ := currency.NewAmount("10.00", "USD")
+	parts, _ := amount.Split(3)
+	for _, part := range parts {
+		fmt.Println(part)
+	}
+	// Output: 3.34 USD
+	// 3.33 USD
+	// 3.33 USD
+}
+
+func ExampleAmount_Allocate() {
+	amount, _ := currency.NewAmount("100.00", "USD")
+	parts, _ := amount.Allocate(1, 2, 3)
+	for _, part := range parts {
+		fmt.Println(part)
+	}
+	// Output: 16.67 USD
+	// 33.33 USD
+	// 50.00 USD
+}
+
 func ExampleAmount_Round() {
 	firstAmount, _ := currency.NewAmount("12.345", "USD")
 	secondAmount, _ := currency.NewAmount("12.345", "JPY")

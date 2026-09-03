@@ -6,6 +6,7 @@ package currency_test
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 	"math/big"
 	"sync"
 	"testing"
@@ -482,6 +483,103 @@ func TestAmount_Div(t *testing.T) {
 	}
 	if e.String() != "18446744073709551614 USD" {
 		t.Errorf("got %v, want 18446744073709551614 USD", e.String())
+	}
+}
+
+func TestAmount_Split(t *testing.T) {
+	a, _ := currency.NewAmount("99.99", "USD")
+
+	for _, n := range []int{0, -1} {
+		if _, err := a.Split(n); err == nil {
+			t.Errorf("Split(%d): expected an error", n)
+		}
+	}
+
+	tests := []struct {
+		n    int
+		want []string
+	}{
+		{1, []string{"99.99"}},
+		{2, []string{"50.00", "49.99"}},
+		{7, []string{"14.29", "14.29", "14.29", "14.28", "14.28", "14.28", "14.28"}},
+	}
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("%d", tt.n), func(t *testing.T) {
+			parts, err := a.Split(tt.n)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			assertParts(t, a, parts, tt.want)
+		})
+	}
+}
+
+func TestAmount_Allocate(t *testing.T) {
+	a, _ := currency.NewAmount("99.99", "USD")
+
+	for _, ratios := range [][]int{{}, {0, 0}, {1, -1}} {
+		if _, err := a.Allocate(ratios...); err == nil {
+			t.Errorf("Allocate(%v): expected an error", ratios)
+		}
+	}
+
+	tests := []struct {
+		number       string
+		currencyCode string
+		ratios       []int
+		want         []string
+	}{
+		{"99.99", "USD", []int{1}, []string{"99.99"}},
+		{"100", "USD", []int{1, 1, 1}, []string{"33.34", "33.33", "33.33"}},
+		{"100", "USD", []int{70, 30}, []string{"70.00", "30.00"}},
+		{"0.05", "USD", []int{70, 30}, []string{"0.04", "0.01"}},
+		{"100", "USD", []int{1, 2, 3}, []string{"16.67", "33.33", "50.00"}},
+		{"0", "USD", []int{1, 2, 3}, []string{"0.00", "0.00", "0.00"}},
+		// Zero ratios get nothing, including the remainder.
+		{"0.05", "USD", []int{0, 1, 1}, []string{"0.00", "0.03", "0.02"}},
+		{"-100", "USD", []int{1, 1, 1}, []string{"-33.34", "-33.33", "-33.33"}},
+		{"-0.02", "USD", []int{1, 1, 1}, []string{"-0.01", "-0.01", "0.00"}},
+		// Currencies with 0 and 3 fraction digits.
+		{"100", "JPY", []int{1, 1, 1}, []string{"34", "33", "33"}},
+		{"100", "KWD", []int{1, 1, 1}, []string{"33.334", "33.333", "33.333"}},
+		// Amounts with more fraction digits than the currency keep their precision.
+		{"10.005", "USD", []int{1, 2}, []string{"3.335", "6.670"}},
+		{"1E+2", "USD", []int{1, 1, 1}, []string{"33.34", "33.33", "33.33"}},
+		// A ratio total larger than math.MaxInt must not overflow.
+		{"100", "USD", []int{math.MaxInt, 1}, []string{"100.00", "0.00"}},
+		// An amount equal to math.MaxInt64.
+		{"9223372036854775807", "USD", []int{1, 2}, []string{"3074457345618258602.34", "6148914691236517204.66"}},
+	}
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("%s %s / %v", tt.number, tt.currencyCode, tt.ratios), func(t *testing.T) {
+			a, _ := currency.NewAmount(tt.number, tt.currencyCode)
+			parts, err := a.Allocate(tt.ratios...)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			assertParts(t, a, parts, tt.want)
+		})
+	}
+}
+
+// assertParts checks the parts against the expected numbers and confirms that they add up to a.
+func assertParts(t *testing.T, a currency.Amount, parts []currency.Amount, want []string) {
+	t.Helper()
+	if len(parts) != len(want) {
+		t.Fatalf("got %d parts, want %d", len(parts), len(want))
+	}
+	sum := currency.Amount{}
+	for i, part := range parts {
+		if part.Number() != want[i] {
+			t.Errorf("part %d: got %v, want %v", i, part.Number(), want[i])
+		}
+		if part.CurrencyCode() != a.CurrencyCode() {
+			t.Errorf("part %d: got %v, want %v", i, part.CurrencyCode(), a.CurrencyCode())
+		}
+		sum, _ = sum.Add(part)
+	}
+	if !sum.Equal(a) {
+		t.Errorf("parts add up to %v, want %v", sum, a)
 	}
 }
 
