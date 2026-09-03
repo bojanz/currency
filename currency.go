@@ -155,11 +155,14 @@ func Register(currencyCode string, d Definition) {
 		return
 	}
 
+	if _, ok := currencies[currencyCode]; !ok {
+		// Overriding an existing currency must not duplicate its code.
+		currencyCodes = append(currencyCodes, currencyCode)
+	}
 	currencies[currencyCode] = currencyInfo{
 		numericCode: d.NumericCode,
 		digits:      d.Digits,
 	}
-	currencyCodes = append(currencyCodes, currencyCode)
 
 	if d.DefaultSymbol != "" {
 		currencySymbols[currencyCode] = []symbolInfo{
