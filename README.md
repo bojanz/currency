@@ -70,7 +70,7 @@ Amount structs can be compared via [google/go-cmp](https://github.com/google/go-
 
 ### Usable with a PostgreSQL composite type.
 
-Thanks to the driver.Valuer and sql.Scanner interfaces, applications using the [pgx](https://github.com/jackc/pgx) driver can store amounts in a composite type.
+Thanks to the driver.Valuer and sql.Scanner interfaces, applications using the [pgx](https://github.com/jackc/pgx) or [pq](https://github.com/lib/pq) drivers can store amounts in a composite type.
 
 Example schema:
 ```

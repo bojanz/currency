@@ -424,9 +424,12 @@ func (a Amount) Value() (driver.Value, error) {
 
 // Scan implements the database/sql.Scanner interface.
 //
-// Allows scanning amounts from a PostgreSQL composite type.
+// Allows scanning amounts from a PostgreSQL composite type, as string or []byte.
 func (a *Amount) Scan(src any) error {
 	// Wire format: "(9.99,USD)".
+	if b, ok := src.([]byte); ok {
+		src = string(b)
+	}
 	input, ok := src.(string)
 	if !ok {
 		return fmt.Errorf("value is not a string: %v", src)

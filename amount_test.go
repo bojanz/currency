@@ -1040,3 +1040,16 @@ func TestAmount_ScanNonString(t *testing.T) {
 		t.Errorf("error: got %v, want %v", errStr, wantError)
 	}
 }
+
+func TestAmount_ScanBytes(t *testing.T) {
+	var a currency.Amount
+	if err := a.Scan([]byte("(0.00000,EUR)")); err != nil {
+		t.Fatal(err)
+	}
+	if a.Number() != "0.00000" {
+		t.Errorf("number: got %v, want 0.00000", a.Number())
+	}
+	if a.CurrencyCode() != "EUR" {
+		t.Errorf("currency code: got %v, want EUR", a.CurrencyCode())
+	}
+}
