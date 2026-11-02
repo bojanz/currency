@@ -228,6 +228,44 @@ func TestFormatter_Digits(t *testing.T) {
 	}
 }
 
+func TestFormatter_NegativeRoundingToZero(t *testing.T) {
+	// A negative amount that rounds to zero must not keep its minus sign,
+	// neither as a leading "-" nor as accounting-style parentheses.
+	tests := []struct {
+		number          string
+		currencyCode    string
+		localeID        string
+		maxDigits       uint8
+		accountingStyle bool
+		want            string
+	}{
+		// Standard style: "-$0.00" was produced before the fix.
+		{"-0.001", "USD", "en", 2, false, "$0.00"},
+		{"-0.004", "USD", "en", 2, false, "$0.00"},
+		// JPY has 0 fraction digits, so "-0.4" rounds to 0 ("¥-0" before the fix).
+		{"-0.4", "JPY", "en", currency.DefaultDigits, false, "¥0"},
+		// Accounting style: "($0.00)" was produced before the fix.
+		{"-0.004", "USD", "en", 2, true, "$0.00"},
+		// A negative amount that does NOT round to zero keeps its sign.
+		{"-0.006", "USD", "en", 2, false, "-$0.01"},
+		{"-0.006", "USD", "en", 2, true, "($0.01)"},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			amount, _ := currency.NewAmount(tt.number, tt.currencyCode)
+			locale := currency.NewLocale(tt.localeID)
+			formatter := currency.NewFormatter(locale)
+			formatter.MaxDigits = tt.maxDigits
+			formatter.AccountingStyle = tt.accountingStyle
+			got := formatter.Format(amount)
+			if got != tt.want {
+				t.Errorf("got %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestFormatter_RoundingMode(t *testing.T) {
 	tests := []struct {
 		number       string
