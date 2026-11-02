@@ -993,7 +993,7 @@ func TestAmount_Value(t *testing.T) {
 
 func TestAmount_Scan(t *testing.T) {
 	tests := []struct {
-		src              string
+		src              any
 		wantNumber       string
 		wantCurrencyCode string
 		wantError        string
@@ -1004,6 +1004,8 @@ func TestAmount_Scan(t *testing.T) {
 		{"(,USD)", "0", "", `invalid number ""`},
 		{"(0,)", "0", "", ""},
 		{"(0,   )", "0", "", ""},
+		{[]byte("(0.00000,EUR)"), "0.00000", "EUR", ""},
+		{123, "0", "", "value is not a string or []byte: 123"},
 	}
 
 	for _, tt := range tests {
@@ -1024,32 +1026,5 @@ func TestAmount_Scan(t *testing.T) {
 				t.Errorf("error: got %v, want %v", errStr, tt.wantError)
 			}
 		})
-	}
-}
-
-func TestAmount_ScanNonString(t *testing.T) {
-	var a currency.Amount
-	err := a.Scan(123)
-
-	wantError := "value is not a string: 123"
-	errStr := ""
-	if err != nil {
-		errStr = err.Error()
-	}
-	if errStr != wantError {
-		t.Errorf("error: got %v, want %v", errStr, wantError)
-	}
-}
-
-func TestAmount_ScanBytes(t *testing.T) {
-	var a currency.Amount
-	if err := a.Scan([]byte("(0.00000,EUR)")); err != nil {
-		t.Fatal(err)
-	}
-	if a.Number() != "0.00000" {
-		t.Errorf("number: got %v, want 0.00000", a.Number())
-	}
-	if a.CurrencyCode() != "EUR" {
-		t.Errorf("currency code: got %v, want EUR", a.CurrencyCode())
 	}
 }
