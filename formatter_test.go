@@ -84,6 +84,7 @@ func TestFormatter_AccountingStyle(t *testing.T) {
 		{"1234.59", "USD", "en", false, "$1,234.59"},
 		{"-1234.59", "USD", "en", false, "($1,234.59)"},
 		{"1234.59", "USD", "en", true, "+$1,234.59"},
+		{"-0.0000001", "USD", "en", false, "$0.00"},
 
 		// Locale without an accounting pattern.
 		{"1234.59", "EUR", "es", false, "1234,59 €"},
@@ -211,6 +212,11 @@ func TestFormatter_Digits(t *testing.T) {
 		{"59.5", "USD", "en", 2, 3, "$59.50"},
 		{"59.567", "USD", "en", 2, 3, "$59.567"},
 		{"59.5678", "USD", "en", 2, 3, "$59.568"},
+
+		// Negative amounts that round to zero lose their sign.
+		{"-0.004", "USD", "en", currency.DefaultDigits, currency.DefaultDigits, "$0.00"},
+		{"-0.006", "USD", "en", currency.DefaultDigits, currency.DefaultDigits, "-$0.01"},
+		{"-0.4", "JPY", "en", currency.DefaultDigits, currency.DefaultDigits, "¥0"},
 	}
 
 	for _, tt := range tests {
