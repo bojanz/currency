@@ -719,7 +719,7 @@ var currencySymbols = map[string][]symbolInfo{
 		{"$", "bn-IN en en-IN es-419 nl-BQ qu-EC sw-KE"},
 		{"$US", "fr qu"},
 		{"$\u00a0US", "fr-CA"},
-		{"US$", "ak am ar as az bn cs cy en-001 en-CA es es-AR es-CL es-CO es-CU es-DO es-UY eu gu id jv ka kk-Arab ko kok lo mk my ne nl pa pcm pt sd si so sq sr sr-Latn sv sw ta-SG th tk uz vi yue yue-Hans zh zh-Hant"},
+		{"US$", "af-NA ak am ar as az bn cs cy en-001 en-CA es es-AR es-BZ es-CL es-CO es-CU es-DO es-MX es-UY eu gu id jv ka kk-Arab ko kok lo mk ms-BN ms-SG my ne nl pa pcm pt sd si so sq sr sr-Latn sv sw ta-SG th tk uz vi yue yue-Hans zh zh-Hant"},
 		{"щ.д.", "bg"},
 	},
 	"UYU": {
