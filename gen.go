@@ -760,6 +760,8 @@ func generateParentLocales(locales []string, dir string) (map[string]string, err
 	// Dsrt and Shaw are made up scripts.
 	delete(parentLocales, "en-Dsrt")
 	delete(parentLocales, "en-Shaw")
+	// CLDR 49 no longer lists nb, whose data lives under no.
+	parentLocales["nb"] = "no"
 
 	return parentLocales, nil
 }

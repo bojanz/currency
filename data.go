@@ -1061,7 +1061,7 @@ var parentLocales = map[string]string{
 	"es-NI": "es-419", "es-PA": "es-419", "es-PE": "es-419",
 	"es-PR": "es-419", "es-PY": "es-419", "es-SV": "es-419",
 	"es-US": "es-419", "es-UY": "es-419", "es-VE": "es-419",
-	"hi-Latn": "en-IN", "kk-Arab": "en", "nn": "no",
+	"hi-Latn": "en-IN", "kk-Arab": "en", "nb": "no", "nn": "no",
 	"pt-AO": "pt-PT", "pt-CH": "pt-PT", "pt-CV": "pt-PT",
 	"pt-GQ": "pt-PT", "pt-GW": "pt-PT", "pt-LU": "pt-PT",
 	"pt-MO": "pt-PT", "pt-MZ": "pt-PT", "pt-ST": "pt-PT",

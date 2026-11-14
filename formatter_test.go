@@ -394,3 +394,13 @@ func TestEmptyLocale(t *testing.T) {
 		t.Errorf("got %v, want empty locale", got)
 	}
 }
+
+func TestFormatter_Format_Bokmal(t *testing.T) {
+	amount, _ := currency.NewAmount("1234.56", "NOK")
+	for _, locale := range []string{"nb", "nb-NO"} {
+		formatter := currency.NewFormatter(currency.NewLocale(locale))
+		if got, want := formatter.Format(amount), "1\u00a0234,56\u00a0kr"; got != want {
+			t.Errorf("%s: got %q, want %q", locale, got, want)
+		}
+	}
+}
