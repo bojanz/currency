@@ -407,7 +407,12 @@ func (a *Amount) UnmarshalJSON(data []byte) error {
 		return InvalidNumberError{auxNumber}
 	}
 	// Allow the zero value (number=0, currencyCode is empty).
-	if (aux.CurrencyCode == "" && !number.IsZero()) || !IsValid(aux.CurrencyCode) {
+	if aux.CurrencyCode == "" && number.IsZero() {
+		a.number = number
+		a.currencyCode = ""
+		return nil
+	}
+	if aux.CurrencyCode == "" || !IsValid(aux.CurrencyCode) {
 		return InvalidCurrencyCodeError{aux.CurrencyCode}
 	}
 	a.number = number
