@@ -424,17 +424,6 @@ func generateCountryCurrencies(dir string) (map[string]string, error) {
 	return countryCurrencies, nil
 }
 
-// usesSymbol checks whether the locale uses the symbol for a currency
-// other than the given one.
-func usesSymbol(symbols map[string]map[string][]string, currencyCode, symbol, locale string) bool {
-	for otherCode, localSymbols := range symbols {
-		if otherCode != currencyCode && slices.Contains(localSymbols[symbol], locale) {
-			return true
-		}
-	}
-	return false
-}
-
 // generateSymbols generates currency symbols for all locales.
 //
 // Symbols are grouped by locale, and deduplicated by parent.
@@ -574,6 +563,17 @@ func readSymbols(currencies map[string]*currencyInfo, dir string, locale string)
 	}
 
 	return symbols, nil
+}
+
+// usesSymbol checks whether the locale uses the symbol for a currency
+// other than the given one.
+func usesSymbol(symbols map[string]map[string][]string, currencyCode, symbol, locale string) bool {
+	for otherCode, localSymbols := range symbols {
+		if otherCode != currencyCode && slices.Contains(localSymbols[symbol], locale) {
+			return true
+		}
+	}
+	return false
 }
 
 // generateFormats generates currency formats from CLDR data.
