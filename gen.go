@@ -424,6 +424,17 @@ func generateCountryCurrencies(dir string) (map[string]string, error) {
 	return countryCurrencies, nil
 }
 
+// usesSymbol checks whether the locale uses the symbol for a currency
+// other than the given one.
+func usesSymbol(symbols map[string]map[string][]string, currencyCode, symbol, locale string) bool {
+	for otherCode, localSymbols := range symbols {
+		if otherCode != currencyCode && slices.Contains(localSymbols[symbol], locale) {
+			return true
+		}
+	}
+	return false
+}
+
 // generateSymbols generates currency symbols for all locales.
 //
 // Symbols are grouped by locale, and deduplicated by parent.
@@ -466,21 +477,21 @@ func generateSymbols(currencies map[string]*currencyInfo, locales []string, dir 
 				break
 			}
 		}
-		// The logic above results in "en-AU" using the same $ symbol for AUD and USD.
-		// Related: https://unicode-org.atlassian.net/projects/CLDR/issues/CLDR-10710
-		if currencyCode == "USD" {
-			// Move en-AU from symbols["USD"]["$"] to symbols["USD"]["US$"].
-			li := 0
-			for i, locale := range symbols["USD"]["$"] {
-				if locale == "en-AU" {
-					li = i
-					break
-				}
-			}
-			symbols["USD"]["$"] = append(symbols["USD"]["$"][:li], symbols["USD"]["$"][li+1:]...)
-			symbols["USD"]["US$"] = append(symbols["USD"]["US$"], "en-AU")
+	}
+
+	// The logic above results in locales such as "en-AU" and "es-MX" using
+	// the same $ symbol for USD and for their own dollar or peso.
+	// Use US$ for USD in those locales.
+	// Related: https://unicode-org.atlassian.net/projects/CLDR/issues/CLDR-10710
+	var usdLocales []string
+	for _, locale := range symbols["USD"]["$"] {
+		if usesSymbol(symbols, "USD", "$", locale) {
+			symbols["USD"]["US$"] = append(symbols["USD"]["US$"], locale)
+		} else {
+			usdLocales = append(usdLocales, locale)
 		}
 	}
+	symbols["USD"]["$"] = usdLocales
 
 	// Child locales don't need to be listed if the parent is present.
 	for currencyCode, localSymbols := range symbols {

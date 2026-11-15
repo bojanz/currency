@@ -118,6 +118,7 @@ func TestGetSymbol(t *testing.T) {
 		{"USD", currency.NewLocale("en"), "$", true},
 		{"USD", currency.NewLocale("en-US"), "$", true},
 		{"USD", currency.NewLocale("en-AU"), "US$", true},
+		{"USD", currency.NewLocale("es-MX"), "US$", true},
 		{"USD", currency.NewLocale("es"), "US$", true},
 		{"USD", currency.NewLocale("es-ES"), "US$", true},
 		// An empty locale should use "en" data.
