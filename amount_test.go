@@ -883,6 +883,15 @@ func TestAmount_UnmarshalBinary(t *testing.T) {
 	if a.CurrencyCode() != "USD" {
 		t.Errorf("got %v, want USD", a.CurrencyCode())
 	}
+
+	d = []byte("0")
+	err = a.UnmarshalBinary(d)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+	if !a.Equal(currency.Amount{}) {
+		t.Errorf("got %v, want the zero value", a)
+	}
 }
 
 func TestAmount_MarshalJSON(t *testing.T) {

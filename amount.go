@@ -357,6 +357,12 @@ func (a Amount) MarshalBinary() ([]byte, error) {
 
 // UnmarshalBinary implements the encoding.BinaryUnmarshaler interface.
 func (a *Amount) UnmarshalBinary(data []byte) error {
+	// Allow the zero value (number=0, currencyCode is empty).
+	if string(data) == "0" {
+		a.number = apd.Decimal{}
+		a.currencyCode = ""
+		return nil
+	}
 	if len(data) < 3 {
 		return InvalidCurrencyCodeError{string(data)}
 	}
